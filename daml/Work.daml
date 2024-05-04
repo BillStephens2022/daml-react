@@ -1,0 +1,82 @@
+module Work where
+
+import Daml.Script
+
+type WorkProposalId = ContractId WorkProposal
+type WorkContractId = ContractId WorkContract
+data RateType = Hourly | Flat deriving (Eq, Show)
+
+template WorkProposal
+  with
+    client: Party
+    worker: Party
+    jobCategory: Text
+    jobTitle: Text
+    jobDescription: Text
+    note : Text
+    rateType : RateType
+    rateAmount : Decimal
+  where
+    signatory client
+    observer worker
+    choice Propose : WorkProposalId
+        controller client
+        do
+            create this
+    choice ReviseProposal : WorkProposalId
+        with
+            revisedJobCategory : Text
+            revisedJobTitle : Text
+            revisedJobDescription : Text
+            feedbackText : Text
+            adjustedRateType : RateType
+            adjustedRateAmount: Decimal
+        controller client
+        do
+            create this with
+                jobCategory = revisedJobCategory
+                jobTitle = revisedJobTitle
+                jobDescription = revisedJobDescription
+                note = feedbackText
+                rateType = adjustedRateType
+                rateAmount = adjustedRateAmount
+    choice RejectProposal : WorkContractId
+        with
+          feedback : Text
+        controller worker
+        do
+          create this with
+            note = feedback
+
+
+    choice AcceptProposal : WorkContractId
+        controller worker
+        do
+            create WorkContract with
+                contractClient = client
+                contractWorker =  worker
+                contractJobCategory = jobCategory
+                contractJobTitle = jobTitle
+                contractJobDescription = jobDescription
+                contractRateType = rateType
+                contractRateAmount = rateAmount
+
+template WorkContract
+  with
+    contractClient : Party
+    contractWorker : Party
+    contractJobCategory : Text
+    contractJobTitle: Text
+    contractJobDescription : Text
+    contractRateType : RateType
+    contractRateAmount : Decimal
+  where
+        signatory contractClient, contractWorker
+
+
+
+
+            
+
+
+  
