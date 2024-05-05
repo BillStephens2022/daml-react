@@ -88,6 +88,16 @@ const MainView: React.FC = () => {
               />
               {/* USERLIST_END */}
             </Segment>
+            <Segment>
+              <Header as="h2">
+                <Icon name='wrench' />
+                <Header.Content>
+                  Work Requests
+                  <Header.Subheader>My Work Requests</Header.Subheader>
+                </Header.Content>
+              </Header>
+              <Divider />
+            </Segment>
           </Grid.Column>
         </Grid.Row>
       </Grid>
