@@ -8,6 +8,7 @@ import { User } from '@daml.js/daml-react';
 import { publicContext, userContext } from './App';
 import UserList from './UserList';
 import PartyListEdit from './PartyListEdit';
+import WorkRequestForm from './WorkRequestForm';
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
@@ -47,6 +48,17 @@ const MainView: React.FC = () => {
     }
   }
   // FOLLOW_END
+
+  const handleSubmitWorkRequest = (workRequest: any) => {
+    // Here you can handle the submission of the work request data
+    console.log('Work Request Data:', workRequest);
+    setShowModal(false); // Close the modal after submission
+  };
+
+  const handleCancelWorkRequest = () => {
+    setShowModal(false); // Close the modal when cancel is clicked
+  };
+
 
   return (
     <Container>
@@ -104,9 +116,9 @@ const MainView: React.FC = () => {
                 onClose={() => setShowModal(false)}
                 closeIcon
               >
-                <Modal.Header>New Request</Modal.Header>
+                <Modal.Header>New Work Request</Modal.Header>
                 <Modal.Content>
-                  <p>Hello!!</p>
+                  <WorkRequestForm onSubmit={handleSubmitWorkRequest} onCancel={handleCancelWorkRequest} />
                 </Modal.Content>
               </Modal>
             </Segment>
