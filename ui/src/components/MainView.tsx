@@ -1,8 +1,8 @@
 // Copyright (c) 2022 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useMemo } from 'react';
-import { Container, Grid, Header, Icon, Segment, Divider } from 'semantic-ui-react';
+import React, { useState, useMemo } from 'react';
+import { Container, Grid, Header, Icon, Segment, Divider, Button, Modal } from 'semantic-ui-react';
 import { Party } from '@daml/types';
 import { User } from '@daml.js/daml-react';
 import { publicContext, userContext } from './App';
@@ -17,6 +17,7 @@ const MainView: React.FC = () => {
   const myUser = myUserResult.contracts[0]?.payload;
   const allUsers = userContext.useStreamQueries(User.User).contracts;
 // USERS_END
+  const [showModal, setShowModal] = useState(false)
 
   // Sorted list of users that are following the current user
   const followers = useMemo(() =>
@@ -97,6 +98,17 @@ const MainView: React.FC = () => {
                 </Header.Content>
               </Header>
               <Divider />
+              <Button type="button" onClick={() => setShowModal(!showModal)}>New Request</Button>
+              <Modal
+                open={showModal}
+                onClose={() => setShowModal(false)}
+                closeIcon
+              >
+                <Modal.Header>New Request</Modal.Header>
+                <Modal.Content>
+                  <p>Hello!!</p>
+                </Modal.Content>
+              </Modal>
             </Segment>
           </Grid.Column>
         </Grid.Row>
