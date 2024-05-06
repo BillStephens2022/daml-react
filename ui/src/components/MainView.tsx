@@ -5,10 +5,14 @@ import React, { useState, useMemo } from 'react';
 import { Container, Grid, Header, Icon, Segment, Divider, Button, Modal } from 'semantic-ui-react';
 import { Party } from '@daml/types';
 import { User } from '@daml.js/daml-react';
+import { Work } from '@daml.js/daml-react';
 import { publicContext, userContext } from './App';
 import UserList from './UserList';
 import PartyListEdit from './PartyListEdit';
 import WorkRequestForm from './WorkRequestForm';
+import { WorkRequest} from '../types';
+
+
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
@@ -49,10 +53,40 @@ const MainView: React.FC = () => {
   }
   // FOLLOW_END
 
-  const handleSubmitWorkRequest = (workRequest: any) => {
-    // Here you can handle the submission of the work request data
-    console.log('Work Request Data:', workRequest);
-    setShowModal(false); // Close the modal after submission
+   // Function to submit a new work request to the DAML ledger
+   const submitWorkRequest = async (workRequest: WorkRequest) => {
+    try {
+      const workProposal = await ledger.create(Work.WorkProposal, {
+        client: username,
+        worker: workRequest.worker,
+        jobCategory: workRequest.jobCategory,
+        jobTitle: workRequest.jobTitle,
+        jobDescription: workRequest.jobDescription,
+        note: workRequest.note,
+        rateType: workRequest.rateType,
+        rateAmount: workRequest.rateAmount,
+      });
+      console.log("Work proposal created:", workProposal);
+      return true;
+    } catch (error) {
+      alert(`Error creating work proposal:\n${error}`);
+      return false;
+    }
+  };
+
+  // Function to handle submission of work request form
+  const handleSubmitWorkRequest = (workRequest: WorkRequest) => {
+    console.log('Work Request Data:', workRequest as WorkRequest);
+    if (typeof workRequest.rateAmount === 'number') {
+      submitWorkRequest(workRequest)
+        .then((success) => {
+          if (success) {
+            setShowModal(false); // Close the modal after submission
+          }
+        });
+    } else {
+      alert('Invalid rateAmount value');
+    }
   };
 
   const handleCancelWorkRequest = () => {

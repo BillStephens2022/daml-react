@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Dropdown, Button } from 'semantic-ui-react';
-
-type RateType = 'Hourly' | 'Flat';
-
-interface WorkRequest {
-  client: string;
-  worker: string;
-  jobCategory: string;
-  jobTitle: string;
-  jobDescription: string;
-  note: string;
-  rateType: RateType;
-  rateAmount: number;
-}
+import { RateType, WorkRequest } from '../types';
 
 const RateOptions = [
   { key: 'hourly', value: 'Hourly', text: 'Hourly' },
@@ -38,7 +26,8 @@ const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const newValue = name === 'rateAmount' ? parseFloat(value) : value; // Convert value to number for rateAmount
+    setFormData({ ...formData, [name]: newValue });
   };
 
   const handleSubmit = () => {
