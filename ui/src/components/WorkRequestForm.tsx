@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Dropdown, Button } from 'semantic-ui-react';
+import { Form, Input, Dropdown, Button, DropdownProps } from 'semantic-ui-react';
 import { RateType, WorkRequest } from '../types';
 
 const RateOptions = [
@@ -10,11 +10,13 @@ const RateOptions = [
 interface Props {
   onSubmit: (data: WorkRequest) => void;
   onCancel: () => void;
+  username: string;
+  userAliases: string[];
 }
 
-const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
+const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel, username, userAliases }) => {
   const [formData, setFormData] = useState<WorkRequest>({
-    client: '',
+    client: username,
     worker: '',
     jobCategory: '',
     jobTitle: '',
@@ -30,10 +32,21 @@ const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
     setFormData({ ...formData, [name]: newValue });
   };
 
+  const handleWorkerChange = (event: React.SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
+    const { value } = data; // Extract the value from data
+    setFormData({ ...formData, worker: value as string }); // Use value as string
+  };
+
   const handleSubmit = () => {
     console.log("Form Data: ", formData)
     onSubmit(formData);
   };
+
+  const userOptions = userAliases.map(user => ({
+    key: user,
+    value: user,
+    text: user,
+  }));
 
   return (
     
@@ -42,7 +55,7 @@ const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
             <label>Client</label>
             <Input
               name="client"
-              value={formData.client}
+              value={username}
               onChange={handleChange}
               placeholder='Client'
               required
@@ -50,11 +63,13 @@ const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           </Form.Field>
           <Form.Field>
             <label>Worker</label>
-            <Input
+            <Dropdown
               name="worker"
-              value={formData.worker}
-              onChange={handleChange}
-              placeholder='Worker'
+              placeholder='Select Worker'
+              fluid
+              selection
+              options={userOptions}
+              onChange={handleWorkerChange}
               required
             />
           </Form.Field>

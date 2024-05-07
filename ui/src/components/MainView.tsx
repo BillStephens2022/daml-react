@@ -37,6 +37,14 @@ const MainView: React.FC = () => {
     new Map<Party, string>(aliases.contracts.map(({payload}) => [payload.username, payload.alias])),
     [aliases]
   );
+  const allUserAliases = useMemo(() => {
+    const userAliases = new Map();
+    aliases.contracts.forEach(({ payload }) => {
+      userAliases.set(payload.username, payload.alias);
+    });
+    return userAliases;
+  }, [aliases]);
+
   const myUserName = aliases.loading ? 'loading ...' : partyToAlias.get(username) ?? username;
 
   // FOLLOW_BEGIN
@@ -152,7 +160,7 @@ const MainView: React.FC = () => {
               >
                 <Modal.Header>New Work Request</Modal.Header>
                 <Modal.Content>
-                  <WorkRequestForm onSubmit={handleSubmitWorkRequest} onCancel={handleCancelWorkRequest} />
+                  <WorkRequestForm onSubmit={handleSubmitWorkRequest} onCancel={handleCancelWorkRequest} username={myUserName} userAliases={Array.from(allUserAliases.values())} />
                 </Modal.Content>
               </Modal>
             </Segment>
