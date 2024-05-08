@@ -3,10 +3,13 @@
 
 module User where
 
+data UserType = Client | Worker deriving (Eq, Show)
+
 -- MAIN_TEMPLATE_BEGIN
 template User with
     username: Party
     following: [Party]
+    userType: UserType
   where
     signatory username
     observer following

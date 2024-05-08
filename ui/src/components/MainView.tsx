@@ -45,6 +45,7 @@ const MainView: React.FC = () => {
     return userAliases;
   }, [aliases]);
 
+
   const myUserName = aliases.loading ? 'loading ...' : partyToAlias.get(username) ?? username;
 
   // FOLLOW_BEGIN
@@ -101,7 +102,9 @@ const MainView: React.FC = () => {
     setShowModal(false); // Close the modal when cancel is clicked
   };
 
-
+  console.log("Aliases: ", aliases);
+  console.log("All Users", allUsers);
+  
   return (
     <Container>
       <Grid centered columns={2}>
