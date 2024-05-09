@@ -101,7 +101,7 @@ const MainView: React.FC = () => {
         console.error("Worker not found.");
         return false;
       }
-      console.log("WorkerAlias!: ", workerAlias)
+      console.log("WorkerAlias!: ", workerAlias);
       const workerParty = workerAlias.payload.username;
       const workProposal = await ledger.create(Work.WorkProposal, {
         client: username,
@@ -114,7 +114,7 @@ const MainView: React.FC = () => {
         rateAmount: workRequest.rateAmount,
       });
       console.log("Work proposal created:", workProposal);
-   
+
       return true;
     } catch (error) {
       console.error("Error creating work proposal:", error);
@@ -147,7 +147,7 @@ const MainView: React.FC = () => {
 
   return (
     <Container>
-      <Grid centered columns={2}>
+      <Grid centered columns={1}>
         <Grid.Row stretched>
           <Grid.Column>
             <Header
@@ -235,7 +235,7 @@ const MainView: React.FC = () => {
               <Grid columns={3} stackable>
                 {allWorkProposals.map((proposal) => (
                   <Grid.Column key={proposal.contractId}>
-                    <Segment>
+                    <Segment style={{ minWidth: 0, width: 'auto' }}>
                       <Header as="h3">{proposal.payload.jobTitle}</Header>
                       <p>
                         <strong>Client:</strong>{" "}
@@ -263,6 +263,11 @@ const MainView: React.FC = () => {
                         <strong>Rate Amount:</strong>{" "}
                         {proposal.payload.rateAmount}
                       </p>
+                      <Button.Group fluid>
+                        <Button color="blue">Accept</Button>
+                        <Button.Or />
+                        <Button color="red">Reject</Button>
+                      </Button.Group>
                     </Segment>
                   </Grid.Column>
                 ))}
