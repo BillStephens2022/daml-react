@@ -36,7 +36,7 @@ const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel, username, userAl
     const { value } = data; // Extract the value from data
     setFormData({ ...formData, worker: value as string }); // Use value as string
   };
-
+  
   const handleSubmit = () => {
     console.log("Form Data: ", formData)
     onSubmit(formData);

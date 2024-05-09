@@ -61,6 +61,7 @@ const MainView: React.FC = () => {
       ),
     [aliases]
   );
+
   const allUserAliases = useMemo(() => {
     const userAliases = new Map();
     aliases.contracts.forEach(({ payload }) => {
@@ -112,6 +113,7 @@ const MainView: React.FC = () => {
         rateAmount: workRequest.rateAmount,
       });
       console.log("Work proposal created:", workProposal);
+   
       return true;
     } catch (error) {
       console.error("Error creating work proposal:", error);
@@ -139,6 +141,8 @@ const MainView: React.FC = () => {
 
   console.log("Aliases: ", aliases);
   console.log("All Users", users);
+  console.log("allUserAliases: ", allUserAliases);
+  console.log("allWorkProposals: ", allWorkProposals);
 
   return (
     <Container>
@@ -232,10 +236,12 @@ const MainView: React.FC = () => {
                     <Segment>
                       <Header as="h3">{proposal.payload.jobTitle}</Header>
                       <p>
-                        <strong>Client:</strong> {proposal.payload.client}
+                        <strong>Client:</strong>{" "}
+                        {partyToAlias.get(proposal.payload.client) ?? "Unknown"}
                       </p>
                       <p>
-                        <strong>Worker:</strong> {proposal.payload.worker}
+                        <strong>Worker:</strong>{" "}
+                        {partyToAlias.get(proposal.payload.worker) ?? "Unknown"}
                       </p>
                       <p>
                         <strong>Category:</strong>{" "}
