@@ -40,15 +40,6 @@ const MainView: React.FC = () => {
   // USERS_END
   const [showModal, setShowModal] = useState(false);
 
-  // Sorted list of users that are following the current user
-  const followers = useMemo(
-    () =>
-      allUsers
-        .map((user) => user.payload)
-        .filter((user) => user.username !== username)
-        .sort((x, y) => x.username.localeCompare(y.username)),
-    [allUsers, username]
-  );
 
   // Map to translate party identifiers to aliases.
   const partyToAlias = useMemo(
@@ -74,19 +65,6 @@ const MainView: React.FC = () => {
     ? "loading ..."
     : partyToAlias.get(username) ?? username;
 
-  // FOLLOW_BEGIN
-  const ledger = userContext.useLedger();
-
-  const follow = async (userToFollow: Party): Promise<boolean> => {
-    try {
-      await ledger.exerciseByKey(User.User.Follow, username, { userToFollow });
-      return true;
-    } catch (error) {
-      alert(`Unknown error:\n${JSON.stringify(error)}`);
-      return false;
-    }
-  };
-  // FOLLOW_END
 
   // Function to submit a new work request to the DAML ledger
   const submitWorkRequest = async (workRequest: WorkRequest) => {
@@ -165,41 +143,17 @@ const MainView: React.FC = () => {
                 <Icon name="user" />
                 <Header.Content>
                   {myUserName ?? "Loading..."}
-                  <Header.Subheader>Users I'm following</Header.Subheader>
                 </Header.Content>
               </Header>
               <Divider />
-              <PartyListEdit
-                parties={myUser?.following ?? []}
-                partyToAlias={partyToAlias}
-                onAddParty={follow}
-              />
+       
             </Segment>
+           
             <Segment>
               <Header as="h2">
-                <Icon name="globe" />
+                <Icon name="envelope" />
                 <Header.Content>
-                  The Network
-                  <Header.Subheader>
-                    My followers and users they are following
-                  </Header.Subheader>
-                </Header.Content>
-              </Header>
-              <Divider />
-              {/* USERLIST_BEGIN */}
-              <UserList
-                users={followers}
-                partyToAlias={partyToAlias}
-                onFollow={follow}
-              />
-              {/* USERLIST_END */}
-            </Segment>
-            <Segment>
-              <Header as="h2">
-                <Icon name="wrench" />
-                <Header.Content>
-                  Work Requests
-                  <Header.Subheader>My Work Requests</Header.Subheader>
+                  Submit a Work Request
                 </Header.Content>
               </Header>
               <Divider />
@@ -227,8 +181,8 @@ const MainView: React.FC = () => {
               <Header as="h2">
                 <Icon name="wrench" />
                 <Header.Content>
-                  Work Proposals
-                  <Header.Subheader>All Work Proposals</Header.Subheader>
+                  Work Requests
+                  <Header.Subheader>Open Work Requests</Header.Subheader>
                 </Header.Content>
               </Header>
               <Divider />
