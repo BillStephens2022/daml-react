@@ -19,6 +19,7 @@ const MainView: React.FC = () => {
   const username = userContext.useParty();
   const myUserResult = userContext.useStreamFetchByKeys(User.User, () => [username], [username]);
   const aliases = publicContext.useStreamQueries(User.Alias, () => [], []);
+  const users = publicContext.useStreamQueries(User.User, () => [], []);
   const myUser = myUserResult.contracts[0]?.payload;
   const allUsers = userContext.useStreamQueries(User.User).contracts;
 // USERS_END
@@ -65,9 +66,18 @@ const MainView: React.FC = () => {
    // Function to submit a new work request to the DAML ledger
    const submitWorkRequest = async (workRequest: WorkRequest) => {
     try {
+      // Convert worker value to lowercase
+      const workerLowercase = workRequest.worker.toLowerCase();
+      // Find the worker's party
+      const workerAlias = aliases.contracts.find(alias => alias.payload.alias.toLowerCase() === workerLowercase);
+      if (!workerAlias) {
+          console.error("Worker not found.");
+          return false;
+      }
+      const workerParty = workerAlias.payload.public;
       const workProposal = await ledger.create(Work.WorkProposal, {
         client: username,
-        worker: workRequest.worker,
+        worker: workerParty,
         jobCategory: workRequest.jobCategory,
         jobTitle: workRequest.jobTitle,
         jobDescription: workRequest.jobDescription,
@@ -78,7 +88,7 @@ const MainView: React.FC = () => {
       console.log("Work proposal created:", workProposal);
       return true;
     } catch (error) {
-      alert(`Error creating work proposal:\n${error}`);
+      console.error("Error creating work proposal:", error);
       return false;
     }
   };
@@ -103,7 +113,7 @@ const MainView: React.FC = () => {
   };
 
   console.log("Aliases: ", aliases);
-  console.log("All Users", allUsers);
+  console.log("All Users", users);
   
   return (
     <Container>
