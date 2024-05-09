@@ -101,7 +101,8 @@ const MainView: React.FC = () => {
         console.error("Worker not found.");
         return false;
       }
-      const workerParty = workerAlias.payload.public;
+      console.log("WorkerAlias!: ", workerAlias)
+      const workerParty = workerAlias.payload.username;
       const workProposal = await ledger.create(Work.WorkProposal, {
         client: username,
         worker: workerParty,
@@ -217,6 +218,7 @@ const MainView: React.FC = () => {
                     onCancel={handleCancelWorkRequest}
                     username={myUserName}
                     userAliases={Array.from(allUserAliases.values())}
+                    allUserAliases={allUserAliases}
                   />
                 </Modal.Content>
               </Modal>

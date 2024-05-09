@@ -12,9 +12,10 @@ interface Props {
   onCancel: () => void;
   username: string;
   userAliases: string[];
+  allUserAliases: Map<any, any>;
 }
 
-const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel, username, userAliases }) => {
+const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel, username, userAliases, allUserAliases }) => {
   const [formData, setFormData] = useState<WorkRequest>({
     client: username,
     worker: '',
@@ -42,11 +43,14 @@ const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel, username, userAl
     onSubmit(formData);
   };
 
-  const userOptions = userAliases.map(user => ({
-    key: user,
-    value: user,
-    text: user,
+  const userOptions = Array.from(allUserAliases.entries()).map(([partyId, alias]) => ({
+    key: partyId,
+    value: alias,
+    text: alias,
   }));
+
+  console.log("user ALIASES: ", userAliases)
+  console.log("user options: ", userOptions)
 
   return (
     
