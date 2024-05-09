@@ -1,7 +1,6 @@
-module Work where
+-- Work.daml
 
-import Daml.Script
-import DA.Optional
+module Work where
 
 type WorkProposalId = ContractId WorkProposal
 type WorkContractId = ContractId WorkContract
@@ -20,48 +19,43 @@ template WorkProposal
   where
     signatory client
     observer worker
-    choice Propose : WorkProposalId
-        controller client
-        do
-            create this
-    choice ReviseProposal : WorkProposalId
-        with
-            revisedJobCategory : Optional Text
-            revisedJobTitle : Optional Text
-            revisedJobDescription : Optional Text
-            feedbackText : Optional Text
-            adjustedRateType : Optional RateType
-            adjustedRateAmount: Optional Decimal
-        controller client
-        do
-            create this with
-                jobCategory = fromOptional jobCategory revisedJobCategory
-                jobTitle = fromOptional jobTitle revisedJobTitle
-                jobDescription = fromOptional jobDescription revisedJobDescription
-                note = fromOptional note feedbackText
-                rateType = fromOptional rateType adjustedRateType
-                rateAmount = fromOptional rateAmount adjustedRateAmount
-                  
-    choice RejectProposal : WorkProposalId
-        with
-          feedback : Text
-        controller worker
-        do
-          create this with
-            note = feedback
 
-
-    choice AcceptProposal : WorkContractId
+    choice AcceptProposal : ContractId WorkContract
         controller worker
         do
             create WorkContract with
                 contractClient = client
-                contractWorker =  worker
+                contractWorker = worker
                 contractJobCategory = jobCategory
                 contractJobTitle = jobTitle
                 contractJobDescription = jobDescription
                 contractRateType = rateType
                 contractRateAmount = rateAmount
+
+    choice RejectProposal : ContractId WorkProposal
+        with
+            feedback : Text
+        controller worker
+        do
+            create this with note = feedback
+
+    choice ReviseProposal : ContractId WorkProposal
+        with
+            revisedJobCategory : Text
+            revisedJobTitle : Text
+            revisedJobDescription : Text
+            feedbackText : Text
+            adjustedRateType : RateType
+            adjustedRateAmount: Decimal
+        controller client
+        do
+            create this with
+                jobCategory = revisedJobCategory
+                jobTitle = revisedJobTitle
+                jobDescription = revisedJobDescription
+                note = feedbackText
+                rateType = adjustedRateType
+                rateAmount = adjustedRateAmount
 
 template WorkContract
   with
@@ -73,63 +67,4 @@ template WorkContract
     contractRateType : RateType
     contractRateAmount : Decimal
   where
-        signatory contractClient, contractWorker
-
-
-setup : Script ()
-setup = script do
-    -- 1. Set up test users
-    ann <- allocatePartyWithHint "Ann" (PartyIdHint "Ann")
-    schneider <- allocatePartyWithHint "Schneider" (PartyIdHint "Schneider")
-
-    -- 2. Construct user-id's from text
-    annId <- validateUserId "Ann"
-    schneiderId <- validateUserId "Schneider"
-
-    -- 3. Create users with the given rights
-    createUser (User annId (Some ann)) [CanActAs ann]
-    createUser (User schneiderId (Some schneider)) [CanActAs schneider]
-
-    return ()       
-
-testWorkContracts : Script WorkContractId
-testWorkContracts = script do
-    ann <- allocateParty "Ann" 
-    schneider <- allocateParty "Schneider"
-    
-    -- client proposes a job
-    annProposal1 <- submit ann do
-        createCmd WorkProposal with
-            client = ann
-            worker = schneider
-            jobCategory = "Handyman"
-            jobTitle = "Leak in Kitchen Sink"
-            jobDescription = "Fix Leak under Kitchen Sink"
-            note = "Please fix as soon as possible, I can't get it to stop!"
-            rateType = Flat
-            rateAmount = 10.00
-
-
-
-    --- worker rejects job, gives feedback
-    schneiderRejectsProposal <- submit schneider do
-        exerciseCmd annProposal1 RejectProposal
-            with    
-                feedback = "Will gladly fix you leak, but my price is $25.00"
-    
-    -- client revises the terms, and re-proposes
-    annProposal2 <- submit ann do
-        exerciseCmd schneiderRejectsProposal ReviseProposal
-            with
-                revisedJobCategory = None
-                revisedJobTitle = None
-                revisedJobDescription = None
-                adjustedRateAmount = Some 25.00
-                feedbackText = Some "I am Ok with your price!"
-                adjustedRateType = None
-               
-
-    -- worker accepts the revised job proposal
-    submit schneider do
-        exerciseCmd annProposal2 AcceptProposal
-  
+    signatory contractClient, contractWorker
