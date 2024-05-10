@@ -17,21 +17,54 @@ import { Work } from "@daml.js/daml-react";
 type Props = {
   partyToAlias: Map<Party, string>;
   workProposals: readonly CreateEvent<Work.WorkProposal, undefined, string>[];
+  username: string;
+  isWorkerList: boolean;
 };
 
-const WorkList: React.FC<Props> = ({ partyToAlias, workProposals }) => {
+const WorkList: React.FC<Props> = ({
+  partyToAlias,
+  workProposals,
+  username,
+  isWorkerList,
+}) => {
+  // Filter proposals where the current user is the client
+  const clientProposals = workProposals.filter(
+    (proposal) => proposal.payload.client === username
+  );
+
+  // Filter proposals where the current user is the worker
+  const workerProposals = workProposals.filter(
+    (proposal) => proposal.payload.worker === username
+  );
+
+  const workerHeaders = [
+    "Work Proposals to Me",
+    "Please Action- Accept or Reject the Proposal",
+  ];
+  const clientHeaders = [
+    "My Work Proposals to Others",
+    "Pending Worker Approval",
+  ];
+
+  // Determine which headers, proposals to use based on isWorkerList
+  const headersToUse = isWorkerList ? workerHeaders : clientHeaders;
+  const proposalsToUse = isWorkerList ? workerProposals : clientProposals;
+  
+
   return (
     <Segment>
       <Header as="h2">
-        <Icon name="wrench" />
+        {isWorkerList ? (<Icon name="exclamation triangle" color="red" />) : (<Icon name="wrench" color="blue" />) }
         <Header.Content>
-          Work Requests
-          <Header.Subheader>Open Work Requests</Header.Subheader>
+          {headersToUse[0]}
+          <Header.Subheader>
+            {headersToUse[1]}
+          </Header.Subheader>
         </Header.Content>
       </Header>
       <Divider />
       <Grid columns={3} stackable>
-        {workProposals.map((proposal) => (
+        {proposalsToUse.map((proposal) => (
           <Grid.Column key={proposal.contractId}>
             <Segment style={{ minWidth: 0, width: "auto" }}>
               <Header as="h3">{proposal.payload.jobTitle}</Header>
@@ -58,11 +91,11 @@ const WorkList: React.FC<Props> = ({ partyToAlias, workProposals }) => {
               <p>
                 <strong>Rate Amount:</strong> {proposal.payload.rateAmount}
               </p>
-              <Button.Group fluid>
+              {isWorkerList && (<Button.Group fluid>
                 <Button color="blue">Accept</Button>
                 <Button.Or />
                 <Button color="red">Reject</Button>
-              </Button.Group>
+              </Button.Group>)}
             </Segment>
           </Grid.Column>
         ))}

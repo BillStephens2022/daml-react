@@ -174,6 +174,14 @@ const MainView: React.FC = () => {
             <WorkList
               partyToAlias={partyToAlias}
               workProposals={allWorkProposals}
+              username={username}
+              isWorkerList={true}
+            />
+             <WorkList
+              partyToAlias={partyToAlias}
+              workProposals={allWorkProposals}
+              username={username}
+              isWorkerList={false}
             />
           </Grid.Column>
         </Grid.Row>
