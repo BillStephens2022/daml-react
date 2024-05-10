@@ -16,10 +16,9 @@ import { Party } from "@daml/types";
 import { User } from "@daml.js/daml-react";
 import { Work } from "@daml.js/daml-react";
 import { publicContext, userContext } from "./App";
-import UserList from "./UserList";
-import PartyListEdit from "./PartyListEdit";
 import WorkRequestForm from "./WorkRequestForm";
 import { WorkRequest } from "../types";
+import WorkList from "./WorkList";
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
@@ -40,6 +39,7 @@ const MainView: React.FC = () => {
   // USERS_END
   const [showModal, setShowModal] = useState(false);
 
+  const ledger = userContext.useLedger();
 
   // Map to translate party identifiers to aliases.
   const partyToAlias = useMemo(
@@ -64,7 +64,6 @@ const MainView: React.FC = () => {
   const myUserName = aliases.loading
     ? "loading ..."
     : partyToAlias.get(username) ?? username;
-
 
   // Function to submit a new work request to the DAML ledger
   const submitWorkRequest = async (workRequest: WorkRequest) => {
@@ -141,20 +140,15 @@ const MainView: React.FC = () => {
             <Segment>
               <Header as="h2">
                 <Icon name="user" />
-                <Header.Content>
-                  {myUserName ?? "Loading..."}
-                </Header.Content>
+                <Header.Content>{myUserName ?? "Loading..."}</Header.Content>
               </Header>
               <Divider />
-       
             </Segment>
-           
+
             <Segment>
               <Header as="h2">
                 <Icon name="envelope" />
-                <Header.Content>
-                  Submit a Work Request
-                </Header.Content>
+                <Header.Content>Submit a Work Request</Header.Content>
               </Header>
               <Divider />
               <Button type="button" onClick={() => setShowModal(!showModal)}>
@@ -177,56 +171,10 @@ const MainView: React.FC = () => {
                 </Modal.Content>
               </Modal>
             </Segment>
-            <Segment>
-              <Header as="h2">
-                <Icon name="wrench" />
-                <Header.Content>
-                  Work Requests
-                  <Header.Subheader>Open Work Requests</Header.Subheader>
-                </Header.Content>
-              </Header>
-              <Divider />
-              <Grid columns={3} stackable>
-                {allWorkProposals.map((proposal) => (
-                  <Grid.Column key={proposal.contractId}>
-                    <Segment style={{ minWidth: 0, width: 'auto' }}>
-                      <Header as="h3">{proposal.payload.jobTitle}</Header>
-                      <p>
-                        <strong>Client:</strong>{" "}
-                        {partyToAlias.get(proposal.payload.client) ?? "Unknown"}
-                      </p>
-                      <p>
-                        <strong>Worker:</strong>{" "}
-                        {partyToAlias.get(proposal.payload.worker) ?? "Unknown"}
-                      </p>
-                      <p>
-                        <strong>Category:</strong>{" "}
-                        {proposal.payload.jobCategory}
-                      </p>
-                      <p>
-                        <strong>Description:</strong>{" "}
-                        {proposal.payload.jobDescription}
-                      </p>
-                      <p>
-                        <strong>Note:</strong> {proposal.payload.note}
-                      </p>
-                      <p>
-                        <strong>Rate Type:</strong> {proposal.payload.rateType}
-                      </p>
-                      <p>
-                        <strong>Rate Amount:</strong>{" "}
-                        {proposal.payload.rateAmount}
-                      </p>
-                      <Button.Group fluid>
-                        <Button color="blue">Accept</Button>
-                        <Button.Or />
-                        <Button color="red">Reject</Button>
-                      </Button.Group>
-                    </Segment>
-                  </Grid.Column>
-                ))}
-              </Grid>
-            </Segment>
+            <WorkList
+              partyToAlias={partyToAlias}
+              workProposals={allWorkProposals}
+            />
           </Grid.Column>
         </Grid.Row>
       </Grid>
