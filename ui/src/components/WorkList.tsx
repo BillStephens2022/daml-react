@@ -27,6 +27,7 @@ type Props = {
 const WorkList: React.FC<Props> = ({
   partyToAlias,
   workProposals,
+  workContracts,
   username,
   isWorkerList,
   isWorkContract,
@@ -52,15 +53,20 @@ const WorkList: React.FC<Props> = ({
     "Pending Worker Approval",
   ];
 
+  const contractHeaders = [
+    "Accepted Work Contracts",
+    "Active Contracts"
+  ]
+
   // Determine which headers, proposals to use based on isWorkerList
-  const headersToUse = isWorkerList ? workerHeaders : clientHeaders;
-  const proposalsToUse = isWorkerList ? workerProposals : clientProposals;
+  const headersToUse = isWorkContract ? contractHeaders : (isWorkerList ? workerHeaders : clientHeaders);
+  const contractsToUse = isWorkContract ? workContracts : workProposals;
   
 
-  const acceptProposal = async (proposalId: ContractId<Work.WorkProposal>) => {
+  const acceptProposal = async (contractId: ContractId<Work.WorkProposal>) => {
     try {
-      await ledger.exercise(Work.WorkProposal.AcceptProposal, proposalId, {});
-      console.log("Proposal accepted:", proposalId);
+      await ledger.exercise(Work.WorkProposal.AcceptProposal, contractId, {});
+      console.log("Proposal accepted:", contractId);
       // Optionally, you can reload or update the list of proposals after accepting
     } catch (error) {
       console.error("Error accepting proposal:", error);
@@ -82,38 +88,38 @@ const WorkList: React.FC<Props> = ({
       </Header>
       <Divider />
       <Grid columns={3} stackable>
-        {proposalsToUse.map((proposal) => (
-          <Grid.Column key={proposal.contractId}>
+        {contractsToUse.map((contract) => (
+          <Grid.Column key={contract.contractId}>
             <Segment style={{ minWidth: 0, width: "auto" }}>
-              <Header as="h3">{proposal.payload.jobTitle}</Header>
+              <Header as="h3">{isWorkContract ? contract.payload.contractJobTitle : contract.payload.jobTitle}</Header>
               <p>
                 <strong>Client:</strong>{" "}
-                {partyToAlias.get(proposal.payload.client) ?? "Unknown"}
+                {partyToAlias.get(isWorkContract ? contract.payload.contractClient : contract.payload.client) ?? "Unknown"}
               </p>
               <p>
                 <strong>Worker:</strong>{" "}
-                {partyToAlias.get(proposal.payload.worker) ?? "Unknown"}
+                {partyToAlias.get(isWorkContract ? contract.payload.contractWorker : contract.payload.worker) ?? "Unknown"}
               </p>
               <p>
-                <strong>Category:</strong> {proposal.payload.jobCategory}
+                <strong>Category:</strong> {isWorkContract ? contract.payload.contractJobCategory : contract.payload.jobCategory}
               </p>
               <p>
-                <strong>Description:</strong> {proposal.payload.jobDescription}
+                <strong>Description:</strong> {isWorkContract ? contract.payload.contractJobDescription : contract.payload.jobDescription}
               </p>
               <p>
-                <strong>Note:</strong> {proposal.payload.note}
+                <strong>Note:</strong> {isWorkContract ? contract.payload.contractNote : contract.payload.note}
               </p>
               <p>
-                <strong>Rate Type:</strong> {proposal.payload.rateType}
+                <strong>Rate Type:</strong> {isWorkContract ? contract.payload.contractRateType : contract.payload.rateType}
               </p>
               <p>
-                <strong>Rate Amount:</strong> {proposal.payload.rateAmount}
+                <strong>Rate Amount:</strong> {isWorkContract ? contract.payload.contractRateAmount : contract.payload.rateAmount}
               </p>
               {isWorkerList && (
                 <Button.Group fluid>
                   <Button
                     color="blue"
-                    onClick={() => acceptProposal(proposal.contractId)}
+                    onClick={() => acceptProposal(contract.contractId)}
                   >
                     Accept
                   </Button>

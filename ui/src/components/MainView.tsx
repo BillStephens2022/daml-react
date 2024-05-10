@@ -192,6 +192,15 @@ const MainView: React.FC = () => {
               isWorkContract={false}
               ledger={ledger}
             />
+            <WorkList
+              partyToAlias={partyToAlias}
+              workProposals={allWorkProposals}
+              workContracts={allWorkContracts}
+              username={username}
+              isWorkerList={false}
+              isWorkContract={true}
+              ledger={ledger}
+            />
           </Grid.Column>
         </Grid.Row>
       </Grid>
