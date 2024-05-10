@@ -35,6 +35,9 @@ const MainView: React.FC = () => {
   const allWorkProposals = publicContext.useStreamQueries(
     Work.WorkProposal
   ).contracts;
+  const allWorkContracts = publicContext.useStreamQueries(
+    Work.WorkContract
+  ).contracts;
 
   // USERS_END
   const [showModal, setShowModal] = useState(false);
@@ -174,14 +177,20 @@ const MainView: React.FC = () => {
             <WorkList
               partyToAlias={partyToAlias}
               workProposals={allWorkProposals}
+              workContracts={allWorkContracts}
               username={username}
               isWorkerList={true}
+              isWorkContract={false}
+              ledger={ledger}
             />
-             <WorkList
+            <WorkList
               partyToAlias={partyToAlias}
               workProposals={allWorkProposals}
+              workContracts={allWorkContracts}
               username={username}
               isWorkerList={false}
+              isWorkContract={false}
+              ledger={ledger}
             />
           </Grid.Column>
         </Grid.Row>
