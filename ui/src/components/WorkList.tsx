@@ -1,7 +1,7 @@
 // Copyright (c) 2022 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Segment,
   Header,
@@ -13,6 +13,7 @@ import {
 import { ContractId, Party } from "@daml/types";
 import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
+
 
 type Props = {
   partyToAlias: Map<Party, string>;
@@ -33,7 +34,7 @@ const WorkList: React.FC<Props> = ({
   isWorkContract,
   ledger
 }) => {
-  
+  const [showRejectForm, setShowRejectForm] = useState(false);
   // Filter proposals where the current user is the client
   const clientProposals = workProposals.filter(
     (proposal) => proposal.payload.client === username
@@ -58,7 +59,7 @@ const WorkList: React.FC<Props> = ({
     "Active Contracts"
   ]
 
-  // Determine which headers, proposals to use based on isWorkerList
+  // Determine which headers, contracts to use based on isWorkContracct & isWorkerList
   const headersToUse = isWorkContract ? contractHeaders : (isWorkerList ? workerHeaders : clientHeaders);
   const contractsToUse = isWorkContract ? workContracts : workProposals;
   
@@ -72,6 +73,10 @@ const WorkList: React.FC<Props> = ({
       console.error("Error accepting proposal:", error);
     }
   };
+
+  const openRejectForm = (contractId: ContractId<Work.WorkProposal>) => {
+    setShowRejectForm(true);
+  }
 
   return (
     <Segment>
@@ -91,40 +96,40 @@ const WorkList: React.FC<Props> = ({
         {contractsToUse.map((contract) => (
           <Grid.Column key={contract.contractId}>
             <Segment style={{ minWidth: 0, width: "auto" }}>
-              <Header as="h3">{isWorkContract ? contract.payload.contractJobTitle : contract.payload.jobTitle}</Header>
+              <Header as="h3">{isWorkContract ? (contract.payload as Work.WorkContract).contractJobTitle : (contract.payload as Work.WorkProposal).jobTitle}</Header>
               <p>
                 <strong>Client:</strong>{" "}
-                {partyToAlias.get(isWorkContract ? contract.payload.contractClient : contract.payload.client) ?? "Unknown"}
+                {partyToAlias.get(isWorkContract ? (contract.payload as Work.WorkContract).contractClient : (contract.payload as Work.WorkProposal).client) ?? "Unknown"}
               </p>
               <p>
                 <strong>Worker:</strong>{" "}
-                {partyToAlias.get(isWorkContract ? contract.payload.contractWorker : contract.payload.worker) ?? "Unknown"}
+                {partyToAlias.get(isWorkContract ? (contract.payload as Work.WorkContract).contractWorker : (contract.payload as Work.WorkProposal).worker) ?? "Unknown"}
               </p>
               <p>
-                <strong>Category:</strong> {isWorkContract ? contract.payload.contractJobCategory : contract.payload.jobCategory}
+                <strong>Category:</strong> {isWorkContract ? (contract.payload as Work.WorkContract).contractJobCategory : (contract.payload as Work.WorkProposal).jobCategory}
               </p>
               <p>
-                <strong>Description:</strong> {isWorkContract ? contract.payload.contractJobDescription : contract.payload.jobDescription}
+                <strong>Description:</strong> {isWorkContract ? (contract.payload as Work.WorkContract).contractJobDescription : (contract.payload as Work.WorkProposal).jobDescription}
               </p>
               <p>
-                <strong>Note:</strong> {isWorkContract ? contract.payload.contractNote : contract.payload.note}
+                <strong>Note:</strong> {isWorkContract ? null : (contract.payload as Work.WorkProposal).note}
               </p>
               <p>
-                <strong>Rate Type:</strong> {isWorkContract ? contract.payload.contractRateType : contract.payload.rateType}
+                <strong>Rate Type:</strong> {isWorkContract ? (contract.payload as Work.WorkContract).contractRateType : (contract.payload as Work.WorkProposal).rateType}
               </p>
               <p>
-                <strong>Rate Amount:</strong> {isWorkContract ? contract.payload.contractRateAmount : contract.payload.rateAmount}
+                <strong>Rate Amount:</strong> {isWorkContract ? (contract.payload as Work.WorkContract).contractRateAmount : (contract.payload as Work.WorkProposal).rateAmount}
               </p>
               {isWorkerList && (
                 <Button.Group fluid>
                   <Button
                     color="blue"
-                    onClick={() => acceptProposal(contract.contractId)}
+                    onClick={() => acceptProposal((contract.contractId as ContractId<Work.WorkProposal>))}
                   >
                     Accept
                   </Button>
                   <Button.Or />
-                  <Button color="red">Reject</Button>
+                  <Button color="red" onClick={() => openRejectForm(contract.contractId as ContractId<Work.WorkProposal>)}>Reject</Button>
                 </Button.Group>
               )}
             </Segment>
