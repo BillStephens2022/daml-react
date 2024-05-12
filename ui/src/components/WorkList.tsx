@@ -176,7 +176,7 @@ const WorkList: React.FC<Props> = ({
                   ? (contract.payload as Work.WorkContract).contractRateAmount
                   : (contract.payload as Work.WorkProposal).rateAmount}
               </p>
-              {isWorkerList && (
+              {isWorkerList ? (
                 <Button.Group fluid>
                   <Button
                     color="blue"
@@ -200,7 +200,7 @@ const WorkList: React.FC<Props> = ({
                     Reject
                   </Button>
                 </Button.Group>
-              )}
+              ): (isWorkContract ? null : <Button color="yellow">Edit</Button>)}
             </Segment>
           </Grid.Column>
         ))}
