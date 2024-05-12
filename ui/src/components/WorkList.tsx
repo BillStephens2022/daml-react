@@ -61,14 +61,15 @@ const WorkList: React.FC<Props> = ({
   ];
 
   const contractHeaders = ["Accepted Work Contracts", "Active Contracts"];
-
+  
   // Determine which headers, contracts to use based on isWorkContracct & isWorkerList
   const headersToUse = isWorkContract
     ? contractHeaders
     : isWorkerList
     ? workerHeaders
     : clientHeaders;
-  const contractsToUse = isWorkContract ? workContracts : workProposals;
+
+  const contractsToUse = isWorkContract ? workContracts : (isWorkerList ? workerProposals : clientProposals);
 
   const acceptProposal = async (contractId: ContractId<Work.WorkProposal>) => {
     try {
