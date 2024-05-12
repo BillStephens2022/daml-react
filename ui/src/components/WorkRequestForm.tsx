@@ -25,6 +25,7 @@ const WorkRequestForm: React.FC<Props> = ({ onSubmit, onCancel, username, userAl
     note: '',
     rateType: 'Hourly',
     rateAmount: 0,
+    rejected: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

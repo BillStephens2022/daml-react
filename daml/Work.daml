@@ -16,6 +16,7 @@ template WorkProposal
     note : Text
     rateType : RateType
     rateAmount : Decimal
+    rejected : Bool
   where
     signatory client
     observer worker
@@ -37,7 +38,9 @@ template WorkProposal
             feedback : Text
         controller worker
         do
-            create this with note = feedback
+            create this with 
+              note = feedback
+              rejected = True
 
     choice ReviseProposal : ContractId WorkProposal
         with
@@ -56,6 +59,7 @@ template WorkProposal
                 note = feedbackText
                 rateType = adjustedRateType
                 rateAmount = adjustedRateAmount
+                rejected = False
 
 template WorkContract
   with

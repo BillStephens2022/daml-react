@@ -31,6 +31,7 @@ template User with
                 note = note
                 rateType = rateType
                 rateAmount = rateAmount
+                rejected = False
 
 -- ALIAS_BEGIN
 template Alias with

@@ -176,6 +176,12 @@ const WorkList: React.FC<Props> = ({
                   ? (contract.payload as Work.WorkContract).contractRateAmount
                   : (contract.payload as Work.WorkProposal).rateAmount}
               </p>
+              <p>
+                <strong>Status</strong>{" "}
+                {isWorkContract
+                  ? "Accepted"
+                  : (contract.payload as Work.WorkProposal).rejected}
+              </p>
               {isWorkerList ? (
                 <Button.Group fluid>
                   <Button
