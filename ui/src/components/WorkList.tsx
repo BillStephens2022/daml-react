@@ -180,7 +180,7 @@ const WorkList: React.FC<Props> = ({
                 <strong>Status</strong>{" "}
                 {isWorkContract
                   ? "Accepted"
-                  : (contract.payload as Work.WorkProposal).rejected}
+                  : (contract.payload as Work.WorkProposal).rejected ? "Rejected" : "Pending Approval"}
               </p>
               {isWorkerList ? (
                 <Button.Group fluid>

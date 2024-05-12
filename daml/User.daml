@@ -20,6 +20,7 @@ template User with
             note: Text
             rateType: RateType
             rateAmount: Decimal
+            rejected : Bool
         controller username
         do
             create WorkProposal with
@@ -31,7 +32,7 @@ template User with
                 note = note
                 rateType = rateType
                 rateAmount = rateAmount
-                rejected = False
+                rejected = rejected
 
 -- ALIAS_BEGIN
 template Alias with
