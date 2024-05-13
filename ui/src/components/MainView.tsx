@@ -95,7 +95,6 @@ const MainView: React.FC = () => {
         rejected: workRequest.rejected
       });
       console.log("Work proposal created:", workProposal);
-
       return true;
     } catch (error) {
       console.error("Error creating work proposal:", error);

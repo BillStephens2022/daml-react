@@ -15,6 +15,9 @@ import { ContractId, Party } from "@daml/types";
 import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
 import RejectForm from "./RejectForm";
+import WorkRequestForm from "./WorkRequestForm";
+import EditProposalForm from "./EditProposalForm";
+import { WorkRequest } from "../types";
 
 type Props = {
   partyToAlias: Map<Party, string>;
@@ -35,12 +38,19 @@ const WorkList: React.FC<Props> = ({
   isWorkContract,
   ledger,
 }) => {
-    // state for modal showing the Reject Proposal Form
+  // state for modal showing the Reject Proposal Form
   const [showRejectForm, setShowRejectForm] = useState(false);
+  // state for modal showing the Work Request Form - for editing existing request
+  const [showEditProposalForm, setShowEditProposalForm] = useState(false);
   // id of proposal selected
   const [selectedProposalId, setSelectedProposalId] =
     useState<ContractId<Work.WorkProposal> | null>(null);
-
+  // selected proposal to edit
+  const [selectedProposal, setSelectedProposal] = useState<CreateEvent<
+    Work.WorkProposal,
+    undefined,
+    string
+  > | null>(null);
   // Filter proposals where the current user is the client
   const clientProposals = workProposals.filter(
     (proposal) => proposal.payload.client === username
@@ -61,7 +71,7 @@ const WorkList: React.FC<Props> = ({
   ];
 
   const contractHeaders = ["Accepted Work Contracts", "Active Contracts"];
-  
+
   // Determine which headers, contracts to use based on isWorkContracct & isWorkerList
   const headersToUse = isWorkContract
     ? contractHeaders
@@ -69,7 +79,11 @@ const WorkList: React.FC<Props> = ({
     ? workerHeaders
     : clientHeaders;
 
-  const contractsToUse = isWorkContract ? workContracts : (isWorkerList ? workerProposals : clientProposals);
+  const contractsToUse = isWorkContract
+    ? workContracts
+    : isWorkerList
+    ? workerProposals
+    : clientProposals;
 
   const acceptProposal = async (contractId: ContractId<Work.WorkProposal>) => {
     try {
@@ -81,11 +95,23 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
-  const openRejectForm = (
-    contractId: ContractId<Work.WorkProposal>
-  ) => {
+  const openRejectForm = (contractId: ContractId<Work.WorkProposal>) => {
     setSelectedProposalId(contractId); // Set the selected proposal ID
     setShowRejectForm(true);
+  };
+
+  const openEditForm = (contractId: ContractId<Work.WorkProposal>) => {
+    const proposal = workProposals.find(
+      (proposal) => proposal.contractId === contractId
+    );
+
+    if (proposal) {
+      setSelectedProposal(proposal);
+      setSelectedProposalId(contractId);
+      setShowEditProposalForm(true);
+    } else {
+      console.error("Proposal not found");
+    }
   };
 
   const handleRejectProposal = async (feedback: string) => {
@@ -104,6 +130,10 @@ const WorkList: React.FC<Props> = ({
     } catch (error) {
       console.error("Error rejecting proposal:", error);
     }
+  };
+
+  const handleEditProposal = async (formData: any) => {
+    console.log("Edit formData: ", formData);
   };
 
   return (
@@ -180,7 +210,9 @@ const WorkList: React.FC<Props> = ({
                 <strong>Status</strong>{" "}
                 {isWorkContract
                   ? "Accepted"
-                  : (contract.payload as Work.WorkProposal).rejected ? "Rejected" : "Pending Approval"}
+                  : (contract.payload as Work.WorkProposal).rejected
+                  ? "Rejected"
+                  : "Pending Approval"}
               </p>
               {isWorkerList ? (
                 <Button.Group fluid>
@@ -206,7 +238,18 @@ const WorkList: React.FC<Props> = ({
                     Reject
                   </Button>
                 </Button.Group>
-              ): (isWorkContract ? null : <Button color="yellow">Edit</Button>)}
+              ) : isWorkContract ? null : (
+                <Button
+                  color="yellow"
+                  onClick={() =>
+                    openEditForm(
+                      contract.contractId as ContractId<Work.WorkProposal>
+                    )
+                  }
+                >
+                  Edit
+                </Button>
+              )}
             </Segment>
           </Grid.Column>
         ))}
@@ -224,6 +267,38 @@ const WorkList: React.FC<Props> = ({
             onSubmit={(feedback) => handleRejectProposal(feedback)}
             onCancel={() => setShowRejectForm(false)}
           />
+        </Modal.Content>
+      </Modal>
+      <Modal
+        open={showEditProposalForm}
+        onClose={() => {
+          setShowEditProposalForm(false);
+          setSelectedProposalId(null);
+        }}
+      >
+        <Modal.Header>Edit Work Proposal</Modal.Header>
+        <Modal.Content>
+          {selectedProposal && (
+            <EditProposalForm
+              onSubmit={handleEditProposal}
+              onCancel={() => setShowEditProposalForm(false)}
+              initialValues={{
+                client: selectedProposal.payload?.client ?? "",
+                worker: selectedProposal.payload?.worker ?? "",
+                jobCategory: selectedProposal.payload?.jobCategory ?? "",
+                jobTitle: selectedProposal.payload?.jobTitle ?? "",
+                jobDescription: selectedProposal.payload?.jobDescription ?? "",
+                note: selectedProposal.payload?.note ?? "",
+                rateType: selectedProposal.payload?.rateType ?? "",
+                // Convert rateAmount to a number
+                rateAmount: parseFloat(
+                  selectedProposal.payload?.rateAmount ?? "0",
+                
+                ),
+                rejected: selectedProposal.payload?.rejected ?? "",
+              }}
+            />
+          )}
         </Modal.Content>
       </Modal>
     </Segment>
