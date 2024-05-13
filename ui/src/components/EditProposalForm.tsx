@@ -3,8 +3,7 @@ import {
   Form,
   Input,
   Dropdown,
-  Button,
-  DropdownProps,
+  Button
 } from "semantic-ui-react";
 import { RateType, WorkRequest } from "../types";
 
@@ -22,9 +21,11 @@ interface Props {
 const EditProposalForm: React.FC<Props> = ({
   onSubmit,
   onCancel,
-  initialValues
+  initialValues,
 }) => {
-  const [formData, setFormData] = useState<WorkRequest>(initialValues as WorkRequest);
+  const [formData, setFormData] = useState<WorkRequest>(
+    initialValues as WorkRequest
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -34,48 +35,18 @@ const EditProposalForm: React.FC<Props> = ({
     setFormData({ ...formData, [name]: newValue });
   };
 
-  const handleWorkerChange = (
-    event: React.SyntheticEvent<HTMLElement, Event>,
-    data: DropdownProps
-  ) => {
-    const { value } = data; // Extract the value from data
-    setFormData({ ...formData, worker: value as string }); // Use value as string
-  };
-
   const handleSubmit = () => {
     console.log("Form Data: ", formData);
     onSubmit(formData);
   };
 
-   // Check if initialValues is not null before using it
-   if (!initialValues) {
+  // Check if initialValues is not null before using it
+  if (!initialValues) {
     return null; // Or return a loading indicator or something else
   }
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Field>
-        <label>Client</label>
-        <Input
-          name="client"
-          value={formData.client}
-          onChange={handleChange}
-          placeholder="Client"
-          disabled
-          required
-        />
-      </Form.Field>
-      <Form.Field>
-        <label>Worker</label>
-        <Input
-          name="worker"
-          value={formData.worker}
-          onChange={handleChange}
-          placeholder="Worker"
-          disabled
-          required
-        />
-      </Form.Field>
       <Form.Field>
         <label>Job Category</label>
         <Input
