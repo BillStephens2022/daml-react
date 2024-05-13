@@ -132,6 +132,46 @@ const WorkList: React.FC<Props> = ({
 
   const handleEditProposal = async (formData: any) => {
     console.log("Edit formData: ", formData);
+    try {
+      if (selectedProposalId && selectedProposal) {
+        const {
+          jobCategory,
+          jobTitle,
+          jobDescription,
+          note,
+          rateType,
+          rateAmount,
+        } = formData;
+        const revisedJobCategory =
+          jobCategory ?? selectedProposal.payload.jobCategory;
+        const revisedJobTitle = jobTitle ?? selectedProposal.payload.jobTitle;
+        const revisedJobDescription =
+          jobDescription ?? selectedProposal.payload.jobDescription;
+        const feedbackText = note ?? selectedProposal.payload.note;
+        const adjustedRateType = rateType ?? selectedProposal.payload.rateType;
+        const adjustedRateAmount = parseFloat(
+          rateAmount ?? selectedProposal.payload.rateAmount
+        );
+
+        await ledger.exercise(
+          Work.WorkProposal.ReviseProposal,
+          selectedProposalId,
+          {
+            revisedJobCategory,
+            revisedJobTitle,
+            revisedJobDescription,
+            feedbackText,
+            adjustedRateType,
+            adjustedRateAmount: adjustedRateAmount.toString(), // Convert to string for Decimal
+          }
+        );
+
+        setShowEditProposalForm(false);
+        setSelectedProposalId(null);
+      }
+    } catch (error) {
+      console.error("Error editing proposal:", error);
+    }
   };
 
   return (
@@ -290,8 +330,7 @@ const WorkList: React.FC<Props> = ({
                 rateType: selectedProposal.payload?.rateType ?? "",
                 // Convert rateAmount to a number
                 rateAmount: parseFloat(
-                  selectedProposal.payload?.rateAmount ?? "0",
-                
+                  selectedProposal.payload?.rateAmount ?? "0"
                 ),
                 rejected: selectedProposal.payload?.rejected ?? "",
               }}
