@@ -91,7 +91,7 @@ const MainView: React.FC = () => {
         jobDescription: workRequest.jobDescription,
         note: workRequest.note,
         rateType: workRequest.rateType,
-        rateAmount: workRequest.rateAmount,
+        rateAmount: workRequest.rateAmount.toString(),
         rejected: workRequest.rejected
       });
       console.log("Work proposal created:", workProposal);

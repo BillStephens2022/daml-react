@@ -252,7 +252,7 @@ const WorkList: React.FC<Props> = ({
                   ? "Rejected"
                   : "Pending Approval"}
               </p>
-              {isWorkerList ? (
+              {isWorkerList && ((contract.payload as Work.WorkProposal).rejected !== true)? (
                 <Button.Group fluid>
                   <Button
                     color="blue"
