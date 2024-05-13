@@ -15,9 +15,7 @@ import { ContractId, Party } from "@daml/types";
 import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
 import RejectForm from "./RejectForm";
-import WorkRequestForm from "./WorkRequestForm";
 import EditProposalForm from "./EditProposalForm";
-import { WorkRequest } from "../types";
 
 type Props = {
   partyToAlias: Map<Party, string>;
