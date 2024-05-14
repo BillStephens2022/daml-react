@@ -1,8 +1,8 @@
 // Copyright (c) 2022 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useCallback, useState } from "react";
-import { Button, Form, Grid, Header, Image, Segment } from "semantic-ui-react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
+import { Button, Dropdown, Form, Grid, Header, Image, Segment } from "semantic-ui-react";
 import Credentials, { PublicParty } from "../Credentials";
 import Ledger from "@daml/ledger";
 import {
@@ -10,6 +10,14 @@ import {
   usePublicParty,
 } from "@daml/hub-react";
 import { authConfig, Insecure } from "../config";
+
+// Define options for the skillset dropdown
+const skillsetOptions = [
+  { key: 'handyman', text: 'Handyman', value: 'Handyman' },
+  { key: 'technology', text: 'Technology', value: 'Technology' },
+  { key: 'landscaping', text: 'Landscaping', value: 'Landscaping' },
+  { key: 'financial', text: 'Financial', value: 'Financial'}
+];
 
 type Props = {
   onLogin: (credentials: Credentials) => void;
@@ -19,8 +27,12 @@ type Props = {
  * React component for the login screen of the `App`.
  */
 const LoginScreen: React.FC<Props> = ({ onLogin }) => {
+ 
+  const [selectedSkillset, setSelectedSkillset] = useState<string>("");
+
   const login = useCallback(
     async (credentials: Credentials) => {
+      console.log("Credentials received:", credentials); 
       onLogin(credentials);
     },
     [onLogin],
@@ -57,9 +69,14 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
   );
 
   const InsecureLogin: React.FC<{ auth: Insecure }> = ({ auth }) => {
-    const [username, setUsername] = React.useState("");
+    const [username, setUsername] = useState("");
+    
 
     const handleLogin = async (event: React.FormEvent) => {
+      if (!selectedSkillset) {
+        alert('Please select a skillset.');
+        return;
+      }
       event.preventDefault();
       const token = auth.makeToken(username);
       const ledger = new Ledger({ token: token });
@@ -97,11 +114,13 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
         };
         return { usePublicParty: () => publicParty, setup: setup };
       };
+      console.log("selected Skillset - 1st log: ", selectedSkillset)
       await login({
         user: { userId: username, primaryParty: primaryParty },
         party: primaryParty,
         token: auth.makeToken(username),
         getPublicParty: useGetPublicParty,
+        skillset: selectedSkillset,
       });
     };
 
@@ -115,6 +134,13 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
           className="test-select-username-field"
           onChange={(e, { value }) => setUsername(value?.toString() ?? "")}
         />
+        <Dropdown
+              fluid
+              selection
+              placeholder="Select Skillset"
+              options={skillsetOptions}
+              onChange={(e, { value }) => setSelectedSkillset(value as string)}
+            />
         <Button
           primary
           fluid
@@ -127,8 +153,8 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
     );
   };
 
-  const DamlHubLogin: React.FC = () =>
-    wrap(
+  const DamlHubLogin: React.FC = () => 
+     wrap(
       <DamlHubLoginBtn
         onLogin={creds => {
           if (creds) {
@@ -140,6 +166,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
                 usePublicParty: () => usePublicParty(),
                 setup: () => {},
               }),
+              skillset: selectedSkillset
             });
           }
         }}
@@ -152,6 +179,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
         }}
       />,
     );
+  
 
   return authConfig.provider === "none" ? (
     <InsecureLogin auth={authConfig} />

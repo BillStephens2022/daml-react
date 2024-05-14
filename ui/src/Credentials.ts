@@ -15,6 +15,7 @@ export type Credentials = {
   party: string;
   token: string;
   user: User;
+  skillset: string;
   getPublicParty: () => PublicParty;
 };
 

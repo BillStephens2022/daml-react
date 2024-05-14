@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@daml/types": "^2.8.5"
+  }
+}

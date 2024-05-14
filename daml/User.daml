@@ -4,8 +4,12 @@ module User where
 
 import Work
 
+data Skillset = Handyman | Technology | Landscaping | Financial
+  deriving (Eq, Show)
+
 template User with
     username: Party
+    skillset: Skillset
   where
     signatory username
 

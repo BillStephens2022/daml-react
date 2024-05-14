@@ -8,9 +8,13 @@ import { User } from '@daml.js/daml-react';
 import { PublicParty } from '../Credentials';
 import { userContext } from './App';
 
+
+type Skillset = 'Handyman' | 'Technology' | 'Landscaping' | 'Financial';
+
 type Props = {
   onLogout: () => void;
   getPublicParty : () => PublicParty;
+  skillset: Skillset;
 }
 
 const toAlias = (userId: string): string =>
@@ -19,7 +23,7 @@ const toAlias = (userId: string): string =>
 /**
  * React component for the main screen of the `App`.
  */
-const MainScreen: React.FC<Props> = ({onLogout, getPublicParty}) => {
+const MainScreen: React.FC<Props> = ({onLogout, getPublicParty, skillset}) => {
   const user = userContext.useUser();
   const party = userContext.useParty();
   const {usePublicParty, setup} = getPublicParty();
@@ -36,14 +40,14 @@ const MainScreen: React.FC<Props> = ({onLogout, getPublicParty}) => {
     try {
       let userContract = await ledger.fetchByKey(User.User, party);
       if (userContract === null) {
-        const user = {username: party, following: []};
+        const user = {username: party, skillset: skillset};
         userContract = await ledger.create(User.User, user);
       }
       setCreatedUser(true);
     } catch(error) {
       alert(`Unknown error:\n${JSON.stringify(error)}`);
     }
-  }, [ledger, party]);
+  }, [ledger, party, skillset]);
 
   const createAliasMemo = useCallback(async () => {
     if (publicParty) {

@@ -64,6 +64,7 @@ const App: React.FC = () => {
           user={credentials.user}>
           <MainScreen
             getPublicParty={credentials.getPublicParty}
+            skillset="Technology"
             onLogout={() => {
               if (authConfig.provider === "daml-hub") {
                 damlHubLogout();
