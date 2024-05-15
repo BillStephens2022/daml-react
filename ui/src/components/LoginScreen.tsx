@@ -10,23 +10,26 @@ import {
   usePublicParty,
 } from "@daml/hub-react";
 import { authConfig, Insecure } from "../config";
+import { Skillset } from "../types";
 
 // Define options for the skillset dropdown
 const skillsetOptions = [
   { key: 'handyman', text: 'Handyman', value: 'Handyman' },
   { key: 'technology', text: 'Technology', value: 'Technology' },
   { key: 'landscaping', text: 'Landscaping', value: 'Landscaping' },
-  { key: 'financial', text: 'Financial', value: 'Financial'}
+  { key: 'financial', text: 'Financial', value: 'Financial' },
+  { key: 'housekeeping', text: 'Housekeeping', value: 'Housekeeping' }
 ];
 
 type Props = {
   onLogin: (credentials: Credentials) => void;
+  onSkillsetChange: (skillset: Skillset) => void;
 };
 
 /**
  * React component for the login screen of the `App`.
  */
-const LoginScreen: React.FC<Props> = ({ onLogin }) => {
+const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
  
   const [selectedSkillset, setSelectedSkillset] = useState<string>("");
 
@@ -139,7 +142,10 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
               selection
               placeholder="Select Skillset"
               options={skillsetOptions}
-              onChange={(e, { value }) => setSelectedSkillset(value as string)}
+              onChange={(e, { value }) => {
+                setSelectedSkillset(value as Skillset);
+                if (onSkillsetChange) onSkillsetChange(value as Skillset);
+              }}
             />
         <Button
           primary

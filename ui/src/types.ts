@@ -11,3 +11,5 @@ export interface WorkRequest {
   rateAmount: number;
   rejected: boolean;
 }
+
+export type Skillset = 'Handyman' | 'Technology' | 'Landscaping' | 'Financial' | 'Housekeeping';

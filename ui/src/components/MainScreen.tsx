@@ -7,9 +7,9 @@ import MainView from './MainView';
 import { User } from '@daml.js/daml-react';
 import { PublicParty } from '../Credentials';
 import { userContext } from './App';
+import { Skillset } from '../types';
 
 
-type Skillset = 'Handyman' | 'Technology' | 'Landscaping' | 'Financial';
 
 type Props = {
   onLogout: () => void;
