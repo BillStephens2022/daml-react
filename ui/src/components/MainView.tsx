@@ -64,20 +64,6 @@ const MainView: React.FC = () => {
     return userAliases;
   }, [aliases]);
 
-  const aliasSkillsetMapping = useMemo(() => {
-    const mapping = new Map();
-    allUsers.contracts.forEach(({ payload }) => {
-      mapping.set(payload.username, { skillset: payload.skillset });
-    });
-    aliases.contracts.forEach(({ payload }) => {
-      const user = allUsers.contracts.find(user => user.payload.username === payload.username);
-      if (user) {
-        mapping.get(payload.username).alias = payload.alias;
-      }
-    });
-    return mapping;
-  }, [allUsers, aliases]);
-
   const myUserName = aliases.loading
     ? "loading ..."
     : partyToAlias.get(username) ?? username;
@@ -153,9 +139,10 @@ const MainView: React.FC = () => {
   };
   
 
-  const formattedUsers = users.contracts.map((user) => ({
+  const formattedUsers = aliases.contracts.map((user) => ({
     payload: {
       username: user.payload.username,
+      alias: user.payload.alias,
       skillset: toTS_Skillset(user.payload.skillset), // Convert DAML Skillset to TypeScript Skillset
     },
   }));
@@ -166,7 +153,7 @@ const MainView: React.FC = () => {
   console.log("allUsers", allUsers);
   console.log("allUserAliases: ", allUserAliases);
   console.log("allWorkProposals: ", allWorkProposals);
-  console.log("alias & skillset mapping: ", aliasSkillsetMapping);
+  console.log("formatted users: ", formattedUsers);
 
   return (
     <Container>

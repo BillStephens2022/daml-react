@@ -27,7 +27,7 @@ interface Props {
   username: string;
   userAliases: string[];
   allUserAliases: Map<any, any>;
-  users: { payload: { username: string; skillset: Skillset } }[];
+  users: { payload: { username: string; alias: string; skillset: Skillset } }[];
 }
 
 const WorkRequestForm: React.FC<Props> = ({
@@ -58,6 +58,8 @@ const WorkRequestForm: React.FC<Props> = ({
     { key: string; value: string; text: string }[]
   >([]);
 
+  console.log("USERS WORKREQUESTFORM: ", users);
+
   useEffect(() => {
     if (jobCategorySelected) {
       const filteredUsers = users
@@ -69,7 +71,7 @@ const WorkRequestForm: React.FC<Props> = ({
         .map((user) => ({
           key: user.payload.username,
           value: user.payload.username,
-          text: user.payload.username,
+          text: user.payload.alias,
         }));
       setUserOptions(filteredUsers);
     }
@@ -89,6 +91,7 @@ const WorkRequestForm: React.FC<Props> = ({
   ) => {
     const { value } = data;
     setFormData({ ...formData, jobCategory: value as Skillset | null }); // Allow setting null
+    setJobCategorySelected(true);
   };
 
   const handleWorkerChange = (

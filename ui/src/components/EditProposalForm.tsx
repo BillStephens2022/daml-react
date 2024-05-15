@@ -5,7 +5,7 @@ import {
   Dropdown,
   Button
 } from "semantic-ui-react";
-import { RateType, WorkRequest } from "../types";
+import { RateType, WorkRequest, NullableSkillset } from "../types";
 
 const RateOptions = [
   { key: "hourly", value: "Hourly", text: "Hourly" },
@@ -51,7 +51,7 @@ const EditProposalForm: React.FC<Props> = ({
         <label>Job Category</label>
         <Input
           name="jobCategory"
-          value={formData.jobCategory}
+          value={formData.jobCategory || ""}
           onChange={handleChange}
           placeholder="Job Category"
           required

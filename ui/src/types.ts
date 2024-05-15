@@ -1,7 +1,7 @@
 export type RateType = 'Hourly' | 'Flat';
 
 
-type NullableSkillset = Skillset | null;
+export type NullableSkillset = Skillset | null;
 
 export interface WorkRequest {
   client: string;
