@@ -17,7 +17,7 @@ import { User } from "@daml.js/daml-react";
 import { Work } from "@daml.js/daml-react";
 import { publicContext, userContext } from "./App";
 import WorkRequestForm from "./WorkRequestForm";
-import { WorkRequest } from "../types";
+import { WorkRequest, Skillset } from "../types";
 import WorkList from "./WorkList";
 
 // USERS_BEGIN
@@ -31,7 +31,7 @@ const MainView: React.FC = () => {
   const aliases = publicContext.useStreamQueries(User.Alias, () => [], []);
   const users = publicContext.useStreamQueries(User.User, () => [], []);
   const myUser = myUserResult.contracts[0]?.payload;
-  const allUsers = userContext.useStreamQueries(User.User).contracts;
+  const allUsers = publicContext.useStreamQueries(User.User, () => [], []);
   const allWorkProposals = publicContext.useStreamQueries(
     Work.WorkProposal
   ).contracts;
@@ -64,6 +64,20 @@ const MainView: React.FC = () => {
     return userAliases;
   }, [aliases]);
 
+  const aliasSkillsetMapping = useMemo(() => {
+    const mapping = new Map();
+    allUsers.contracts.forEach(({ payload }) => {
+      mapping.set(payload.username, { skillset: payload.skillset });
+    });
+    aliases.contracts.forEach(({ payload }) => {
+      const user = allUsers.contracts.find(user => user.payload.username === payload.username);
+      if (user) {
+        mapping.get(payload.username).alias = payload.alias;
+      }
+    });
+    return mapping;
+  }, [allUsers, aliases]);
+
   const myUserName = aliases.loading
     ? "loading ..."
     : partyToAlias.get(username) ?? username;
@@ -83,10 +97,11 @@ const MainView: React.FC = () => {
       }
       console.log("WorkerAlias!: ", workerAlias);
       const workerParty = workerAlias.payload.username;
+      const jobCategory = workRequest.jobCategory || Skillset.Handyman;
       const workProposal = await ledger.create(Work.WorkProposal, {
         client: username,
         worker: workerParty,
-        jobCategory: workRequest.jobCategory,
+        jobCategory: jobCategory,
         jobTitle: workRequest.jobTitle,
         jobDescription: workRequest.jobDescription,
         note: workRequest.note,
@@ -120,10 +135,38 @@ const MainView: React.FC = () => {
     setShowModal(false); // Close the modal when cancel is clicked
   };
 
+  const toTS_Skillset = (damlSkillset: string): Skillset => {
+    switch (damlSkillset) {
+      case "Handyman":
+        return Skillset.Handyman;
+      case "Technology":
+        return Skillset.Technology;
+      case "Landscaping":
+        return Skillset.Landscaping;
+      case "Financial":
+        return Skillset.Financial;
+      case "Housekeeping":
+        return Skillset.Housekeeping;
+      default:
+        throw new Error(`Unknown skillset: ${damlSkillset}`);
+    }
+  };
+  
+
+  const formattedUsers = users.contracts.map((user) => ({
+    payload: {
+      username: user.payload.username,
+      skillset: toTS_Skillset(user.payload.skillset), // Convert DAML Skillset to TypeScript Skillset
+    },
+  }));
+
+
   console.log("Aliases: ", aliases);
-  console.log("All Users", users);
+  console.log("users", users);
+  console.log("allUsers", allUsers);
   console.log("allUserAliases: ", allUserAliases);
   console.log("allWorkProposals: ", allWorkProposals);
+  console.log("alias & skillset mapping: ", aliasSkillsetMapping);
 
   return (
     <Container>
@@ -170,6 +213,7 @@ const MainView: React.FC = () => {
                     username={myUserName}
                     userAliases={Array.from(allUserAliases.values())}
                     allUserAliases={allUserAliases}
+                    users = {formattedUsers}
                   />
                 </Modal.Content>
               </Modal>

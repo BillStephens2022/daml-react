@@ -54,14 +54,14 @@ const MainScreen: React.FC<Props> = ({onLogout, getPublicParty, skillset}) => {
       try {
         let userAlias = await ledger.fetchByKey(User.Alias, {_1: party, _2: publicParty});
         if (userAlias === null) {
-           await ledger.create(User.Alias, {username: party, alias: toAlias(user.userId), public: publicParty});
+           await ledger.create(User.Alias, {username: party, alias: toAlias(user.userId), public: publicParty, skillset: skillset});
         }
       } catch(error) {
         alert(`Unknown error:\n${JSON.stringify(error)}`);
       }
       setCreatedAlias(true);
     }
-  }, [ledger, user, publicParty, party]);
+  }, [ledger, user, publicParty, party, skillset]);
 
   useEffect(() => {createUserMemo();} , [createUserMemo])
   useEffect(() => {createAliasMemo();} , [createAliasMemo])

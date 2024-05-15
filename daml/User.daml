@@ -41,6 +41,7 @@ template User with
 template Alias with
     username: Party
     alias: Text
+    skillset: Skillset
     public: Party
   where
     signatory username
@@ -51,8 +52,9 @@ template Alias with
 
     nonconsuming choice Change: ContractId Alias with
         newAlias: Text
+        newSkillset: Skillset
       controller username
       do
         archive self
-        create this with alias = newAlias
+        create this with alias = newAlias; skillset = newSkillset
 -- ALIAS_END

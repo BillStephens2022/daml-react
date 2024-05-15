@@ -1,9 +1,12 @@
 export type RateType = 'Hourly' | 'Flat';
 
+
+type NullableSkillset = Skillset | null;
+
 export interface WorkRequest {
   client: string;
   worker: string;
-  jobCategory: string;
+  jobCategory: NullableSkillset;
   jobTitle: string;
   jobDescription: string;
   note: string;
@@ -12,4 +15,10 @@ export interface WorkRequest {
   rejected: boolean;
 }
 
-export type Skillset = 'Handyman' | 'Technology' | 'Landscaping' | 'Financial' | 'Housekeeping';
+export enum Skillset {
+  Handyman = "Handyman",
+  Technology = "Technology",
+  Landscaping = "Landscaping",
+  Financial = "Financial",
+  Housekeeping = "Housekeeping",
+}

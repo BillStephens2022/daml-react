@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
@@ -6,12 +6,20 @@ import {
   Button,
   DropdownProps,
 } from "semantic-ui-react";
-import { RateType, WorkRequest } from "../types";
+import { RateType, WorkRequest, Skillset } from "../types";
+
 
 const RateOptions = [
   { key: "hourly", value: "Hourly", text: "Hourly" },
   { key: "flat", value: "Flat", text: "Flat" },
 ];
+
+ // Define options for the dropdown dynamically based on Skillset values
+ const jobCategoryOptions = Object.values(Skillset).map(skillset => ({
+  key: skillset,
+  value: skillset,
+  text: skillset,
+}));
 
 interface Props {
   onSubmit: (data: WorkRequest) => void;
@@ -19,6 +27,7 @@ interface Props {
   username: string;
   userAliases: string[];
   allUserAliases: Map<any, any>;
+  users: { payload: { username: string; skillset: Skillset } }[];
 }
 
 const WorkRequestForm: React.FC<Props> = ({
@@ -27,11 +36,12 @@ const WorkRequestForm: React.FC<Props> = ({
   username,
   userAliases,
   allUserAliases,
+  users
 }) => {
   const [formData, setFormData] = useState<WorkRequest>({
     client: username,
     worker: "",
-    jobCategory: "",
+    jobCategory: null,
     jobTitle: "",
     jobDescription: "",
     note: "",
@@ -40,12 +50,45 @@ const WorkRequestForm: React.FC<Props> = ({
     rejected: false,
   });
 
+  const [jobCategorySelected, setJobCategorySelected] = useState<boolean>(
+    false
+  );
+
+  const [userOptions, setUserOptions] = useState<
+    { key: string; value: string; text: string }[]
+  >([]);
+
+  useEffect(() => {
+    if (jobCategorySelected) {
+      const filteredUsers = users
+        .filter((user) => {
+          const skillset = user.payload.skillset;
+          console.log(`User: ${user.payload.username}, Skillset: ${skillset}`);
+          return skillset === formData.jobCategory;
+        })
+        .map((user) => ({
+          key: user.payload.username,
+          value: user.payload.username,
+          text: user.payload.username,
+        }));
+      setUserOptions(filteredUsers);
+    }
+  }, [formData.jobCategory, users, jobCategorySelected]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     const newValue = name === "rateAmount" ? parseFloat(value) : value; // Convert value to number for rateAmount
     setFormData({ ...formData, [name]: newValue });
+  };
+
+  const handleJobCategoryChange = (
+    event: React.SyntheticEvent<HTMLElement, Event>,
+    data: DropdownProps
+  ) => {
+    const { value } = data;
+    setFormData({ ...formData, jobCategory: value as Skillset | null }); // Allow setting null
   };
 
   const handleWorkerChange = (
@@ -56,18 +99,20 @@ const WorkRequestForm: React.FC<Props> = ({
     setFormData({ ...formData, worker: value as string }); // Use value as string
   };
 
+  
+
   const handleSubmit = () => {
     console.log("Form Data: ", formData);
     onSubmit(formData);
   };
 
-  const userOptions = Array.from(allUserAliases.entries()).map(
-    ([partyId, alias]) => ({
-      key: partyId,
-      value: alias,
-      text: alias,
-    })
-  );
+  // const userOptions = Array.from(allUserAliases.entries()).map(
+  //   ([partyId, alias]) => ({
+  //     key: partyId,
+  //     value: alias,
+  //     text: alias,
+  //   })
+  // );
 
   console.log("user ALIASES: ", userAliases);
   console.log("user options: ", userOptions);
@@ -85,6 +130,20 @@ const WorkRequestForm: React.FC<Props> = ({
         />
       </Form.Field>
       <Form.Field>
+        <label>Job Category</label>
+        <Dropdown
+          name="jobCategory"
+          value={formData.jobCategory || ""}
+          onChange={handleJobCategoryChange}
+          placeholder="Job Category"
+          fluid
+          search
+          selection
+          options={jobCategoryOptions}
+          required
+        />
+      </Form.Field>
+      <Form.Field>
         <label>Worker</label>
         <Dropdown
           name="worker"
@@ -93,16 +152,7 @@ const WorkRequestForm: React.FC<Props> = ({
           selection
           options={userOptions}
           onChange={handleWorkerChange}
-          required
-        />
-      </Form.Field>
-      <Form.Field>
-        <label>Job Category</label>
-        <Input
-          name="jobCategory"
-          value={formData.jobCategory}
-          onChange={handleChange}
-          placeholder="Job Category"
+          disabled={!jobCategorySelected}
           required
         />
       </Form.Field>
