@@ -1,6 +1,7 @@
 -- Work.daml
 
 module Work where
+import Common (Skillset)
 
 type WorkProposalId = ContractId WorkProposal
 type WorkContractId = ContractId WorkContract
@@ -10,7 +11,7 @@ template WorkProposal
   with
     client: Party
     worker: Party
-    jobCategory: Text
+    jobCategory: Skillset
     jobTitle: Text
     jobDescription: Text
     note : Text
@@ -44,7 +45,7 @@ template WorkProposal
 
     choice ReviseProposal : ContractId WorkProposal
         with
-            revisedJobCategory : Text
+            revisedJobCategory : Skillset
             revisedJobTitle : Text
             revisedJobDescription : Text
             feedbackText : Text
@@ -65,7 +66,7 @@ template WorkContract
   with
     contractClient : Party
     contractWorker : Party
-    contractJobCategory : Text
+    contractJobCategory : Skillset
     contractJobTitle: Text
     contractJobDescription : Text
     contractRateType : RateType

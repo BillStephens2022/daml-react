@@ -3,9 +3,8 @@
 module User where
 
 import Work
+import Common (Skillset)
 
-data Skillset = Handyman | Technology | Landscaping | Financial | Housekeeping
-  deriving (Eq, Show)
 
 template User with
     username: Party
@@ -18,7 +17,7 @@ template User with
 
     nonconsuming choice ProposeWork : WorkProposalId
         with
-            jobCategory: Text
+            jobCategory: Skillset
             jobTitle: Text
             jobDescription: Text
             note: Text
