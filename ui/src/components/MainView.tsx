@@ -78,6 +78,10 @@ const MainView: React.FC = () => {
         (alias) => alias.payload.alias.toLowerCase() === workerLowercase
       );
       if (!workerAlias) {
+        console.log("Worker Alias: ", workerAlias);
+        console.log("Worker Lower Case: ", workerLowercase);
+        console.log("alias contracts: ", aliases.contracts);
+
         console.error("Worker not found.");
         return false;
       }
@@ -105,7 +109,7 @@ const MainView: React.FC = () => {
 
   // Function to handle submission of work request form
   const handleSubmitWorkRequest = (workRequest: WorkRequest) => {
-    console.log("Work Request Data:", workRequest as WorkRequest);
+    console.log("Work Request Data:", workRequest as WorkRequest);  
     if (typeof workRequest.rateAmount === "number") {
       submitWorkRequest(workRequest).then((success) => {
         if (success) {

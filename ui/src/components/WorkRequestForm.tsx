@@ -70,7 +70,7 @@ const WorkRequestForm: React.FC<Props> = ({
         })
         .map((user) => ({
           key: user.payload.username,
-          value: user.payload.username,
+          value: user.payload.alias,
           text: user.payload.alias,
         }));
       setUserOptions(filteredUsers);
