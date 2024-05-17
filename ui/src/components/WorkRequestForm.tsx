@@ -6,8 +6,8 @@ import {
   Button,
   DropdownProps,
 } from "semantic-ui-react";
-import { RateType, WorkRequest, Skillset } from "../types";
-
+import { RateType, WorkRequest } from "../types";
+import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 
 const RateOptions = [
   { key: "hourly", value: "Hourly", text: "Hourly" },

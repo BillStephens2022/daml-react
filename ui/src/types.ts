@@ -1,3 +1,5 @@
+import { Skillset } from "@daml.js/daml-react/lib/Common/module";
+
 export type RateType = 'Hourly' | 'Flat';
 
 
@@ -15,10 +17,11 @@ export interface WorkRequest {
   rejected: boolean;
 }
 
-export enum Skillset {
-  Handyman = "Handyman",
-  Technology = "Technology",
-  Landscaping = "Landscaping",
-  Financial = "Financial",
-  Housekeeping = "Housekeeping",
-}
+// export enum Skillset {
+//   Handyman = "Handyman",
+//   Technology = "Technology",
+//   Landscaping = "Landscaping",
+//   Financial = "Financial",
+//   Housekeeping = "Housekeeping",
+//   None = "None",
+// }

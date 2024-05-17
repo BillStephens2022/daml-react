@@ -17,8 +17,9 @@ import { User } from "@daml.js/daml-react";
 import { Work } from "@daml.js/daml-react";
 import { publicContext, userContext } from "./App";
 import WorkRequestForm from "./WorkRequestForm";
-import { WorkRequest, Skillset } from "../types";
+import { WorkRequest } from "../types";
 import WorkList from "./WorkList";
+import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
@@ -136,6 +137,8 @@ const MainView: React.FC = () => {
         return Skillset.Financial;
       case "Housekeeping":
         return Skillset.Housekeeping;
+      case "None":
+        return Skillset.None;
       default:
         throw new Error(`Unknown skillset: ${damlSkillset}`);
     }

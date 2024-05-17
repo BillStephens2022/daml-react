@@ -10,28 +10,28 @@ import {
   usePublicParty,
 } from "@daml/hub-react";
 import { authConfig, Insecure } from "../config";
-import { Skillset } from "../types";
+
 
 // Define options for the skillset dropdown
-const skillsetOptions = [
-  { key: 'handyman', text: 'Handyman', value: 'Handyman' },
-  { key: 'technology', text: 'Technology', value: 'Technology' },
-  { key: 'landscaping', text: 'Landscaping', value: 'Landscaping' },
-  { key: 'financial', text: 'Financial', value: 'Financial' },
-  { key: 'housekeeping', text: 'Housekeeping', value: 'Housekeeping' }
-];
+// const skillsetOptions = [
+//   { key: 'handyman', text: 'Handyman', value: 'Handyman' },
+//   { key: 'technology', text: 'Technology', value: 'Technology' },
+//   { key: 'landscaping', text: 'Landscaping', value: 'Landscaping' },
+//   { key: 'financial', text: 'Financial', value: 'Financial' },
+//   { key: 'housekeeping', text: 'Housekeeping', value: 'Housekeeping' }
+// ];
 
 type Props = {
   onLogin: (credentials: Credentials) => void;
-  onSkillsetChange: (skillset: Skillset) => void;
+  // onSkillsetChange: (skillset: Skillset) => void;
 };
 
 /**
  * React component for the login screen of the `App`.
  */
-const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
+const LoginScreen: React.FC<Props> = ({ onLogin }) => {
  
-  const [selectedSkillset, setSelectedSkillset] = useState<string>("");
+  // const [selectedSkillset, setSelectedSkillset] = useState<string>("");
 
   const login = useCallback(
     async (credentials: Credentials) => {
@@ -76,10 +76,10 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
    
 
     const handleLogin = async (event: React.FormEvent) => {
-      if (!selectedSkillset) {
-        alert('Please select a skillset.');
-        return;
-      }
+      // if (!selectedSkillset) {
+      //   alert('Please select a skillset.');
+      //   return;
+      // }
       event.preventDefault();
       const token = auth.makeToken(username);
       const ledger = new Ledger({ token: token });
@@ -123,7 +123,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
         party: primaryParty,
         token: auth.makeToken(username),
         getPublicParty: useGetPublicParty,
-        skillset: selectedSkillset,
+        skillset: "None",
       });
     };
 
@@ -137,7 +137,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
           className="test-select-username-field"
           onChange={(e, { value }) => setUsername(value?.toString() ?? "")}
         />
-        <Dropdown
+        {/* <Dropdown
               fluid
               selection
               placeholder="Select Skillset"
@@ -146,7 +146,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
                 setSelectedSkillset(value as Skillset);
                 if (onSkillsetChange) onSkillsetChange(value as Skillset);
               }}
-            />
+            /> */}
         <Button
           primary
           fluid
@@ -172,7 +172,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
                 usePublicParty: () => usePublicParty(),
                 setup: () => {},
               }),
-              skillset: selectedSkillset
+              skillset: "None"
             });
           }
         }}

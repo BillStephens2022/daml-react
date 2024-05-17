@@ -13,7 +13,7 @@ import DamlHub, {
 } from "@daml/hub-react";
 import Credentials from "../Credentials";
 import { authConfig } from "../config";
-import { Skillset } from '../types';
+import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 
 // Context for the party of the user.
 export const userContext = createLedgerContext();
@@ -79,7 +79,7 @@ const App: React.FC = () => {
       </Wrap>
     );
   } else {
-    return <LoginScreen onLogin={setCredentials} onSkillsetChange={setSelectedSkillset} />;
+    return <LoginScreen onLogin={setCredentials} />;
   }
 };
 // APP_END
