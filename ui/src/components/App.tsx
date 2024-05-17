@@ -13,7 +13,6 @@ import DamlHub, {
 } from "@daml/hub-react";
 import Credentials from "../Credentials";
 import { authConfig } from "../config";
-import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 
 // Context for the party of the user.
 export const userContext = createLedgerContext();
@@ -30,7 +29,7 @@ export const publicContext = isRunningOnHub()
  */
 // APP_BEGIN
 const App: React.FC = () => {
-  const [selectedSkillset, setSelectedSkillset] = React.useState<Skillset>(Object.values(Skillset)[0]);
+  // const [selectedSkillset, setSelectedSkillset] = React.useState<Skillset>(Object.values(Skillset)[0]);
 
   const [credentials, setCredentials] = React.useState<
     Credentials | undefined
@@ -67,7 +66,7 @@ const App: React.FC = () => {
           user={credentials.user}>
           <MainScreen
             getPublicParty={credentials.getPublicParty}
-            skillset={selectedSkillset}
+            // skillset={selectedSkillset}
             onLogout={() => {
               if (authConfig.provider === "daml-hub") {
                 damlHubLogout();

@@ -68,6 +68,10 @@ const MainView: React.FC = () => {
     ? "loading ..."
     : partyToAlias.get(username) ?? username;
 
+  const mySkillset = users.loading
+    ? "loading..."
+    : users.contracts[0].payload.skillset;
+
   // Function to submit a new work request to the DAML ledger
   const submitWorkRequest = async (workRequest: WorkRequest) => {
     try {
@@ -87,7 +91,7 @@ const MainView: React.FC = () => {
       }
       console.log("WorkerAlias!: ", workerAlias);
       const workerParty = workerAlias.payload.username;
-      const jobCategory = workRequest.jobCategory || Skillset.Handyman;
+      const jobCategory = workRequest.jobCategory || Skillset.None;
       const workProposal = await ledger.create(Work.WorkProposal, {
         client: username,
         worker: workerParty,
@@ -180,8 +184,10 @@ const MainView: React.FC = () => {
               <Header as="h2">
                 <Icon name="user" />
                 <Header.Content>{myUserName ?? "Loading..."}</Header.Content>
+                Skillset: {mySkillset ?? "Loading..."}
               </Header>
               <Divider />
+              <Button type="button" color="yellow">Edit Skillset</Button>
             </Segment>
 
             <Segment>
@@ -190,7 +196,7 @@ const MainView: React.FC = () => {
                 <Header.Content>Submit a Work Request</Header.Content>
               </Header>
               <Divider />
-              <Button type="button" onClick={() => setShowModal(!showModal)}>
+              <Button type="button" color="blue" onClick={() => setShowModal(!showModal)}>
                 New Request
               </Button>
               <Modal

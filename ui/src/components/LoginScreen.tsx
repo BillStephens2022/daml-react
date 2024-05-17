@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useCallback, useState } from "react";
-import { Button, Dropdown, Form, Grid, Header, Image, Segment } from "semantic-ui-react";
+import { Button, Form, Grid, Header, Image, Segment } from "semantic-ui-react";
 import Credentials, { PublicParty } from "../Credentials";
 import Ledger from "@daml/ledger";
 import {
