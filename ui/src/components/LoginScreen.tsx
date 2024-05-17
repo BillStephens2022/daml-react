@@ -73,10 +73,10 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
 
   const InsecureLogin: React.FC<{ auth: Insecure }> = ({ auth }) => {
     const [username, setUsername] = useState("");
-    const [selectedSkillset2, setSelectedSkillset2] = useState<string>("");
+   
 
     const handleLogin = async (event: React.FormEvent) => {
-      if (!selectedSkillset2) {
+      if (!selectedSkillset) {
         alert('Please select a skillset.');
         return;
       }
@@ -117,13 +117,13 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
         };
         return { usePublicParty: () => publicParty, setup: setup };
       };
-      console.log("selected Skillset - 1st log: ", selectedSkillset2)
+      
       await login({
         user: { userId: username, primaryParty: primaryParty },
         party: primaryParty,
         token: auth.makeToken(username),
         getPublicParty: useGetPublicParty,
-        skillset: selectedSkillset2,
+        skillset: selectedSkillset,
       });
     };
 
@@ -143,7 +143,6 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
               placeholder="Select Skillset"
               options={skillsetOptions}
               onChange={(e, { value }) => {
-                setSelectedSkillset2(value as Skillset);
                 setSelectedSkillset(value as Skillset);
                 if (onSkillsetChange) onSkillsetChange(value as Skillset);
               }}
@@ -187,7 +186,6 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
       />,
     );
   
-
   return authConfig.provider === "none" ? (
     <InsecureLogin auth={authConfig} />
   ) : authConfig.provider === "daml-hub" ? (
