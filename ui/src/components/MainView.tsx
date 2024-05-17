@@ -23,14 +23,13 @@ import WorkList from "./WorkList";
 // USERS_BEGIN
 const MainView: React.FC = () => {
   const username = userContext.useParty();
-  const myUserResult = userContext.useStreamFetchByKeys(
-    User.User,
-    () => [username],
-    [username]
-  );
+  // const myUserResult = userContext.useStreamFetchByKeys(
+  //   User.User,
+  //   () => [username],
+  //   [username]
+  // );
   const aliases = publicContext.useStreamQueries(User.Alias, () => [], []);
   const users = publicContext.useStreamQueries(User.User, () => [], []);
-  const myUser = myUserResult.contracts[0]?.payload;
   const allUsers = publicContext.useStreamQueries(User.User, () => [], []);
   const allWorkProposals = publicContext.useStreamQueries(
     Work.WorkProposal

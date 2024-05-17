@@ -1,7 +1,7 @@
 // Copyright (c) 2022 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useCallback, useState, useRef, useEffect } from "react";
+import React, { useCallback, useState } from "react";
 import { Button, Dropdown, Form, Grid, Header, Image, Segment } from "semantic-ui-react";
 import Credentials, { PublicParty } from "../Credentials";
 import Ledger from "@daml/ledger";
@@ -64,7 +64,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
             App
           </Header.Content>
         </Header>
-        <Form size="large" className="test-select-login-screen">
+        <Form size="massive" className="test-select-login-screen">
           <Segment>{component}</Segment>
         </Form>
       </Grid.Column>
@@ -73,10 +73,10 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
 
   const InsecureLogin: React.FC<{ auth: Insecure }> = ({ auth }) => {
     const [username, setUsername] = useState("");
-    
+    const [selectedSkillset2, setSelectedSkillset2] = useState<string>("");
 
     const handleLogin = async (event: React.FormEvent) => {
-      if (!selectedSkillset) {
+      if (!selectedSkillset2) {
         alert('Please select a skillset.');
         return;
       }
@@ -117,13 +117,13 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
         };
         return { usePublicParty: () => publicParty, setup: setup };
       };
-      console.log("selected Skillset - 1st log: ", selectedSkillset)
+      console.log("selected Skillset - 1st log: ", selectedSkillset2)
       await login({
         user: { userId: username, primaryParty: primaryParty },
         party: primaryParty,
         token: auth.makeToken(username),
         getPublicParty: useGetPublicParty,
-        skillset: selectedSkillset,
+        skillset: selectedSkillset2,
       });
     };
 
@@ -143,6 +143,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin, onSkillsetChange }) => {
               placeholder="Select Skillset"
               options={skillsetOptions}
               onChange={(e, { value }) => {
+                setSelectedSkillset2(value as Skillset);
                 setSelectedSkillset(value as Skillset);
                 if (onSkillsetChange) onSkillsetChange(value as Skillset);
               }}

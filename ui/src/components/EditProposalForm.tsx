@@ -5,7 +5,7 @@ import {
   Dropdown,
   Button
 } from "semantic-ui-react";
-import { RateType, WorkRequest, NullableSkillset } from "../types";
+import { RateType, WorkRequest } from "../types";
 
 const RateOptions = [
   { key: "hourly", value: "Hourly", text: "Hourly" },
