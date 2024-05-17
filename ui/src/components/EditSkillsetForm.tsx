@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Dropdown, Button } from "semantic-ui-react";
+import { Form, Dropdown, Button } from "semantic-ui-react";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 
 interface Props {
@@ -13,9 +13,9 @@ const EditSkillsetForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
   // Function to generate dropdown options from the Skillset enum
   const skillsetOptions = Object.values(Skillset).map((skillset) => ({
     key: skillset,
-    text: skillset,
-    value: skillset,
-  }));
+    text: skillset.toString(),
+    value: skillset.toString(),
+  }));  
 
   const handleChange = (e: React.SyntheticEvent<HTMLElement, Event>, data: any) => {
     setSelectedSkillset(data.value);
@@ -34,7 +34,7 @@ const EditSkillsetForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           fluid
           selection
           options={skillsetOptions}
-          value={selectedSkillset}
+          value={selectedSkillset.toString()}
           onChange={handleChange}
           placeholder="Select a Skillset"
           required

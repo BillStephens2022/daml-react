@@ -20,6 +20,7 @@ import WorkRequestForm from "./WorkRequestForm";
 import { WorkRequest } from "../types";
 import WorkList from "./WorkList";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
+import EditSkillsetForm from "./EditSkillsetForm";
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
@@ -41,6 +42,7 @@ const MainView: React.FC = () => {
 
   // USERS_END
   const [showModal, setShowModal] = useState(false);
+  const [showSkillsetModal, setShowSkillsetModal] = useState(false);
 
   const ledger = userContext.useLedger();
 
@@ -129,6 +131,15 @@ const MainView: React.FC = () => {
     setShowModal(false); // Close the modal when cancel is clicked
   };
 
+  const handleCancelEditSkillset = () => {
+    setShowModal(false); // Close the modal when cancel is clicked
+  };
+
+  const handleEditSkillset = () => {
+    console.log("editing skillset!");
+  }
+
+
   const toTS_Skillset = (damlSkillset: string): Skillset => {
     switch (damlSkillset) {
       case "Handyman":
@@ -187,7 +198,20 @@ const MainView: React.FC = () => {
                 Skillset: {mySkillset ?? "Loading..."}
               </Header>
               <Divider />
-              <Button type="button" color="yellow">Edit Skillset</Button>
+              <Button type="button" color="yellow" onClick={() => setShowSkillsetModal(!showSkillsetModal)}>Edit Skillset</Button>
+              <Modal
+                open={showSkillsetModal}
+                onClose={() => setShowSkillsetModal(false)}
+                closeIcon
+              >
+                <Modal.Header>Edit Skillset</Modal.Header>
+                <Modal.Content>
+                  <EditSkillsetForm
+                    onSubmit={handleEditSkillset}
+                    onCancel={handleCancelEditSkillset}
+                  />
+                </Modal.Content>
+              </Modal>
             </Segment>
 
             <Segment>
