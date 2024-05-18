@@ -135,8 +135,18 @@ const MainView: React.FC = () => {
     setShowModal(false); // Close the modal when cancel is clicked
   };
 
-  const handleEditSkillset = () => {
-    console.log("editing skillset!");
+  const handleEditSkillset = async (selectedSkillset: Skillset) => {
+    console.log("editing skillset!: ", selectedSkillset);
+    try {
+      const userContractId = users.contracts[0].contractId;
+      console.log("userContractId", userContractId);
+      await ledger.exercise(User.User.ChangeSkillset, userContractId, {
+        newSkillset: selectedSkillset,
+      });
+      setShowSkillsetModal(false);
+    } catch (error) {
+      console.error("Error editing proposal:", error);
+    }
   }
 
 

@@ -36,7 +36,8 @@ template User with
                 rateType = rateType
                 rateAmount = rateAmount
                 rejected = rejected
-    nonconsuming choice ChangeSkillset : ContractId User
+    
+    choice ChangeSkillset : ContractId User
         with
             newSkillset: Skillset
         controller username
