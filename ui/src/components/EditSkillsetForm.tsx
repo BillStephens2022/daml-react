@@ -10,8 +10,11 @@ interface Props {
 const EditSkillsetForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
   const [selectedSkillset, setSelectedSkillset] = useState<Skillset>(Skillset.None);
 
+  const validSkillsetValues = Object.values(Skillset).filter(
+    value => typeof value === "string"
+  );
   // Function to generate dropdown options from the Skillset enum
-  const skillsetOptions = Object.values(Skillset).map((skillset) => ({
+  const skillsetOptions = validSkillsetValues.map((skillset) => ({
     key: skillset,
     text: skillset.toString(),
     value: skillset.toString(),
