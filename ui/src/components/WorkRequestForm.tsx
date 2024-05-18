@@ -14,12 +14,19 @@ const RateOptions = [
   { key: "flat", value: "Flat", text: "Flat" },
 ];
 
+const validSkillsetValues = Object.values(Skillset).filter(
+  value => typeof value === "string"
+);
+
  // Define options for the dropdown dynamically based on Skillset values
- const jobCategoryOptions = Object.values(Skillset).map(skillset => ({
+ const jobCategoryOptions = validSkillsetValues.map(skillset => ({
   key: skillset,
   value: skillset,
   text: skillset,
 }));
+
+console.log("Job Category Options: ", jobCategoryOptions);
+console.log("Skillset enum values: ", Object.values(Skillset));
 
 interface Props {
   onSubmit: (data: WorkRequest) => void;
