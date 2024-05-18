@@ -33,7 +33,6 @@ interface Props {
   onCancel: () => void;
   username: string;
   userAliases: string[];
-  allUserAliases: Map<any, any>;
   users: { payload: { username: string; alias: string; skillset: Skillset } }[];
 }
 
@@ -42,7 +41,6 @@ const WorkRequestForm: React.FC<Props> = ({
   onCancel,
   username,
   userAliases,
-  allUserAliases,
   users
 }) => {
   const [formData, setFormData] = useState<WorkRequest>({

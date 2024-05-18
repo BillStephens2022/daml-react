@@ -263,7 +263,6 @@ const MainView: React.FC = () => {
                     onCancel={handleCancelWorkRequest}
                     username={myUserName}
                     userAliases={Array.from(allUserAliases.values())}
-                    allUserAliases={allUserAliases}
                     users={formattedUsers}
                   />
                 </Modal.Content>
