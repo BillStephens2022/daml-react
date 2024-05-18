@@ -7,10 +7,14 @@ import MainView from './MainView';
 import { User } from '@daml.js/daml-react';
 import { PublicParty } from '../Credentials';
 import { userContext } from './App';
+import { Skillset } from "@daml.js/daml-react/lib/Common/module";
+
+
 
 type Props = {
   onLogout: () => void;
   getPublicParty : () => PublicParty;
+  // skillset: Skillset;
 }
 
 const toAlias = (userId: string): string =>
@@ -36,7 +40,7 @@ const MainScreen: React.FC<Props> = ({onLogout, getPublicParty}) => {
     try {
       let userContract = await ledger.fetchByKey(User.User, party);
       if (userContract === null) {
-        const user = {username: party, following: []};
+        const user = {username: party, skillset: Skillset.None};
         userContract = await ledger.create(User.User, user);
       }
       setCreatedUser(true);
@@ -50,7 +54,7 @@ const MainScreen: React.FC<Props> = ({onLogout, getPublicParty}) => {
       try {
         let userAlias = await ledger.fetchByKey(User.Alias, {_1: party, _2: publicParty});
         if (userAlias === null) {
-           await ledger.create(User.Alias, {username: party, alias: toAlias(user.userId), public: publicParty});
+           await ledger.create(User.Alias, {username: party, alias: toAlias(user.userId), public: publicParty, skillset: Skillset.None});
         }
       } catch(error) {
         alert(`Unknown error:\n${JSON.stringify(error)}`);

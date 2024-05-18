@@ -29,6 +29,8 @@ export const publicContext = isRunningOnHub()
  */
 // APP_BEGIN
 const App: React.FC = () => {
+  // const [selectedSkillset, setSelectedSkillset] = React.useState<Skillset>(Object.values(Skillset)[0]);
+
   const [credentials, setCredentials] = React.useState<
     Credentials | undefined
   >();
@@ -64,6 +66,7 @@ const App: React.FC = () => {
           user={credentials.user}>
           <MainScreen
             getPublicParty={credentials.getPublicParty}
+            // skillset={selectedSkillset}
             onLogout={() => {
               if (authConfig.provider === "daml-hub") {
                 damlHubLogout();

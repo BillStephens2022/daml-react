@@ -19,19 +19,20 @@ import { publicContext, userContext } from "./App";
 import WorkRequestForm from "./WorkRequestForm";
 import { WorkRequest } from "../types";
 import WorkList from "./WorkList";
+import { Skillset } from "@daml.js/daml-react/lib/Common/module";
+import EditSkillsetForm from "./EditSkillsetForm";
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
   const username = userContext.useParty();
-  const myUserResult = userContext.useStreamFetchByKeys(
-    User.User,
-    () => [username],
-    [username]
-  );
+  // const myUserResult = userContext.useStreamFetchByKeys(
+  //   User.User,
+  //   () => [username],
+  //   [username]
+  // );
   const aliases = publicContext.useStreamQueries(User.Alias, () => [], []);
   const users = publicContext.useStreamQueries(User.User, () => [], []);
-  const myUser = myUserResult.contracts[0]?.payload;
-  const allUsers = userContext.useStreamQueries(User.User).contracts;
+  const allUsers = publicContext.useStreamQueries(User.User, () => [], []);
   const allWorkProposals = publicContext.useStreamQueries(
     Work.WorkProposal
   ).contracts;
@@ -41,6 +42,7 @@ const MainView: React.FC = () => {
 
   // USERS_END
   const [showModal, setShowModal] = useState(false);
+  const [showSkillsetModal, setShowSkillsetModal] = useState(false);
 
   const ledger = userContext.useLedger();
 
@@ -68,6 +70,10 @@ const MainView: React.FC = () => {
     ? "loading ..."
     : partyToAlias.get(username) ?? username;
 
+  const mySkillset = users.loading
+    ? "loading..."
+    : users.contracts[0].payload.skillset;
+
   // Function to submit a new work request to the DAML ledger
   const submitWorkRequest = async (workRequest: WorkRequest) => {
     try {
@@ -78,21 +84,26 @@ const MainView: React.FC = () => {
         (alias) => alias.payload.alias.toLowerCase() === workerLowercase
       );
       if (!workerAlias) {
+        console.log("Worker Alias: ", workerAlias);
+        console.log("Worker Lower Case: ", workerLowercase);
+        console.log("alias contracts: ", aliases.contracts);
+
         console.error("Worker not found.");
         return false;
       }
       console.log("WorkerAlias!: ", workerAlias);
       const workerParty = workerAlias.payload.username;
+      const jobCategory = workRequest.jobCategory || Skillset.None;
       const workProposal = await ledger.create(Work.WorkProposal, {
         client: username,
         worker: workerParty,
-        jobCategory: workRequest.jobCategory,
+        jobCategory: jobCategory,
         jobTitle: workRequest.jobTitle,
         jobDescription: workRequest.jobDescription,
         note: workRequest.note,
         rateType: workRequest.rateType,
         rateAmount: workRequest.rateAmount.toString(),
-        rejected: workRequest.rejected
+        rejected: workRequest.rejected,
       });
       console.log("Work proposal created:", workProposal);
       return true;
@@ -120,10 +131,68 @@ const MainView: React.FC = () => {
     setShowModal(false); // Close the modal when cancel is clicked
   };
 
+  const handleCancelEditSkillset = () => {
+    setShowModal(false); // Close the modal when cancel is clicked
+  };
+
+  const handleEditSkillset = async (selectedSkillset: Skillset) => {
+    console.log("editing skillset!: ", selectedSkillset);
+    try {
+      const userContractId = users.contracts[0].contractId;
+      console.log("userContractId", userContractId);
+      await ledger.exercise(User.User.ChangeSkillset, userContractId, {
+        newSkillset: selectedSkillset,
+      });
+      // Update the corresponding Alias contract with the new skillset
+      const userAlias = aliases.contracts.find(alias => alias.payload.username === username);
+      if (userAlias) {
+        const aliasContractId = userAlias.contractId;
+        await ledger.exercise(User.Alias.Change, aliasContractId, {
+          newAlias: userAlias.payload.alias, // Provide the existing alias
+          newSkillset: selectedSkillset,
+        });
+      }
+      setShowSkillsetModal(false);
+    } catch (error) {
+      console.error("Error editing proposal:", error);
+    }
+  };
+
+  const toTS_Skillset = (damlSkillset: string): Skillset => {
+    switch (damlSkillset) {
+      case "Handyman":
+        return Skillset.Handyman;
+      case "Technology":
+        return Skillset.Technology;
+      case "Landscaping":
+        return Skillset.Landscaping;
+      case "Financial":
+        return Skillset.Financial;
+      case "Housekeeping":
+        return Skillset.Housekeeping;
+      case "None":
+        return Skillset.None;
+      default:
+        throw new Error(`Unknown skillset: ${damlSkillset}`);
+    }
+  };
+
+  const formattedUsers = useMemo(() => {
+    return aliases.contracts.map((user) => ({
+      payload: {
+        username: user.payload.username,
+        alias: user.payload.alias,
+        skillset: toTS_Skillset(user.payload.skillset), // Convert DAML Skillset to TypeScript Skillset
+      },
+    }));
+  }, [aliases]);
+
   console.log("Aliases: ", aliases);
-  console.log("All Users", users);
+  console.log("users", users);
+  console.log("allUsers", allUsers);
   console.log("allUserAliases: ", allUserAliases);
   console.log("allWorkProposals: ", allWorkProposals);
+  console.log("formatted users: ", formattedUsers);
 
   return (
     <Container>
@@ -144,8 +213,29 @@ const MainView: React.FC = () => {
               <Header as="h2">
                 <Icon name="user" />
                 <Header.Content>{myUserName ?? "Loading..."}</Header.Content>
+                Skillset: {mySkillset ?? "Loading..."}
               </Header>
               <Divider />
+              <Button
+                type="button"
+                color="yellow"
+                onClick={() => setShowSkillsetModal(!showSkillsetModal)}
+              >
+                Edit Skillset
+              </Button>
+              <Modal
+                open={showSkillsetModal}
+                onClose={() => setShowSkillsetModal(false)}
+                closeIcon
+              >
+                <Modal.Header>Edit Skillset</Modal.Header>
+                <Modal.Content>
+                  <EditSkillsetForm
+                    onSubmit={handleEditSkillset}
+                    onCancel={handleCancelEditSkillset}
+                  />
+                </Modal.Content>
+              </Modal>
             </Segment>
 
             <Segment>
@@ -154,7 +244,11 @@ const MainView: React.FC = () => {
                 <Header.Content>Submit a Work Request</Header.Content>
               </Header>
               <Divider />
-              <Button type="button" onClick={() => setShowModal(!showModal)}>
+              <Button
+                type="button"
+                color="blue"
+                onClick={() => setShowModal(!showModal)}
+              >
                 New Request
               </Button>
               <Modal
@@ -169,7 +263,7 @@ const MainView: React.FC = () => {
                     onCancel={handleCancelWorkRequest}
                     username={myUserName}
                     userAliases={Array.from(allUserAliases.values())}
-                    allUserAliases={allUserAliases}
+                    users={formattedUsers}
                   />
                 </Modal.Content>
               </Modal>

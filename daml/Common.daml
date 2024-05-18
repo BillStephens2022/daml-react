@@ -1,0 +1,6 @@
+-- Common.daml
+
+module Common where
+
+data Skillset = Handyman | Technology | Landscaping | Financial | Housekeeping | None
+  deriving (Eq, Show)

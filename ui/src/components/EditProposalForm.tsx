@@ -51,7 +51,7 @@ const EditProposalForm: React.FC<Props> = ({
         <label>Job Category</label>
         <Input
           name="jobCategory"
-          value={formData.jobCategory}
+          value={formData.jobCategory || ""}
           onChange={handleChange}
           placeholder="Job Category"
           required

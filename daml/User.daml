@@ -3,9 +3,12 @@
 module User where
 
 import Work
+import Common (Skillset)
+
 
 template User with
     username: Party
+    skillset: Skillset
   where
     signatory username
 
@@ -14,7 +17,7 @@ template User with
 
     nonconsuming choice ProposeWork : WorkProposalId
         with
-            jobCategory: Text
+            jobCategory: Skillset
             jobTitle: Text
             jobDescription: Text
             note: Text
@@ -33,11 +36,19 @@ template User with
                 rateType = rateType
                 rateAmount = rateAmount
                 rejected = rejected
+    
+    choice ChangeSkillset : ContractId User
+        with
+            newSkillset: Skillset
+        controller username
+        do
+            create this with skillset = newSkillset
 
 -- ALIAS_BEGIN
 template Alias with
     username: Party
     alias: Text
+    skillset: Skillset
     public: Party
   where
     signatory username
@@ -48,8 +59,9 @@ template Alias with
 
     nonconsuming choice Change: ContractId Alias with
         newAlias: Text
+        newSkillset: Skillset
       controller username
       do
         archive self
-        create this with alias = newAlias
+        create this with alias = newAlias; skillset = newSkillset
 -- ALIAS_END

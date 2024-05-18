@@ -323,7 +323,7 @@ const WorkList: React.FC<Props> = ({
               initialValues={{
                 client: selectedProposal.payload?.client ?? "",
                 worker: selectedProposal.payload?.worker ?? "",
-                jobCategory: selectedProposal.payload?.jobCategory ?? "",
+                jobCategory: null,
                 jobTitle: selectedProposal.payload?.jobTitle ?? "",
                 jobDescription: selectedProposal.payload?.jobDescription ?? "",
                 note: selectedProposal.payload?.note ?? "",
