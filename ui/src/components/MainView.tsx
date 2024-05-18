@@ -103,7 +103,7 @@ const MainView: React.FC = () => {
         note: workRequest.note,
         rateType: workRequest.rateType,
         rateAmount: workRequest.rateAmount.toString(),
-        rejected: workRequest.rejected
+        rejected: workRequest.rejected,
       });
       console.log("Work proposal created:", workProposal);
       return true;
@@ -115,7 +115,7 @@ const MainView: React.FC = () => {
 
   // Function to handle submission of work request form
   const handleSubmitWorkRequest = (workRequest: WorkRequest) => {
-    console.log("Work Request Data:", workRequest as WorkRequest);  
+    console.log("Work Request Data:", workRequest as WorkRequest);
     if (typeof workRequest.rateAmount === "number") {
       submitWorkRequest(workRequest).then((success) => {
         if (success) {
@@ -143,12 +143,20 @@ const MainView: React.FC = () => {
       await ledger.exercise(User.User.ChangeSkillset, userContractId, {
         newSkillset: selectedSkillset,
       });
+      // Update the corresponding Alias contract with the new skillset
+      const userAlias = aliases.contracts.find(alias => alias.payload.username === username);
+      if (userAlias) {
+        const aliasContractId = userAlias.contractId;
+        await ledger.exercise(User.Alias.Change, aliasContractId, {
+          newAlias: userAlias.payload.alias, // Provide the existing alias
+          newSkillset: selectedSkillset,
+        });
+      }
       setShowSkillsetModal(false);
     } catch (error) {
       console.error("Error editing proposal:", error);
     }
-  }
-
+  };
 
   const toTS_Skillset = (damlSkillset: string): Skillset => {
     switch (damlSkillset) {
@@ -168,16 +176,16 @@ const MainView: React.FC = () => {
         throw new Error(`Unknown skillset: ${damlSkillset}`);
     }
   };
-  
 
-  const formattedUsers = aliases.contracts.map((user) => ({
-    payload: {
-      username: user.payload.username,
-      alias: user.payload.alias,
-      skillset: toTS_Skillset(user.payload.skillset), // Convert DAML Skillset to TypeScript Skillset
-    },
-  }));
-
+  const formattedUsers = useMemo(() => {
+    return aliases.contracts.map((user) => ({
+      payload: {
+        username: user.payload.username,
+        alias: user.payload.alias,
+        skillset: toTS_Skillset(user.payload.skillset), // Convert DAML Skillset to TypeScript Skillset
+      },
+    }));
+  }, [aliases]);
 
   console.log("Aliases: ", aliases);
   console.log("users", users);
@@ -208,7 +216,13 @@ const MainView: React.FC = () => {
                 Skillset: {mySkillset ?? "Loading..."}
               </Header>
               <Divider />
-              <Button type="button" color="yellow" onClick={() => setShowSkillsetModal(!showSkillsetModal)}>Edit Skillset</Button>
+              <Button
+                type="button"
+                color="yellow"
+                onClick={() => setShowSkillsetModal(!showSkillsetModal)}
+              >
+                Edit Skillset
+              </Button>
               <Modal
                 open={showSkillsetModal}
                 onClose={() => setShowSkillsetModal(false)}
@@ -230,7 +244,11 @@ const MainView: React.FC = () => {
                 <Header.Content>Submit a Work Request</Header.Content>
               </Header>
               <Divider />
-              <Button type="button" color="blue" onClick={() => setShowModal(!showModal)}>
+              <Button
+                type="button"
+                color="blue"
+                onClick={() => setShowModal(!showModal)}
+              >
                 New Request
               </Button>
               <Modal
@@ -246,7 +264,7 @@ const MainView: React.FC = () => {
                     username={myUserName}
                     userAliases={Array.from(allUserAliases.values())}
                     allUserAliases={allUserAliases}
-                    users = {formattedUsers}
+                    users={formattedUsers}
                   />
                 </Modal.Content>
               </Modal>
