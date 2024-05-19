@@ -12,6 +12,7 @@ import {
   Button,
   Modal,
   ButtonGroup,
+  ButtonOr,
 } from "semantic-ui-react";
 import { Party } from "@daml/types";
 import { User } from "@daml.js/daml-react";
@@ -277,44 +278,54 @@ const MainView: React.FC = () => {
           </Grid.Column>
         </Grid.Row>
       </Grid>
-      <ButtonGroup>
-        <Button color="blue" onClick={() => setView("jobView")}>My Jobs</Button>
-        <Button color="grey" onClick={() => setView("requestView")}>My Requests</Button>
-        <Button color="yellow" onClick={() => setView("contractView")}>Active Contracts</Button>
-      </ButtonGroup>
-      {view === "requestView" &&
-      <MyRequests
-        partyToAlias={partyToAlias}
-        workProposals={allWorkProposals}
-        workContracts={allWorkContracts}
-        username={username}
-        isWorkerList={false}
-        isWorkContract={true}
-        ledger={ledger}
-      />
-  }
-      {view === "jobView" && 
-      <MyJobs
-        partyToAlias={partyToAlias}
-        workProposals={allWorkProposals}
-        workContracts={allWorkContracts}
-        username={username}
-        isWorkerList={false}
-        isWorkContract={true}
-        ledger={ledger}
-      />
-    }
-    {view === "contractView" && 
-      <ActiveWorkContracts
-        partyToAlias={partyToAlias}
-        workProposals={allWorkProposals}
-        workContracts={allWorkContracts}
-        username={username}
-        isWorkerList={false}
-        isWorkContract={true}
-        ledger={ledger}
-      />
-  }
+      <Segment raised textAlign="center">
+        <ButtonGroup>
+          <Button color="blue" onClick={() => setView("jobView")}>
+            My Jobs
+          </Button>
+          <ButtonOr />
+          <Button color="grey" onClick={() => setView("requestView")}>
+            My Requests
+          </Button>
+          <ButtonOr />
+          <Button color="yellow" onClick={() => setView("contractView")}>
+            Active Contracts
+          </Button>
+        </ButtonGroup>
+      </Segment>
+      {view === "requestView" && (
+        <MyRequests
+          partyToAlias={partyToAlias}
+          workProposals={allWorkProposals}
+          workContracts={allWorkContracts}
+          username={username}
+          isWorkerList={false}
+          isWorkContract={true}
+          ledger={ledger}
+        />
+      )}
+      {view === "jobView" && (
+        <MyJobs
+          partyToAlias={partyToAlias}
+          workProposals={allWorkProposals}
+          workContracts={allWorkContracts}
+          username={username}
+          isWorkerList={false}
+          isWorkContract={true}
+          ledger={ledger}
+        />
+      )}
+      {view === "contractView" && (
+        <ActiveWorkContracts
+          partyToAlias={partyToAlias}
+          workProposals={allWorkProposals}
+          workContracts={allWorkContracts}
+          username={username}
+          isWorkerList={false}
+          isWorkContract={true}
+          ledger={ledger}
+        />
+      )}
     </Container>
   );
 };
