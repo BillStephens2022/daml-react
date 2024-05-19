@@ -11,6 +11,7 @@ import {
   Divider,
   Button,
   Modal,
+  ButtonGroup,
 } from "semantic-ui-react";
 import { Party } from "@daml/types";
 import { User } from "@daml.js/daml-react";
@@ -18,9 +19,11 @@ import { Work } from "@daml.js/daml-react";
 import { publicContext, userContext } from "./App";
 import WorkRequestForm from "./WorkRequestForm";
 import { WorkRequest } from "../types";
-import WorkList from "./WorkList";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import EditSkillsetForm from "./EditSkillsetForm";
+import MyRequests from "./MyRequests";
+import MyJobs from "./MyJobs";
+import ActiveWorkContracts from "./ActiveWorkContracts";
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
@@ -43,6 +46,7 @@ const MainView: React.FC = () => {
   // USERS_END
   const [showModal, setShowModal] = useState(false);
   const [showSkillsetModal, setShowSkillsetModal] = useState(false);
+  const [view, setView] = useState("");
 
   const ledger = userContext.useLedger();
 
@@ -144,7 +148,9 @@ const MainView: React.FC = () => {
         newSkillset: selectedSkillset,
       });
       // Update the corresponding Alias contract with the new skillset
-      const userAlias = aliases.contracts.find(alias => alias.payload.username === username);
+      const userAlias = aliases.contracts.find(
+        (alias) => alias.payload.username === username
+      );
       if (userAlias) {
         const aliasContractId = userAlias.contractId;
         await ledger.exercise(User.Alias.Change, aliasContractId, {
@@ -268,36 +274,47 @@ const MainView: React.FC = () => {
                 </Modal.Content>
               </Modal>
             </Segment>
-            <WorkList
-              partyToAlias={partyToAlias}
-              workProposals={allWorkProposals}
-              workContracts={allWorkContracts}
-              username={username}
-              isWorkerList={true}
-              isWorkContract={false}
-              ledger={ledger}
-            />
-            <WorkList
-              partyToAlias={partyToAlias}
-              workProposals={allWorkProposals}
-              workContracts={allWorkContracts}
-              username={username}
-              isWorkerList={false}
-              isWorkContract={false}
-              ledger={ledger}
-            />
-            <WorkList
-              partyToAlias={partyToAlias}
-              workProposals={allWorkProposals}
-              workContracts={allWorkContracts}
-              username={username}
-              isWorkerList={false}
-              isWorkContract={true}
-              ledger={ledger}
-            />
           </Grid.Column>
         </Grid.Row>
       </Grid>
+      <ButtonGroup>
+        <Button color="blue" onClick={() => setView("jobView")}>My Jobs</Button>
+        <Button color="grey" onClick={() => setView("requestView")}>My Requests</Button>
+        <Button color="yellow" onClick={() => setView("contractView")}>Active Contracts</Button>
+      </ButtonGroup>
+      {view === "requestView" &&
+      <MyRequests
+        partyToAlias={partyToAlias}
+        workProposals={allWorkProposals}
+        workContracts={allWorkContracts}
+        username={username}
+        isWorkerList={false}
+        isWorkContract={true}
+        ledger={ledger}
+      />
+  }
+      {view === "jobView" && 
+      <MyJobs
+        partyToAlias={partyToAlias}
+        workProposals={allWorkProposals}
+        workContracts={allWorkContracts}
+        username={username}
+        isWorkerList={false}
+        isWorkContract={true}
+        ledger={ledger}
+      />
+    }
+    {view === "contractView" && 
+      <ActiveWorkContracts
+        partyToAlias={partyToAlias}
+        workProposals={allWorkProposals}
+        workContracts={allWorkContracts}
+        username={username}
+        isWorkerList={false}
+        isWorkContract={true}
+        ledger={ledger}
+      />
+  }
     </Container>
   );
 };
