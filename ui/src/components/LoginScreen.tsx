@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useCallback, useState } from "react";
-import { Button, Form, Grid, Header, Image, Segment } from "semantic-ui-react";
+import { Button, Form, Grid, Header, Image, Icon, Segment, Divider } from "semantic-ui-react";
 import Credentials, { PublicParty } from "../Credentials";
 import Ledger from "@daml/ledger";
 import {
@@ -10,6 +10,7 @@ import {
   usePublicParty,
 } from "@daml/hub-react";
 import { authConfig, Insecure } from "../config";
+import HeaderSubHeader from "semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader";
 
 type Props = {
   onLogin: (credentials: Credentials) => void;
@@ -37,7 +38,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
           size="huge"
           style={{ color: "#223668" }}>
           <Header.Content>
-            Create
+{/*             
             <Image
               as="a"
               href="https://www.digitalasset.com/developers"
@@ -47,8 +48,11 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
               spaced
               size="small"
               verticalAlign="bottom"
-            />
-            App
+            /> */}
+            <Icon name="users" size="big" circular />
+            Community Jobs
+            <Divider />
+            <HeaderSubHeader>A Smart Contract Application</HeaderSubHeader>
           </Header.Content>
         </Header>
         <Form size="massive" className="test-select-login-screen">

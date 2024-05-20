@@ -14,7 +14,6 @@ import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 type Props = {
   onLogout: () => void;
   getPublicParty : () => PublicParty;
-  // skillset: Skillset;
 }
 
 const toAlias = (userId: string): string =>
