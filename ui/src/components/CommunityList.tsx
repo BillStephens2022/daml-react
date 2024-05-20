@@ -1,5 +1,17 @@
-import React from "react";
-import { Segment, Header, Divider, Grid, Icon } from "semantic-ui-react";
+import React, { useState } from "react";
+import {
+  Segment,
+  Header,
+  Button,
+  Divider,
+  Icon,
+  Table,
+  TableRow,
+  TableHeaderCell,
+  TableHeader,
+  TableCell,
+  TableBody,
+} from "semantic-ui-react";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 
 type Props = {
@@ -7,37 +19,35 @@ type Props = {
 };
 
 const CommunityList: React.FC<Props> = ({ aliases }) => {
+  const [showCommunity, setShowCommunity] = useState(false);
   return (
     <Segment>
       <Header as="h2">
         <Icon name="users" />
         <Header.Content>Our Community</Header.Content>
+        <Button primary onClick={() => setShowCommunity(!showCommunity)}>
+          Show Community
+        </Button>
       </Header>
       <Divider />
-      <Grid columns={2} stackable>
-        <Grid.Column>
-          <Header as="h3">Member</Header>
+      {showCommunity && (
+        <Table celled striped>
+          <TableHeader>
+            <TableRow>
+              <TableHeaderCell>Member</TableHeaderCell>
+              <TableHeaderCell>Skillset</TableHeaderCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
           {aliases.map((alias) => (
-            <p
-              key={alias.username}
-              style={{ minWidth: 0, width: "auto" }}
-            >
-              <p>{alias.alias}</p>
-            </p>
-          ))}
-        </Grid.Column>
-        <Grid.Column>
-          <Header as="h3">Skillset</Header>
-          {aliases.map((alias) => (
-            <p
-              key={alias.username}
-              style={{ minWidth: 0, width: "auto" }}
-            >
-              <p>{alias.skillset}</p>
-            </p>
-          ))}
-        </Grid.Column>
-      </Grid>
+            <TableRow key={alias.username}>
+              <TableCell>{alias.alias}</TableCell>
+              <TableCell>{alias.skillset}</TableCell>
+            </TableRow>))}
+          </TableBody>
+          
+        </Table>
+      )}
     </Segment>
   );
 };
