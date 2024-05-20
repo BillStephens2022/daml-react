@@ -1,18 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Segment,
-  Header,
-  Divider,
-  Grid,
-  Button,
-  Icon,
-  Modal,
+  Header
 } from "semantic-ui-react";
-import { ContractId, Party } from "@daml/types";
+import { Party } from "@daml/types";
 import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
-import RejectForm from "./RejectForm";
-import EditProposalForm from "./EditProposalForm";  
 import WorkList from "./WorkList";
 
 type Props = {

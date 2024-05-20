@@ -11,27 +11,14 @@ import {
 } from "@daml/hub-react";
 import { authConfig, Insecure } from "../config";
 
-
-// Define options for the skillset dropdown
-// const skillsetOptions = [
-//   { key: 'handyman', text: 'Handyman', value: 'Handyman' },
-//   { key: 'technology', text: 'Technology', value: 'Technology' },
-//   { key: 'landscaping', text: 'Landscaping', value: 'Landscaping' },
-//   { key: 'financial', text: 'Financial', value: 'Financial' },
-//   { key: 'housekeeping', text: 'Housekeeping', value: 'Housekeeping' }
-// ];
-
 type Props = {
   onLogin: (credentials: Credentials) => void;
-  // onSkillsetChange: (skillset: Skillset) => void;
 };
 
 /**
  * React component for the login screen of the `App`.
  */
 const LoginScreen: React.FC<Props> = ({ onLogin }) => {
- 
-  // const [selectedSkillset, setSelectedSkillset] = useState<string>("");
 
   const login = useCallback(
     async (credentials: Credentials) => {
@@ -76,10 +63,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
    
 
     const handleLogin = async (event: React.FormEvent) => {
-      // if (!selectedSkillset) {
-      //   alert('Please select a skillset.');
-      //   return;
-      // }
+    
       event.preventDefault();
       const token = auth.makeToken(username);
       const ledger = new Ledger({ token: token });
@@ -123,7 +107,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
         party: primaryParty,
         token: auth.makeToken(username),
         getPublicParty: useGetPublicParty,
-        skillset: "None",
+        //skillset: "None",
       });
     };
 
@@ -137,16 +121,6 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
           className="test-select-username-field"
           onChange={(e, { value }) => setUsername(value?.toString() ?? "")}
         />
-        {/* <Dropdown
-              fluid
-              selection
-              placeholder="Select Skillset"
-              options={skillsetOptions}
-              onChange={(e, { value }) => {
-                setSelectedSkillset(value as Skillset);
-                if (onSkillsetChange) onSkillsetChange(value as Skillset);
-              }}
-            /> */}
         <Button
           primary
           fluid
@@ -172,7 +146,7 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
                 usePublicParty: () => usePublicParty(),
                 setup: () => {},
               }),
-              skillset: "None"
+              //skillset: "None"
             });
           }
         }}

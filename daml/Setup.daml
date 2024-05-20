@@ -1,8 +1,11 @@
 module Setup where
 
+
+import Common (Skillset(..))
 import DA.Optional (fromSomeNote)
 import qualified DA.Text as T
 import Daml.Script
+import User as UserModule
 
 -- | A record containing all the parties that we will use in our script
 data Parties = Parties
@@ -21,7 +24,7 @@ data TestUser = TestUser with
   participantName: Optional ParticipantName
 
 defaultParticipant : Optional ParticipantName
-defaultParticipant = None
+defaultParticipant = Prelude.None
 -- | Create a public party, then create three test users.
 
 setup : Script Parties
@@ -33,11 +36,42 @@ setup = do
   alice <- createTestUser $ TestUser "Alice" public defaultParticipant
   bob <- createTestUser $ TestUser "Bob" public defaultParticipant
   charlie <- createTestUser $ TestUser "Charlie" public defaultParticipant
+
+  -- Create User contracts for each party with their respective skillsets
+  createUserContract alice Technology
+  createUserContract bob Handyman
+  createUserContract charlie Landscaping
+
+  -- Create Alias contracts for each party with their respective skillsets
+  createAliasContract alice "Alice" Technology public
+  createAliasContract bob "Bob" Handyman public
+  createAliasContract charlie "Charlie" Landscaping public
+
   pure $ Parties with
     alice
     bob
     charlie
     public
+
+-- | Create a User contract for a party with a specific skillset.
+createUserContract : Party -> Skillset -> Script (ContractId UserModule.User)
+createUserContract party skillset = do
+  cid <- submit party do
+    createCmd UserModule.User with
+      username = party
+      skillset = skillset
+  pure cid
+
+-- | Create Alias contracts for each party with their respective skillsets.
+createAliasContract : Party -> Text -> Skillset -> Party -> Script ()
+createAliasContract party alias skillset public = do
+  _ <- submit party do
+    createCmd UserModule.Alias with
+      username = party
+      alias = alias
+      skillset = skillset
+      public = public
+  pure ()
 
 -- | Create a test user.
 createTestUser : TestUser -> Script Party
@@ -49,12 +83,12 @@ createTestUser TestUser{alias, public, participantName} = do
 -- | Create the public party.
 createPublic : Optional ParticipantName -> Script Party
 createPublic participantName = do
-  publicUser <- getOrCreateUser "Public" None participantName
+  publicUser <- getOrCreateUser "Public" Prelude.None participantName
   pure $ getPrimaryParty publicUser
 
 
 -- | Get a user by their id. If the user doesn't exist, it is created.
-getOrCreateUser : Text -> Optional Party -> Optional ParticipantName -> Script User
+getOrCreateUser : Text -> Optional Party -> Optional ParticipantName -> Script Daml.Script.User
 getOrCreateUser alias publicM participantNameM = do
   userId <- validateUserId $ toUserId alias
   try
@@ -62,33 +96,33 @@ getOrCreateUser alias publicM participantNameM = do
   catch
     UserNotFound _ -> do
       p <- allocateParty_ alias participantNameM
-      let u = User userId (Some p)
+      let u = Daml.Script.User userId (Some p)
       let rights  = CanActAs p :: [CanReadAs public | Some public <- [publicM]]
       createUser_ u rights participantNameM
       pure u
 
-getUser_ : UserId -> Optional ParticipantName -> Script User
+getUser_ : UserId -> Optional ParticipantName -> Script Daml.Script.User
 getUser_  userId participantNameM = do
   case participantNameM of
     Some participantName -> getUserOn userId participantName
-    None -> getUser userId
+    Prelude.None -> getUser userId
 
 allocateParty_ : Text -> Optional ParticipantName -> Script Party
 allocateParty_ alias participantNameM = do
   case participantNameM of
     Some participantName -> allocatePartyOn alias participantName
-    None -> allocateParty alias
+    Prelude.None -> allocateParty alias
 
-createUser_ : User -> [UserRight] ->  Optional ParticipantName -> Script ()
+createUser_ : Daml.Script.User -> [UserRight] ->  Optional ParticipantName -> Script ()
 createUser_ user rights participantNameM = do
   case participantNameM of
     Some participantName -> createUserOn user rights participantName
-    None -> createUser user rights
+    Prelude.None -> createUser user rights
 
 -- | Convert a text to a valid user id.
 toUserId : Text -> Text
 toUserId = T.asciiToLower
 
 -- | Try to get the primary party of a user and fail if the user has no associated primary party.
-getPrimaryParty : User -> Party
+getPrimaryParty : Daml.Script.User -> Party
 getPrimaryParty u = fromSomeNote ("User " <> userIdToText u.userId <> " is missing a primary party.") u.primaryParty
