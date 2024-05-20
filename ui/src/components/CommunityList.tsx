@@ -1,5 +1,5 @@
 import React from "react";
-import { Segment, Header, Divider, Grid } from "semantic-ui-react";
+import { Segment, Header, Divider, Grid, Icon } from "semantic-ui-react";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 
 type Props = {
@@ -10,6 +10,7 @@ const CommunityList: React.FC<Props> = ({ aliases }) => {
   return (
     <Segment>
       <Header as="h2">
+        <Icon name="users" />
         <Header.Content>Our Community</Header.Content>
       </Header>
       <Divider />
