@@ -188,6 +188,8 @@ const MainView: React.FC = () => {
         return Skillset.Financial;
       case "Housekeeping":
         return Skillset.Housekeeping;
+      case "Babysitting":
+        return Skillset.Babysitting;
       case "None":
         return Skillset.None;
       default:

@@ -2,5 +2,5 @@
 
 module Common where
 
-data Skillset = Handyman | Technology | Landscaping | Financial | Housekeeping | None
+data Skillset = Handyman | Technology | Landscaping | Financial | Housekeeping | Babysitting | None
   deriving (Eq, Show)

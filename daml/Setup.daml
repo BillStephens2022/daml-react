@@ -13,6 +13,9 @@ data Parties = Parties
     alice : Party
     bob : Party
     charlie: Party
+    debbie: Party
+    ernie: Party
+    fiona: Party
     public: Party
 
 -- | A test user for the create-daml-app network.
@@ -36,21 +39,36 @@ setup = do
   alice <- createTestUser $ TestUser "Alice" public defaultParticipant
   bob <- createTestUser $ TestUser "Bob" public defaultParticipant
   charlie <- createTestUser $ TestUser "Charlie" public defaultParticipant
+  debbie <- createTestUser $ TestUser "Debbie" public defaultParticipant
+  ernie <- createTestUser $ TestUser "Ernie" public defaultParticipant
+  fiona <- createTestUser $ TestUser "Fiona" public defaultParticipant
+  george <- createTestUser $ TestUser "George" public defaultParticipant
 
   -- Create User contracts for each party with their respective skillsets
   createUserContract alice Technology
   createUserContract bob Handyman
   createUserContract charlie Landscaping
+  createUserContract debbie Babysitting
+  createUserContract ernie Landscaping
+  createUserContract fiona Financial
+  createUserContract george Handyman
 
   -- Create Alias contracts for each party with their respective skillsets
   createAliasContract alice "Alice" Technology public
   createAliasContract bob "Bob" Handyman public
   createAliasContract charlie "Charlie" Landscaping public
+  createAliasContract debbie "Debbie" Babysitting public
+  createAliasContract ernie "Ernie" Landscaping public
+  createAliasContract fiona "Fiona" Financial public
+  createAliasContract george "George" Handyman public
 
   pure $ Parties with
     alice
     bob
     charlie
+    debbie
+    ernie
+    fiona
     public
 
 -- | Create a User contract for a party with a specific skillset.
