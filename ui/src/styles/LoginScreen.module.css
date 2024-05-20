@@ -1,0 +1,10 @@
+.loginForm {
+  background-color: rgb(86, 81, 81) !important;
+}
+
+.loginForm .loginButton {
+    margin-top: 1rem;
+    background-color: darkslateblue;
+    color: white;
+}
+

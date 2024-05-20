@@ -26,6 +26,8 @@ import MyRequests from "./MyRequests";
 import MyJobs from "./MyJobs";
 import ActiveWorkContracts from "./ActiveWorkContracts";
 import CommunityList from "./CommunityList";
+import HeaderSubHeader from "semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader";
+import classes from "../styles/MainView.module.css";
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
@@ -79,7 +81,6 @@ const MainView: React.FC = () => {
       skillset: alias.payload.skillset,
     }));
   }, [aliases]);
-  
 
   const myUserName = aliases.loading
     ? "loading ..."
@@ -219,7 +220,7 @@ const MainView: React.FC = () => {
             <Header
               as="h1"
               size="huge"
-              color="blue"
+              color="black"
               textAlign="center"
               style={{ padding: "1ex 0em 0ex 0em" }}
             >
@@ -228,9 +229,14 @@ const MainView: React.FC = () => {
 
             <Segment>
               <Header as="h2">
-                <Icon name="user" />
-                <Header.Content>{myUserName ?? "Loading..."}</Header.Content>
-                Skillset: {mySkillset ?? "Loading..."}
+              <Header.Content>
+                  <Icon name="user" className={classes.headerIcon} />
+
+                  <Header.Content>{myUserName ?? "Loading..."}</Header.Content>
+                  <HeaderSubHeader>
+                    Skillset: {mySkillset ?? "Loading..."}
+                  </HeaderSubHeader>
+                  </Header.Content>
               </Header>
               <Divider />
               <Button
@@ -256,7 +262,7 @@ const MainView: React.FC = () => {
             </Segment>
             <Segment>
               <CommunityList aliases={formattedAliases} />
-              </Segment>
+            </Segment>
             <Segment>
               <Header as="h2">
                 <Icon name="envelope" />

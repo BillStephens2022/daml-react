@@ -8,7 +8,7 @@ import { User } from '@daml.js/daml-react';
 import { PublicParty } from '../Credentials';
 import { userContext } from './App';
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
-
+import classes from "../styles/MainScreen.module.css"
 
 
 type Props = {
@@ -70,8 +70,8 @@ const MainScreen: React.FC<Props> = ({onLogout, getPublicParty}) => {
   } else {
     return (
       <>
-        <Menu icon borderless>
-          <Menu.Item>
+        <Menu icon borderless inverted>
+          <Menu.Item classes={classes.menuItem}>
             <Image
               as='a'
               href='https://www.digitalasset.com/developers'
@@ -88,7 +88,6 @@ const MainScreen: React.FC<Props> = ({onLogout, getPublicParty}) => {
             <Menu.Item
               position='right'
               active={false}
-              className='test-select-log-out'
               onClick={onLogout}
               icon='log out'
             />
