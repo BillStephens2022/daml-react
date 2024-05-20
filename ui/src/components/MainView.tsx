@@ -25,6 +25,7 @@ import EditSkillsetForm from "./EditSkillsetForm";
 import MyRequests from "./MyRequests";
 import MyJobs from "./MyJobs";
 import ActiveWorkContracts from "./ActiveWorkContracts";
+import CommunityList from "./CommunityList";
 
 // USERS_BEGIN
 const MainView: React.FC = () => {
@@ -70,6 +71,15 @@ const MainView: React.FC = () => {
     });
     return userAliases;
   }, [aliases]);
+
+  const formattedAliases = useMemo(() => {
+    return aliases.contracts.map((alias) => ({
+      username: alias.payload.username,
+      alias: alias.payload.alias,
+      skillset: alias.payload.skillset,
+    }));
+  }, [aliases]);
+  
 
   const myUserName = aliases.loading
     ? "loading ..."
@@ -244,7 +254,9 @@ const MainView: React.FC = () => {
                 </Modal.Content>
               </Modal>
             </Segment>
-
+            <Segment>
+              <CommunityList aliases={formattedAliases} />
+              </Segment>
             <Segment>
               <Header as="h2">
                 <Icon name="envelope" />
