@@ -7,3 +7,7 @@
 .headerIcon {
     margin-right: 0.5rem !important;
 }
+
+.view {
+    min-height: 40rem;
+}

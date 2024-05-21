@@ -11,8 +11,6 @@ import {
   Divider,
   Button,
   Modal,
-  ButtonGroup,
-  ButtonOr,
 } from "semantic-ui-react";
 import { Party } from "@daml/types";
 import { User } from "@daml.js/daml-react";
@@ -50,7 +48,8 @@ const MainView: React.FC = () => {
   // USERS_END
   const [showModal, setShowModal] = useState(false);
   const [showSkillsetModal, setShowSkillsetModal] = useState(false);
-  const [view, setView] = useState("");
+  const [view, setView] = useState("jobView");
+  const [activeMenuItem, setActiveMenuItem] = useState("jobView");
 
   const ledger = userContext.useLedger();
 
@@ -207,6 +206,11 @@ const MainView: React.FC = () => {
     }));
   }, [aliases]);
 
+  const handleMenuItemClick = (view: string) => {
+    setView(view);
+    setActiveMenuItem(view);
+  };
+
   console.log("Aliases: ", aliases);
   console.log("users", users);
   console.log("allUsers", allUsers);
@@ -231,13 +235,13 @@ const MainView: React.FC = () => {
 
             <Segment>
               <Header as="h2">
-              <Header.Content>
+                <Header.Content>
                   <Icon name="user" className={classes.headerIcon} />
                   <Header.Content>{myUserName ?? "Loading..."}</Header.Content>
                   <HeaderSubHeader>
                     Skillset: {mySkillset ?? "Loading..."}
                   </HeaderSubHeader>
-                  </Header.Content>
+                </Header.Content>
               </Header>
               <Divider />
               <Button
@@ -297,54 +301,72 @@ const MainView: React.FC = () => {
           </Grid.Column>
         </Grid.Row>
       </Grid>
-      <Segment raised textAlign="center">
-        <ButtonGroup>
-          <Button color="blue" onClick={() => setView("jobView")}>
-            My Jobs
-          </Button>
-          <ButtonOr />
-          <Button color="grey" onClick={() => setView("requestView")}>
-            My Requests
-          </Button>
-          <ButtonOr />
-          <Button color="yellow" onClick={() => setView("contractView")}>
-            Active Contracts
-          </Button>
-        </ButtonGroup>
-      </Segment>
-      {view === "requestView" && (
-        <MyRequests
-          partyToAlias={partyToAlias}
-          workProposals={allWorkProposals}
-          workContracts={allWorkContracts}
-          username={username}
-          isWorkerList={false}
-          isWorkContract={true}
-          ledger={ledger}
-        />
-      )}
-      {view === "jobView" && (
-        <MyJobs
-          partyToAlias={partyToAlias}
-          workProposals={allWorkProposals}
-          workContracts={allWorkContracts}
-          username={username}
-          isWorkerList={false}
-          isWorkContract={true}
-          ledger={ledger}
-        />
-      )}
-      {view === "contractView" && (
-        <ActiveWorkContracts
-          partyToAlias={partyToAlias}
-          workProposals={allWorkProposals}
-          workContracts={allWorkContracts}
-          username={username}
-          isWorkerList={false}
-          isWorkContract={true}
-          ledger={ledger}
-        />
-      )}
+
+      <div className="ui grid">
+        <div className="four wide column">
+          <div className="ui vertical fluid tabular menu">
+            <p
+              onClick={() => handleMenuItemClick("jobView")}
+              className={`item ${activeMenuItem === "jobView" ? "active" : ""}`}
+            >
+              My Jobs
+            </p>
+            <p
+              onClick={() => handleMenuItemClick("requestView")}
+              className={`item ${
+                activeMenuItem === "requestView" ? "active" : ""
+              }`}
+            >
+              My Requests
+            </p>
+            <p
+              onClick={() => handleMenuItemClick("contractView")}
+              className={`item ${
+                activeMenuItem === "contractView" ? "active" : ""
+              }`}
+            >
+              Active Contracts
+            </p>
+          </div>
+        </div>
+        <div className="twelve wide stretched column">
+          <div className={`ui segment ${classes.view}`}>
+            {view === "requestView" && (
+              <MyRequests
+                partyToAlias={partyToAlias}
+                workProposals={allWorkProposals}
+                workContracts={allWorkContracts}
+                username={username}
+                isWorkerList={false}
+                isWorkContract={true}
+                ledger={ledger}
+              />
+            )}
+            {view === "jobView" && (
+              <MyJobs
+                partyToAlias={partyToAlias}
+                workProposals={allWorkProposals}
+                workContracts={allWorkContracts}
+                username={username}
+                isWorkerList={false}
+                isWorkContract={true}
+                ledger={ledger}
+              />
+            )}
+            {view === "contractView" && (
+              <ActiveWorkContracts
+                partyToAlias={partyToAlias}
+                workProposals={allWorkProposals}
+                workContracts={allWorkContracts}
+                username={username}
+                isWorkerList={false}
+                isWorkContract={true}
+                ledger={ledger}
+              />
+            )}
+          </div>
+        </div>
+      </div>
     </Container>
   );
 };

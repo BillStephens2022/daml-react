@@ -1,8 +1,4 @@
 import React from "react";
-import {
-  Segment,
-  Header
-} from "semantic-ui-react";
 import { Party } from "@daml/types";
 import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
@@ -28,10 +24,8 @@ type Props = {
     ledger
   }) => {
     return (
-        <Segment>
-            <Header>
-                My Jobs
-            </Header>
+        <div>
+          
             <WorkList
               partyToAlias={partyToAlias}
               workProposals={workProposals}
@@ -41,7 +35,7 @@ type Props = {
               isWorkContract={false}
               ledger={ledger}
             />
-        </Segment>
+        </div>
     )
   }
 
