@@ -31,8 +31,9 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
   );
 
   const wrap: (c: JSX.Element) => JSX.Element = component => (
+    <div className={classes.overlay}>
     <Grid textAlign="center" style={{ height: "100vh" }} verticalAlign="middle">
-      <Grid.Column style={{ maxWidth: 450 }}>
+      <Grid.Column style={{ maxWidth: 450 }} className={classes.homeBox}>
         <Header
           as="h1"
           textAlign="center"
@@ -40,16 +41,18 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
           style={{ color: "#223668" }}>
           <Header.Content>
             <Icon name="users" size="big" circular />
-            Community Jobs
+            Community Helpers
             <Divider />
-            <HeaderSubHeader>A Smart Contract Application</HeaderSubHeader>
+            <HeaderSubHeader>Linking Neighbors with Skills to Neighbors in Need</HeaderSubHeader>
+            
           </Header.Content>
         </Header>
         <Form size="massive">
-          <Segment raised className={classes.loginForm}>{component}</Segment>
+          <Segment className={classes.loginForm}>{component}</Segment>
         </Form>
       </Grid.Column>
     </Grid>
+    </div>
   );
 
   const InsecureLogin: React.FC<{ auth: Insecure }> = ({ auth }) => {

@@ -215,7 +215,7 @@ const MainView: React.FC = () => {
   console.log("formatted users: ", formattedUsers);
 
   return (
-    <Container>
+    <Container className={classes.mainView}>
       <Grid centered columns={1}>
         <Grid.Row stretched>
           <Grid.Column>

@@ -1,3 +1,9 @@
+.mainView {
+    background-color: white;
+    margin: 3rem 0;
+    padding: 2rem;
+}
+
 .headerIcon {
     margin-right: 0.5rem !important;
 }
