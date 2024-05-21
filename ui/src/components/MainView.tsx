@@ -301,7 +301,8 @@ const MainView: React.FC = () => {
           </Grid.Column>
         </Grid.Row>
       </Grid>
-
+      <Segment>
+      <Header>Select a View</Header>
       <div className="ui grid">
         <div className="four wide column">
           <div className="ui vertical fluid tabular menu">
@@ -367,6 +368,7 @@ const MainView: React.FC = () => {
           </div>
         </div>
       </div>
+      </Segment>
     </Container>
   );
 };

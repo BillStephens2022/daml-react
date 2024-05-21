@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  Segment,
   Header,
   Button,
   Divider,
@@ -13,6 +12,7 @@ import {
   TableBody,
 } from "semantic-ui-react";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
+import classes from "../styles/Community.module.css";
 
 type Props = {
   aliases: { username: string; alias: string; skillset: Skillset }[];
@@ -20,13 +20,14 @@ type Props = {
 
 const CommunityList: React.FC<Props> = ({ aliases }) => {
   const [showCommunity, setShowCommunity] = useState(false);
+
   return (
-    <Segment>
+    <div className={classes.communityContainer}>
       <Header as="h2">
         <Icon name="users" />
         <Header.Content>Our Community</Header.Content>
-        <Button primary onClick={() => setShowCommunity(!showCommunity)}>
-          Show Community
+        <Button onClick={() => setShowCommunity(!showCommunity)} className={`primary ${classes.communityButton}`}>
+          {showCommunity ? "Hide" : "Show"} Community
         </Button>
       </Header>
       <Divider />
@@ -48,7 +49,7 @@ const CommunityList: React.FC<Props> = ({ aliases }) => {
           
         </Table>
       )}
-    </Segment>
+    </div>
   );
 };
 
