@@ -226,7 +226,7 @@ const MainView: React.FC = () => {
             <Header
               as="h1"
               size="huge"
-              color="black"
+              inverted
               textAlign="center"
               style={{ padding: "1ex 0em 0ex 0em" }}
             >
