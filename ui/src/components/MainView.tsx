@@ -238,7 +238,7 @@ const MainView: React.FC = () => {
                 <Header.Content>
                   <Icon name="user" className={classes.headerIcon} />
                   <Header.Content>{myUserName ?? "Loading..."}</Header.Content>
-                  <HeaderSubHeader>
+                  <HeaderSubHeader className={classes.skillset}>
                     Skillset: {mySkillset ?? "Loading..."}
                   </HeaderSubHeader>
                 </Header.Content>

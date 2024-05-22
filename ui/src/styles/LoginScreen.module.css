@@ -1,5 +1,5 @@
 .loginForm {
-  background-color: rgba(246, 208, 115, 0.15) !important;
+  background-color: rgba(105, 105, 255, 0.15) !important;
 }
 
 .homeBox {
@@ -10,7 +10,7 @@
 
 .loginForm .loginButton {
   margin-top: 1rem;
-  background-color: darkslateblue;
+  background: darkslateblue;
   color: white;
 }
 
