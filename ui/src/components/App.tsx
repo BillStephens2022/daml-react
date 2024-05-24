@@ -4,6 +4,7 @@
 import React from "react";
 import LoginScreen from "./LoginScreen";
 import MainScreen from "./MainScreen";
+import LoaderLarge from "./Loader";
 import { createLedgerContext } from "@daml/react";
 import DamlHub, {
   damlHubLogout,
@@ -46,7 +47,7 @@ const App: React.FC = () => {
           </publicContext.DamlLedger>
         );
       } else {
-        return <h1>Loading ...</h1>;
+        return <LoaderLarge loadingText="Loading..."/>;
       }
     };
     const Wrap: React.FC = ({ children }) =>

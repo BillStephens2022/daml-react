@@ -9,6 +9,7 @@ import { PublicParty } from '../Credentials';
 import { userContext } from './App';
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import classes from "../styles/MainScreen.module.css"
+import LoaderLarge from './Loader';
 
 
 type Props = {
@@ -66,7 +67,7 @@ const MainScreen: React.FC<Props> = ({onLogout, getPublicParty}) => {
   useEffect(() => {createAliasMemo();} , [createAliasMemo])
 
   if (!(createdUser && createdAlias)) {
-    return <h1>Logging in...</h1>;
+    return <LoaderLarge loadingText="Logging In ..." />;
   } else {
     return (
       <>
