@@ -17,6 +17,7 @@ import { Work } from "@daml.js/daml-react";
 import RejectForm from "./RejectForm";
 import EditProposalForm from "./EditProposalForm";
 import AcceptOrRejectButtons from "./AcceptOrRejectButtons";
+import EditButton from "./EditButton";
 
 type Props = {
   partyToAlias: Map<Party, string>;
@@ -261,16 +262,12 @@ const WorkList: React.FC<Props> = ({
                   onReject={openRejectForm}
                 />
               ) : isWorkContract ? null : (
-                <Button
-                  color="yellow"
-                  onClick={() =>
-                    openEditForm(
-                      contract.contractId as ContractId<Work.WorkProposal>
-                    )
+                <EditButton
+                  contractId={
+                    contract.contractId as ContractId<Work.WorkProposal>
                   }
-                >
-                  Edit
-                </Button>
+                  onEdit={openEditForm}
+                />
               )}
             </Segment>
           </Grid.Column>
