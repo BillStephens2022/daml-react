@@ -16,6 +16,7 @@ import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
 import RejectForm from "./RejectForm";
 import EditProposalForm from "./EditProposalForm";
+import AcceptOrRejectButtons from "./AcceptOrRejectButtons";
 
 type Props = {
   partyToAlias: Map<Party, string>;
@@ -246,32 +247,19 @@ const WorkList: React.FC<Props> = ({
               </p>
               <p>
                 <strong>Status</strong>{" "}
-                { (contract.payload as Work.WorkProposal).status }
+                {(contract.payload as Work.WorkProposal).status}
               </p>
-              {isWorkerList && ((contract.payload as Work.WorkProposal).status === "Awaiting Review" || "Revised - Awaiting Review")? (
-                <Button.Group fluid>
-                  <Button
-                    color="blue"
-                    onClick={() =>
-                      acceptProposal(
-                        contract.contractId as ContractId<Work.WorkProposal>
-                      )
-                    }
-                  >
-                    Accept
-                  </Button>
-                  <Button.Or />
-                  <Button
-                    color="red"
-                    onClick={() =>
-                      openRejectForm(
-                        contract.contractId as ContractId<Work.WorkProposal>
-                      )
-                    }
-                  >
-                    Reject
-                  </Button>
-                </Button.Group>
+              {isWorkerList &&
+              ((contract.payload as Work.WorkProposal).status ===
+                "Awaiting Review" ||
+                "Revised - Awaiting Review") ? (
+                <AcceptOrRejectButtons
+                  contractId={
+                    contract.contractId as ContractId<Work.WorkProposal>
+                  }
+                  onAccept={acceptProposal}
+                  onReject={openRejectForm}
+                />
               ) : isWorkContract ? null : (
                 <Button
                   color="yellow"
