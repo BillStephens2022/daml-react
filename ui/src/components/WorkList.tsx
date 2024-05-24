@@ -246,13 +246,9 @@ const WorkList: React.FC<Props> = ({
               </p>
               <p>
                 <strong>Status</strong>{" "}
-                {isWorkContract
-                  ? "Accepted"
-                  : (contract.payload as Work.WorkProposal).rejected
-                  ? "Rejected"
-                  : "Pending Approval"}
+                { (contract.payload as Work.WorkProposal).status }
               </p>
-              {isWorkerList && ((contract.payload as Work.WorkProposal).rejected !== true)? (
+              {isWorkerList && ((contract.payload as Work.WorkProposal).status === "Awaiting Review" || "Revised - Awaiting Review")? (
                 <Button.Group fluid>
                   <Button
                     color="blue"
@@ -332,7 +328,7 @@ const WorkList: React.FC<Props> = ({
                 rateAmount: parseFloat(
                   selectedProposal.payload?.rateAmount ?? "0"
                 ),
-                rejected: selectedProposal.payload?.rejected ?? "",
+                status: selectedProposal.payload?.status ?? "",
               }}
             />
           )}

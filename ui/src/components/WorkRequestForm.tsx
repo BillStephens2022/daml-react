@@ -52,7 +52,7 @@ const WorkRequestForm: React.FC<Props> = ({
     note: "",
     rateType: "Hourly",
     rateAmount: 0,
-    rejected: false,
+    status: "Awaiting Review",
   });
 
   const [jobCategorySelected, setJobCategorySelected] = useState<boolean>(

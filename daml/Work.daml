@@ -17,7 +17,7 @@ template WorkProposal
     note : Text
     rateType : RateType
     rateAmount : Decimal
-    rejected : Bool
+    status : Text
   where
     signatory client
     observer worker
@@ -33,6 +33,7 @@ template WorkProposal
                 contractJobDescription = jobDescription
                 contractRateType = rateType
                 contractRateAmount = rateAmount
+                contractStatus = "Active"
 
     choice RejectProposal : ContractId WorkProposal
         with
@@ -41,7 +42,7 @@ template WorkProposal
         do
             create this with 
               note = feedback
-              rejected = True
+              status = "Rejected"
 
     choice ReviseProposal : ContractId WorkProposal
         with
@@ -60,7 +61,7 @@ template WorkProposal
                 note = feedbackText
                 rateType = adjustedRateType
                 rateAmount = adjustedRateAmount
-                rejected = False
+                status = "Revised - Awaiting Review"
 
 template WorkContract
   with
@@ -71,5 +72,6 @@ template WorkContract
     contractJobDescription : Text
     contractRateType : RateType
     contractRateAmount : Decimal
+    contractStatus: Text
   where
     signatory contractClient, contractWorker

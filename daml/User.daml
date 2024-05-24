@@ -23,7 +23,7 @@ template User with
             note: Text
             rateType: RateType
             rateAmount: Decimal
-            rejected : Bool
+            status : Text
         controller username
         do
             create WorkProposal with
@@ -35,7 +35,7 @@ template User with
                 note = note
                 rateType = rateType
                 rateAmount = rateAmount
-                rejected = rejected
+                status = "Awaiting Approval"
     
     choice ChangeSkillset : ContractId User
         with

@@ -14,7 +14,7 @@ export interface WorkRequest {
   note: string;
   rateType: RateType;
   rateAmount: number;
-  rejected: boolean;
+  status: string;
 }
 
 // export enum Skillset {
