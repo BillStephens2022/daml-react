@@ -187,6 +187,8 @@ const WorkList: React.FC<Props> = ({
             onReject={openRejectForm}
           />
         );
+      case isWorkerList && (status === "Rejected"):
+        return null;
       default:
         return (
           <EditButton
