@@ -7,7 +7,6 @@ import {
   Header,
   Divider,
   Grid,
-  Button,
   Icon,
   Modal,
 } from "semantic-ui-react";
@@ -176,6 +175,28 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
+  const buttonToShow = (isContract: boolean, status: string, contractId: ContractId<Work.WorkProposal | Work.WorkProposal>) => {
+    switch (true) {
+      case isContract:
+        return null;
+      case isWorkerList && (status === "Awaiting Review" || status === "Revised - Awaiting Review"):
+        return (
+          <AcceptOrRejectButtons
+            contractId={contractId}
+            onAccept={acceptProposal}
+            onReject={openRejectForm}
+          />
+        );
+      default:
+        return (
+          <EditButton
+            contractId={contractId}
+            onEdit={openEditForm}
+          />
+        );
+    }
+  };
+
   return (
     <Segment>
       <Header as="h2">
@@ -250,7 +271,8 @@ const WorkList: React.FC<Props> = ({
                 <strong>Status</strong>{" "}
                 {(contract.payload as Work.WorkProposal).status}
               </p>
-              {isWorkerList &&
+              {buttonToShow(isWorkContract, (contract.payload as Work.WorkProposal).status, contract.contractId as ContractId<Work.WorkProposal>)}
+              {/* {isWorkerList &&
               ((contract.payload as Work.WorkProposal).status ===
                 "Awaiting Review" ||
                 "Revised - Awaiting Review") ? (
@@ -268,7 +290,7 @@ const WorkList: React.FC<Props> = ({
                   }
                   onEdit={openEditForm}
                 />
-              )}
+              )} */}
             </Segment>
           </Grid.Column>
         ))}
