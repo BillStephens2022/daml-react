@@ -33,7 +33,7 @@ template WorkProposal
                 contractJobDescription = jobDescription
                 contractRateType = rateType
                 contractRateAmount = rateAmount
-                contractStatus = "Active"
+                contractStatus = "Active Contract - Awaiting Work Completion"
 
     choice RejectProposal : ContractId WorkProposal
         with

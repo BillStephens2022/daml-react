@@ -271,28 +271,11 @@ const WorkList: React.FC<Props> = ({
               </p>
               <p>
                 <strong>Status</strong>{" "}
-                {(contract.payload as Work.WorkProposal).status}
+                {isWorkContract
+                  ? (contract.payload as Work.WorkContract).contractStatus
+                  : (contract.payload as Work.WorkProposal).status}
               </p>
               {buttonToShow(isWorkContract, (contract.payload as Work.WorkProposal).status, contract.contractId as ContractId<Work.WorkProposal>)}
-              {/* {isWorkerList &&
-              ((contract.payload as Work.WorkProposal).status ===
-                "Awaiting Review" ||
-                "Revised - Awaiting Review") ? (
-                <AcceptOrRejectButtons
-                  contractId={
-                    contract.contractId as ContractId<Work.WorkProposal>
-                  }
-                  onAccept={acceptProposal}
-                  onReject={openRejectForm}
-                />
-              ) : isWorkContract ? null : (
-                <EditButton
-                  contractId={
-                    contract.contractId as ContractId<Work.WorkProposal>
-                  }
-                  onEdit={openEditForm}
-                />
-              )} */}
             </Segment>
           </Grid.Column>
         ))}
