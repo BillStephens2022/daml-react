@@ -2,14 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useState } from "react";
-import {
-  Segment,
-  Header,
-  Divider,
-  Grid,
-  Icon,
-  Modal,
-} from "semantic-ui-react";
+import { Segment, Header, Divider, Grid, Icon, Modal } from "semantic-ui-react";
 import { ContractId, Party } from "@daml/types";
 import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
@@ -17,6 +10,7 @@ import RejectForm from "./RejectForm";
 import EditProposalForm from "./EditProposalForm";
 import AcceptOrRejectButtons from "./AcceptOrRejectButtons";
 import EditButton from "./EditButton";
+import CompleteWorkButton from "./CompleteWorkButton";
 
 type Props = {
   partyToAlias: Map<Party, string>;
@@ -175,24 +169,38 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
-  const buttonToShow = (isContract: boolean, status: string, contractId: ContractId<Work.WorkProposal | Work.WorkProposal>) => {
+  const buttonToShow = (
+    isContract: boolean,
+    proposalStatus: string | null,
+    contractStatus: string | null,
+    contractId: ContractId<Work.WorkProposal | Work.WorkContract>
+  ) => {
     switch (true) {
-      case isContract:
-        return null;
-      case isWorkerList && (status === "Awaiting Review" || status === "Revised - Awaiting Review"):
+      
+      case isWorkerList &&
+        (proposalStatus === "Awaiting Review" ||
+          proposalStatus === "Revised - Awaiting Review"):
         return (
           <AcceptOrRejectButtons
-            contractId={contractId}
+            contractId={contractId as ContractId<Work.WorkProposal>}
             onAccept={acceptProposal}
             onReject={openRejectForm}
           />
         );
-      case isWorkerList && (status === "Rejected"):
+      case isWorkerList && isContract && contractStatus === "Active Contract - Awaiting Work Completion":
+        return (
+          <CompleteWorkButton
+            contractId={contractId as ContractId<Work.WorkContract>}
+            onComplete={() => console.log("button pressed!")}
+          />
+        );
+      case isWorkerList && proposalStatus === "Rejected":
         return null;
+
       default:
         return (
           <EditButton
-            contractId={contractId}
+            contractId={contractId as ContractId<Work.WorkProposal>}
             onEdit={openEditForm}
           />
         );
@@ -275,7 +283,12 @@ const WorkList: React.FC<Props> = ({
                   ? (contract.payload as Work.WorkContract).contractStatus
                   : (contract.payload as Work.WorkProposal).status}
               </p>
-              {buttonToShow(isWorkContract, (contract.payload as Work.WorkProposal).status, contract.contractId as ContractId<Work.WorkProposal>)}
+              {buttonToShow(
+                isWorkContract,
+                (contract.payload as Work.WorkProposal).status,
+                (contract.payload as Work.WorkContract).contractStatus,
+                contract.contractId as ContractId<Work.WorkProposal>
+              )}
             </Segment>
           </Grid.Column>
         ))}

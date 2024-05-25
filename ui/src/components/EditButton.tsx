@@ -3,12 +3,12 @@ import { Button } from "semantic-ui-react";
 import { ContractId } from "@daml/types";
 import { Work } from "@daml.js/daml-react";
 
-type AcceptOrRejectButtonsProps = {
+type EditButtonProps = {
   contractId: ContractId<Work.WorkProposal>;
   onEdit: (contractId: ContractId<Work.WorkProposal>) => void;
 };
 
-const AcceptOrRejectButtons: React.FC<AcceptOrRejectButtonsProps> = ({
+const EditButton: React.FC<EditButtonProps> = ({
   contractId,
   onEdit,
 }) => {
@@ -19,4 +19,4 @@ const AcceptOrRejectButtons: React.FC<AcceptOrRejectButtonsProps> = ({
   );
 };
 
-export default AcceptOrRejectButtons;
+export default EditButton;
