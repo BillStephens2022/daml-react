@@ -6,16 +6,20 @@ import { Work } from "@daml.js/daml-react";
 type EditButtonProps = {
   contractId: ContractId<Work.WorkProposal>;
   onEdit: (contractId: ContractId<Work.WorkProposal>) => void;
+  onCancel: (contractId: ContractId<Work.WorkProposal>) => void;
 };
 
-const EditButton: React.FC<EditButtonProps> = ({
-  contractId,
-  onEdit,
-}) => {
+const EditButton: React.FC<EditButtonProps> = ({ contractId, onEdit, onCancel }) => {
   return (
-    <Button color="yellow" onClick={() => onEdit(contractId)}>
-      Edit
-    </Button>
+    <Button.Group>
+      <Button color="yellow" onClick={() => onEdit(contractId)}>
+        Edit
+      </Button>
+      <Button.Or />
+      <Button color="red" onClick={() => onCancel(contractId)}>
+        Cancel
+      </Button>
+    </Button.Group>
   );
 };
 

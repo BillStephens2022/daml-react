@@ -169,6 +169,38 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
+  const cancelProposal = async (contractId: ContractId<Work.WorkProposal>) => {
+    console.log("Attempting to cancel contractID: ", contractId);
+    console.log("workProposals: ", workProposals);
+    try {
+      const latestProposals = await ledger.query(Work.WorkProposal);
+      const proposal = latestProposals.find(
+        (proposal) => proposal.contractId === contractId
+      );
+
+      if (!proposal) {
+        console.error("Proposal not found or already archived");
+        return;
+      }
+
+      console.log("Proposal found! ", proposal);
+      // Verify if the contract is active
+      const isContractActive = await ledger.fetch(
+        Work.WorkProposal,
+        contractId
+      );
+
+      if (!isContractActive) {
+        console.error("Contract is not active, cannot cancel.");
+        return;
+      }
+      console.log("contract is active, should be able to cancel!");
+      await ledger.exercise(Work.WorkProposal.CancelProposal, contractId, {});
+    } catch (error) {
+      console.error("Error canceling proposal:", error);
+    }
+  };
+
   const buttonToShow = (
     isContract: boolean,
     proposalStatus: string | null,
@@ -176,7 +208,6 @@ const WorkList: React.FC<Props> = ({
     contractId: ContractId<Work.WorkProposal | Work.WorkContract>
   ) => {
     switch (true) {
-      
       case isWorkerList &&
         (proposalStatus === "Awaiting Review" ||
           proposalStatus === "Revised - Awaiting Review"):
@@ -187,7 +218,9 @@ const WorkList: React.FC<Props> = ({
             onReject={openRejectForm}
           />
         );
-      case isWorkerList && isContract && contractStatus === "Active Contract - Awaiting Work Completion":
+      case isWorkerList &&
+        isContract &&
+        contractStatus === "Active Contract - Awaiting Work Completion":
         return (
           <CompleteWorkButton
             contractId={contractId as ContractId<Work.WorkContract>}
@@ -202,6 +235,7 @@ const WorkList: React.FC<Props> = ({
           <EditButton
             contractId={contractId as ContractId<Work.WorkProposal>}
             onEdit={openEditForm}
+            onCancel={cancelProposal}
           />
         );
     }

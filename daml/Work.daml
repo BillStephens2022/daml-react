@@ -62,6 +62,7 @@ template WorkProposal
                 rateType = adjustedRateType
                 rateAmount = adjustedRateAmount
                 status = "Revised - Awaiting Review"
+                
     choice CancelProposal : ()
       controller client
       do
