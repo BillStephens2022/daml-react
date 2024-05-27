@@ -64,7 +64,7 @@ template WorkProposal
               rateAmount = adjustedRateAmount
               status = "Revised - Awaiting Review"
                 
-    choice CancelProposal : ()
+    nonconsuming choice CancelProposal : ()
         controller client
         do
           debug "attempting to cancel proposal on back end"

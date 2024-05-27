@@ -2,16 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useState } from "react";
-import { Segment, Header, Divider, Grid, Icon, Modal, Button } from "semantic-ui-react";
+import {
+  Segment,
+  Header,
+  Divider,
+  Grid,
+  Icon,
+  Modal,
+  Button,
+} from "semantic-ui-react";
 import { ContractId, Party } from "@daml/types";
 import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
 import RejectForm from "./RejectForm";
 import EditProposalForm from "./EditProposalForm";
-import AcceptOrRejectButtons from "./AcceptOrRejectButtons";
-import EditButton from "./EditButton";
 import CompleteWorkButton from "./CompleteWorkButton";
-import ContractButtons from "./ContractButtons";
+import ContractButton from "./ContractButton";
 
 type Props = {
   partyToAlias: Map<Party, string>;
@@ -196,7 +202,11 @@ const WorkList: React.FC<Props> = ({
         return;
       }
       console.log("contract is active, should be able to cancel!");
-      await ledger.exercise(Work.WorkProposal.CancelProposal, proposal.contractId, {});
+      await ledger.exercise(
+        Work.WorkProposal.CancelProposal,
+        proposal.contractId,
+        {}
+      );
     } catch (error) {
       console.error("Error canceling proposal:", error);
     }
@@ -213,28 +223,21 @@ const WorkList: React.FC<Props> = ({
         (proposalStatus === "Awaiting Review" ||
           proposalStatus === "Revised - Awaiting Review"):
         return (
-          <div>
-            <Button.Group>
-            <ContractButtons
+          <Button.Group fluid>
+            <ContractButton
               contractId={contractId as ContractId<Work.WorkProposal>}
               onAction={acceptProposal}
               actionLabel="Accept"
               color="blue"
             />
             <Button.Or />
-            <ContractButtons
+            <ContractButton
               contractId={contractId as ContractId<Work.WorkProposal>}
               onAction={openRejectForm}
               actionLabel="Reject"
               color="red"
             />
-            </Button.Group>
-          <AcceptOrRejectButtons
-            contractId={contractId as ContractId<Work.WorkProposal>}
-            onAccept={acceptProposal}
-            onReject={openRejectForm}
-          />
-          </div>
+          </Button.Group>
         );
       case isWorkerList &&
         isContract &&
@@ -250,11 +253,21 @@ const WorkList: React.FC<Props> = ({
 
       default:
         return (
-          <EditButton
+          <Button.Group fluid>
+          <ContractButton
             contractId={contractId as ContractId<Work.WorkProposal>}
-            onEdit={openEditForm}
-            onCancel={cancelProposal}
+            onAction={openEditForm}
+            color="yellow"
+            actionLabel="Edit"
           />
+          <Button.Or />
+          <ContractButton
+            contractId={contractId as ContractId<Work.WorkProposal>}
+            onAction={cancelProposal}
+            color="red"
+            actionLabel="Cancel"
+          />
+          </Button.Group>
         );
     }
   };

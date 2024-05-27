@@ -10,14 +10,17 @@ type ButtonProps = {
   color: SemanticCOLORS;
 };
 
-const ContractButtons: React.FC<ButtonProps> = ({ contractId, onAction, actionLabel, color }) => {
+const ContractButton: React.FC<ButtonProps> = ({
+  contractId,
+  onAction,
+  actionLabel,
+  color,
+}) => {
   return (
-    <Button.Group>
-      <Button color={color} onClick={() => onAction(contractId)}>
-        {actionLabel}
-      </Button>
-    </Button.Group>
+    <Button color={color} onClick={() => onAction(contractId)}>
+      {actionLabel}
+    </Button>
   );
 };
 
-export default ContractButtons;
+export default ContractButton;
