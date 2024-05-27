@@ -3,6 +3,7 @@
 module Work where
 import Common (Skillset)
 
+
 type WorkProposalId = ContractId WorkProposal
 type WorkContractId = ContractId WorkContract
 data RateType = Hourly | Flat deriving (Eq, Show)

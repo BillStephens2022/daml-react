@@ -90,7 +90,7 @@ const MainView: React.FC = () => {
   const mySkillset = users.loading
     ? "loading..."
     : users.contracts[0].payload.skillset;
-  
+
   const myWallet = users.loading
     ? "loading..."
     : users.contracts[0].payload.walletBalance;
@@ -282,16 +282,21 @@ const MainView: React.FC = () => {
               </Header>
               <Divider />
               <Button.Group>
-              <Button
-                type="button"
-                color="yellow"
-                onClick={() => setShowSkillsetModal(!showSkillsetModal)}
-              >
-                Edit Skillset
-              </Button>
-              <Button type="button" color="green" onClick={() => setShowDepositModal(!showDepositModal)}>
-                Deposit Funds
-              </Button>
+                <Button
+                  type="button"
+                  color="yellow"
+                  onClick={() => setShowSkillsetModal(!showSkillsetModal)}
+                >
+                  Edit Skillset
+                </Button>
+                <Button.Or />
+                <Button
+                  type="button"
+                  color="green"
+                  onClick={() => setShowDepositModal(!showDepositModal)}
+                >
+                  Deposit Funds
+                </Button>
               </Button.Group>
               <Modal
                 open={showSkillsetModal}
@@ -357,72 +362,74 @@ const MainView: React.FC = () => {
         </Grid.Row>
       </Grid>
       <Segment>
-      <Header>Select a View</Header>
-      <div className="ui grid">
-        <div className="four wide column">
-          <div className="ui vertical fluid tabular menu">
-            <p
-              onClick={() => handleMenuItemClick("jobView")}
-              className={`item ${activeMenuItem === "jobView" ? "active" : ""}`}
-            >
-              My Jobs
-            </p>
-            <p
-              onClick={() => handleMenuItemClick("requestView")}
-              className={`item ${
-                activeMenuItem === "requestView" ? "active" : ""
-              }`}
-            >
-              My Requests
-            </p>
-            <p
-              onClick={() => handleMenuItemClick("contractView")}
-              className={`item ${
-                activeMenuItem === "contractView" ? "active" : ""
-              }`}
-            >
-              Active Contracts
-            </p>
+        <Header>Select a View</Header>
+        <div className="ui grid">
+          <div className="four wide column">
+            <div className="ui vertical fluid tabular menu">
+              <p
+                onClick={() => handleMenuItemClick("jobView")}
+                className={`item ${
+                  activeMenuItem === "jobView" ? "active" : ""
+                }`}
+              >
+                My Jobs
+              </p>
+              <p
+                onClick={() => handleMenuItemClick("requestView")}
+                className={`item ${
+                  activeMenuItem === "requestView" ? "active" : ""
+                }`}
+              >
+                My Requests
+              </p>
+              <p
+                onClick={() => handleMenuItemClick("contractView")}
+                className={`item ${
+                  activeMenuItem === "contractView" ? "active" : ""
+                }`}
+              >
+                Active Contracts
+              </p>
+            </div>
+          </div>
+          <div className="twelve wide stretched column">
+            <div className={`ui segment ${classes.view}`}>
+              {view === "requestView" && (
+                <MyRequests
+                  partyToAlias={partyToAlias}
+                  workProposals={allWorkProposals}
+                  workContracts={allWorkContracts}
+                  username={username}
+                  isWorkerList={false}
+                  isWorkContract={true}
+                  ledger={ledger}
+                />
+              )}
+              {view === "jobView" && (
+                <MyJobs
+                  partyToAlias={partyToAlias}
+                  workProposals={allWorkProposals}
+                  workContracts={allWorkContracts}
+                  username={username}
+                  isWorkerList={false}
+                  isWorkContract={true}
+                  ledger={ledger}
+                />
+              )}
+              {view === "contractView" && (
+                <ActiveWorkContracts
+                  partyToAlias={partyToAlias}
+                  workProposals={allWorkProposals}
+                  workContracts={allWorkContracts}
+                  username={username}
+                  isWorkerList={false}
+                  isWorkContract={true}
+                  ledger={ledger}
+                />
+              )}
+            </div>
           </div>
         </div>
-        <div className="twelve wide stretched column">
-          <div className={`ui segment ${classes.view}`}>
-            {view === "requestView" && (
-              <MyRequests
-                partyToAlias={partyToAlias}
-                workProposals={allWorkProposals}
-                workContracts={allWorkContracts}
-                username={username}
-                isWorkerList={false}
-                isWorkContract={true}
-                ledger={ledger}
-              />
-            )}
-            {view === "jobView" && (
-              <MyJobs
-                partyToAlias={partyToAlias}
-                workProposals={allWorkProposals}
-                workContracts={allWorkContracts}
-                username={username}
-                isWorkerList={false}
-                isWorkContract={true}
-                ledger={ledger}
-              />
-            )}
-            {view === "contractView" && (
-              <ActiveWorkContracts
-                partyToAlias={partyToAlias}
-                workProposals={allWorkProposals}
-                workContracts={allWorkContracts}
-                username={username}
-                isWorkerList={false}
-                isWorkContract={true}
-                ledger={ledger}
-              />
-            )}
-          </div>
-        </div>
-      </div>
       </Segment>
     </Container>
   );
