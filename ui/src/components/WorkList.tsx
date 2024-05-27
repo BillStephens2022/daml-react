@@ -240,7 +240,7 @@ const WorkList: React.FC<Props> = ({
             />
           </Button.Group>
         );
-      case (worker === username) &&
+      case worker === username &&
         isContract &&
         contractStatus === "Active Contract - Awaiting Work Completion":
         return (
@@ -249,7 +249,7 @@ const WorkList: React.FC<Props> = ({
             onComplete={() => console.log("button pressed!")}
           />
         );
-      case (worker !== username) &&
+      case worker !== username &&
         isContract &&
         contractStatus === "Active Contract - Awaiting Work Completion":
         return null;
@@ -259,19 +259,19 @@ const WorkList: React.FC<Props> = ({
       default:
         return (
           <Button.Group fluid>
-          <ContractButton
-            contractId={contractId as ContractId<Work.WorkProposal>}
-            onAction={openEditForm}
-            color="yellow"
-            actionLabel="Edit"
-          />
-          <Button.Or />
-          <ContractButton
-            contractId={contractId as ContractId<Work.WorkProposal>}
-            onAction={cancelProposal}
-            color="red"
-            actionLabel="Cancel"
-          />
+            <ContractButton
+              contractId={contractId as ContractId<Work.WorkProposal>}
+              onAction={openEditForm}
+              color="yellow"
+              actionLabel="Edit"
+            />
+            <Button.Or />
+            <ContractButton
+              contractId={contractId as ContractId<Work.WorkProposal>}
+              onAction={cancelProposal}
+              color="red"
+              actionLabel="Cancel"
+            />
           </Button.Group>
         );
     }

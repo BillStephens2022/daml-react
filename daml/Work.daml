@@ -84,3 +84,9 @@ template WorkContract
     contractStatus: Text
   where
     signatory contractClient, contractWorker
+
+    choice CompleteWork : ContractId WorkContract
+      controller contractWorker
+      do
+        create this with
+          contractStatus = "Work Completed, Awaiting Payment"
