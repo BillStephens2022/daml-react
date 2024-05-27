@@ -47,7 +47,7 @@ const EditProposalForm: React.FC<Props> = ({
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Field>
+      {/* <Form.Field>
         <label>Job Category</label>
         <Input
           name="jobCategory"
@@ -56,7 +56,7 @@ const EditProposalForm: React.FC<Props> = ({
           placeholder="Job Category"
           required
         />
-      </Form.Field>
+      </Form.Field> */}
       <Form.Field>
         <label>Job Title</label>
         <Input
