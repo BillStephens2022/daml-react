@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import React, { useState } from "react";
-import { Segment, Header, Divider, Grid, Icon, Modal } from "semantic-ui-react";
+import { Segment, Header, Divider, Grid, Icon, Modal, Button } from "semantic-ui-react";
 import { ContractId, Party } from "@daml/types";
 import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
@@ -11,6 +11,7 @@ import EditProposalForm from "./EditProposalForm";
 import AcceptOrRejectButtons from "./AcceptOrRejectButtons";
 import EditButton from "./EditButton";
 import CompleteWorkButton from "./CompleteWorkButton";
+import ContractButtons from "./ContractButtons";
 
 type Props = {
   partyToAlias: Map<Party, string>;
@@ -195,7 +196,7 @@ const WorkList: React.FC<Props> = ({
         return;
       }
       console.log("contract is active, should be able to cancel!");
-      await ledger.exercise(Work.WorkProposal.CancelProposal, contractId, {});
+      await ledger.exercise(Work.WorkProposal.CancelProposal, proposal.contractId, {});
     } catch (error) {
       console.error("Error canceling proposal:", error);
     }
@@ -212,11 +213,28 @@ const WorkList: React.FC<Props> = ({
         (proposalStatus === "Awaiting Review" ||
           proposalStatus === "Revised - Awaiting Review"):
         return (
+          <div>
+            <Button.Group>
+            <ContractButtons
+              contractId={contractId as ContractId<Work.WorkProposal>}
+              onAction={acceptProposal}
+              actionLabel="Accept"
+              color="blue"
+            />
+            <Button.Or />
+            <ContractButtons
+              contractId={contractId as ContractId<Work.WorkProposal>}
+              onAction={openRejectForm}
+              actionLabel="Reject"
+              color="red"
+            />
+            </Button.Group>
           <AcceptOrRejectButtons
             contractId={contractId as ContractId<Work.WorkProposal>}
             onAccept={acceptProposal}
             onReject={openRejectForm}
           />
+          </div>
         );
       case isWorkerList &&
         isContract &&
