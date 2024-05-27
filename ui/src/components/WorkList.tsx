@@ -176,9 +176,7 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
-  const cancelProposal = async (contractId: ContractId<Work.WorkProposal>) => {
-    console.log("Attempting to cancel contractID: ", contractId);
-    console.log("workProposals: ", workProposals);
+  const handleCancelProposal = async (contractId: ContractId<Work.WorkProposal>) => {
     try {
       const latestProposals = await ledger.query(Work.WorkProposal);
       const proposal = latestProposals.find(
@@ -201,7 +199,7 @@ const WorkList: React.FC<Props> = ({
         console.error("Contract is not active, cannot cancel.");
         return;
       }
-      console.log("contract is active, should be able to cancel!");
+
       await ledger.exercise(
         Work.WorkProposal.CancelProposal,
         proposal.contractId,
@@ -212,12 +210,35 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
+  const handleCompleteJob = async (contractId: ContractId<Work.WorkContract>) => {
+    try {
+      const isContractActive = await ledger.fetch(
+        Work.WorkContract,
+        contractId
+      );
+
+      if (!isContractActive) {
+        console.error("Contract is not active, cannot complete job.");
+        return;
+      }
+
+      await ledger.exercise(
+        Work.WorkContract.CompleteJob,
+        contractId,
+        {}
+      );
+    } catch (error) {
+      console.error("Error canceling proposal:", error);
+    }
+  };
+
+
   const buttonToShow = (
     isContract: boolean,
     proposalStatus: string | null,
     contractStatus: string | null,
     worker: string | null,
-    contractId: ContractId<Work.WorkProposal | Work.WorkContract>
+    contractId: (ContractId<Work.WorkProposal> | ContractId<Work.WorkContract>)
   ) => {
     switch (true) {
       case isWorkerList &&
@@ -244,14 +265,31 @@ const WorkList: React.FC<Props> = ({
         isContract &&
         contractStatus === "Active Contract - Awaiting Work Completion":
         return (
-          <CompleteWorkButton
+          <ContractButton
             contractId={contractId as ContractId<Work.WorkContract>}
-            onComplete={() => console.log("button pressed!")}
+            onAction={handleCompleteJob}
+            color="blue"
+            actionLabel="Complete Job"
           />
         );
       case worker !== username &&
         isContract &&
         contractStatus === "Active Contract - Awaiting Work Completion":
+        return null;
+      case worker !== username &&
+        isContract &&
+        contractStatus === "Work Completed, Awaiting Payment":
+        return (
+          <ContractButton
+            contractId={contractId as ContractId<Work.WorkContract>}
+            onAction={() => console.log("Making Payment...")}
+            color="green"
+            actionLabel="Make Payment"
+          />
+        );
+        case worker === username &&
+        isContract &&
+        contractStatus === "Work Completed, Awaiting Payment":
         return null;
       case isWorkerList && proposalStatus === "Rejected":
         return null;
@@ -268,7 +306,7 @@ const WorkList: React.FC<Props> = ({
             <Button.Or />
             <ContractButton
               contractId={contractId as ContractId<Work.WorkProposal>}
-              onAction={cancelProposal}
+              onAction={handleCancelProposal}
               color="red"
               actionLabel="Cancel"
             />

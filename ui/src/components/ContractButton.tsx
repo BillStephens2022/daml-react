@@ -3,19 +3,19 @@ import { Button, SemanticCOLORS } from "semantic-ui-react";
 import { ContractId } from "@daml/types";
 import { Work } from "@daml.js/daml-react";
 
-type ButtonProps = {
-  contractId: ContractId<Work.WorkProposal>;
-  onAction: (contractId: ContractId<Work.WorkProposal>) => void;
+type ButtonProps<T> = {
+  contractId: ContractId<T>;
+  onAction: (contractId: ContractId<T>) => void;
   actionLabel: string;
   color: SemanticCOLORS;
 };
 
-const ContractButton: React.FC<ButtonProps> = ({
+const ContractButton = <T,>({
   contractId,
   onAction,
   actionLabel,
   color,
-}) => {
+}: ButtonProps<T>) => {
   return (
     <Button color={color} onClick={() => onAction(contractId)}>
       {actionLabel}

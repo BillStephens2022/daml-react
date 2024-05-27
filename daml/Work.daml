@@ -85,7 +85,7 @@ template WorkContract
   where
     signatory contractClient, contractWorker
 
-    choice CompleteWork : ContractId WorkContract
+    choice CompleteJob : ContractId WorkContract
       controller contractWorker
       do
         create this with
