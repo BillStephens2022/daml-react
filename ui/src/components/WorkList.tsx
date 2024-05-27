@@ -216,6 +216,7 @@ const WorkList: React.FC<Props> = ({
     isContract: boolean,
     proposalStatus: string | null,
     contractStatus: string | null,
+    worker: string | null,
     contractId: ContractId<Work.WorkProposal | Work.WorkContract>
   ) => {
     switch (true) {
@@ -239,7 +240,7 @@ const WorkList: React.FC<Props> = ({
             />
           </Button.Group>
         );
-      case isWorkerList &&
+      case (worker === username) &&
         isContract &&
         contractStatus === "Active Contract - Awaiting Work Completion":
         return (
@@ -248,6 +249,10 @@ const WorkList: React.FC<Props> = ({
             onComplete={() => console.log("button pressed!")}
           />
         );
+      case (worker !== username) &&
+        isContract &&
+        contractStatus === "Active Contract - Awaiting Work Completion":
+        return null;
       case isWorkerList && proposalStatus === "Rejected":
         return null;
 
@@ -352,6 +357,7 @@ const WorkList: React.FC<Props> = ({
                 isWorkContract,
                 (contract.payload as Work.WorkProposal).status,
                 (contract.payload as Work.WorkContract).contractStatus,
+                (contract.payload as Work.WorkContract).contractWorker,
                 contract.contractId as ContractId<Work.WorkProposal>
               )}
             </Segment>
