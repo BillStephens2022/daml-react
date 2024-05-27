@@ -54,13 +54,13 @@ setup = do
   createUserContract george Handyman
 
   -- Create Alias contracts for each party with their respective skillsets
-  createAliasContract alice "Alice" Technology public
-  createAliasContract bob "Bob" Handyman public
-  createAliasContract charlie "Charlie" Landscaping public
-  createAliasContract debbie "Debbie" Babysitting public
-  createAliasContract ernie "Ernie" Landscaping public
-  createAliasContract fiona "Fiona" Financial public
-  createAliasContract george "George" Handyman public
+  createAliasContract alice "Alice" Technology 0.00 public
+  createAliasContract bob "Bob" Handyman 0.00 public
+  createAliasContract charlie "Charlie" Landscaping 0.00 public
+  createAliasContract debbie "Debbie" Babysitting 0.00 public
+  createAliasContract ernie "Ernie" Landscaping 0.00 public
+  createAliasContract fiona "Fiona" Financial 0.00 public
+  createAliasContract george "George" Handyman 0.00 public
 
   pure $ Parties with
     alice
@@ -78,16 +78,18 @@ createUserContract party skillset = do
     createCmd UserModule.User with
       username = party
       skillset = skillset
+      walletBalance = 0.00
   pure cid
 
 -- | Create Alias contracts for each party with their respective skillsets.
-createAliasContract : Party -> Text -> Skillset -> Party -> Script ()
-createAliasContract party alias skillset public = do
+createAliasContract : Party -> Text -> Skillset -> Decimal -> Party -> Script ()
+createAliasContract party alias skillset walletBalance public = do
   _ <- submit party do
     createCmd UserModule.Alias with
       username = party
       alias = alias
       skillset = skillset
+      walletBalance = walletBalance
       public = public
   pure ()
 

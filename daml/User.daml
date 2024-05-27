@@ -9,6 +9,7 @@ import Common (Skillset)
 template User with
     username: Party
     skillset: Skillset
+    walletBalance: Decimal
   where
     signatory username
 
@@ -44,11 +45,19 @@ template User with
         do
             create this with skillset = newSkillset
 
+    choice DepositFunds : ContractId User
+        with
+            depositAmount: Decimal
+        controller username
+        do
+            create this with walletBalance = walletBalance + depositAmount
+
 -- ALIAS_BEGIN
 template Alias with
     username: Party
     alias: Text
     skillset: Skillset
+    walletBalance: Decimal
     public: Party
   where
     signatory username
@@ -57,11 +66,20 @@ template Alias with
     key (username, public) : (Party, Party)
     maintainer key._1
 
-    nonconsuming choice Change: ContractId Alias with
+    nonconsuming choice Change: ContractId Alias 
+      with
         newAlias: Text
         newSkillset: Skillset
       controller username
       do
         archive self
         create this with alias = newAlias; skillset = newSkillset
+    
+    nonconsuming choice ChangeWallet: ContractId Alias 
+      with
+        newWalletBalance: Decimal
+      controller username
+      do
+        archive self
+        create this with walletBalance = newWalletBalance
 -- ALIAS_END

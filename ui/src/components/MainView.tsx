@@ -20,6 +20,7 @@ import WorkRequestForm from "./WorkRequestForm";
 import { WorkRequest } from "../types";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import EditSkillsetForm from "./EditSkillsetForm";
+import DepositForm from "./DepositForm";
 import MyRequests from "./MyRequests";
 import MyJobs from "./MyJobs";
 import ActiveWorkContracts from "./ActiveWorkContracts";
@@ -48,6 +49,7 @@ const MainView: React.FC = () => {
   // USERS_END
   const [showModal, setShowModal] = useState(false);
   const [showSkillsetModal, setShowSkillsetModal] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
   const [view, setView] = useState("jobView");
   const [activeMenuItem, setActiveMenuItem] = useState("jobView");
 
@@ -88,6 +90,10 @@ const MainView: React.FC = () => {
   const mySkillset = users.loading
     ? "loading..."
     : users.contracts[0].payload.skillset;
+  
+  const myWallet = users.loading
+    ? "loading..."
+    : users.contracts[0].payload.walletBalance;
 
   // Function to submit a new work request to the DAML ledger
   const submitWorkRequest = async (workRequest: WorkRequest) => {
@@ -150,6 +156,10 @@ const MainView: React.FC = () => {
     setShowModal(false); // Close the modal when cancel is clicked
   };
 
+  const handleCancelDeposit = () => {
+    setShowDepositModal(false); // Close the modal when cancel is clicked
+  };
+
   const handleEditSkillset = async (selectedSkillset: Skillset) => {
     console.log("editing skillset!: ", selectedSkillset);
     try {
@@ -170,6 +180,30 @@ const MainView: React.FC = () => {
         });
       }
       setShowSkillsetModal(false);
+    } catch (error) {
+      console.error("Error editing proposal:", error);
+    }
+  };
+
+  const handleDeposit = async (depositAmount: number) => {
+    console.log("depositing to your wallet: ", depositAmount);
+    try {
+      const userContractId = users.contracts[0].contractId;
+
+      await ledger.exercise(User.User.DepositFunds, userContractId, {
+        depositAmount: depositAmount.toString(),
+      });
+      // Update the corresponding Alias contract with the new skillset
+      const userAlias = aliases.contracts.find(
+        (alias) => alias.payload.username === username
+      );
+      if (userAlias) {
+        const aliasContractId = userAlias.contractId;
+        await ledger.exercise(User.Alias.ChangeWallet, aliasContractId, {
+          newWalletBalance: depositAmount.toString(),
+        });
+      }
+      setShowDepositModal(false);
     } catch (error) {
       console.error("Error editing proposal:", error);
     }
@@ -241,9 +275,13 @@ const MainView: React.FC = () => {
                   <HeaderSubHeader className={classes.skillset}>
                     Skillset: {mySkillset ?? "Loading..."}
                   </HeaderSubHeader>
+                  <HeaderSubHeader className={classes.skillset}>
+                    Wallet Balance: $ {myWallet ?? "Loading..."}
+                  </HeaderSubHeader>
                 </Header.Content>
               </Header>
               <Divider />
+              <Button.Group>
               <Button
                 type="button"
                 color="yellow"
@@ -251,6 +289,10 @@ const MainView: React.FC = () => {
               >
                 Edit Skillset
               </Button>
+              <Button type="button" color="green" onClick={() => setShowDepositModal(!showDepositModal)}>
+                Deposit Funds
+              </Button>
+              </Button.Group>
               <Modal
                 open={showSkillsetModal}
                 onClose={() => setShowSkillsetModal(false)}
@@ -261,6 +303,19 @@ const MainView: React.FC = () => {
                   <EditSkillsetForm
                     onSubmit={handleEditSkillset}
                     onCancel={handleCancelEditSkillset}
+                  />
+                </Modal.Content>
+              </Modal>
+              <Modal
+                open={showDepositModal}
+                onClose={() => setShowDepositModal(false)}
+                closeIcon
+              >
+                <Modal.Header>Deposit Funds</Modal.Header>
+                <Modal.Content>
+                  <DepositForm
+                    onSubmit={handleDeposit}
+                    onCancel={handleCancelDeposit}
                   />
                 </Modal.Content>
               </Modal>
