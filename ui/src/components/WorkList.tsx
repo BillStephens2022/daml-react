@@ -16,7 +16,6 @@ import { Ledger, CreateEvent } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
 import RejectForm from "./RejectForm";
 import EditProposalForm from "./EditProposalForm";
-import CompleteWorkButton from "./CompleteWorkButton";
 import ContractButton from "./ContractButton";
 
 type Props = {
