@@ -10,7 +10,6 @@ import UserWallet
 template User with
     username: Party
     skillset: Skillset
-    walletBalance: Decimal
   where
     signatory username
 
@@ -61,7 +60,6 @@ template Alias with
     username: Party
     alias: Text
     skillset: Skillset
-    walletBalance: Decimal
     public: Party
   where
     signatory username
@@ -79,11 +77,5 @@ template Alias with
         archive self
         create this with alias = newAlias; skillset = newSkillset
     
-    nonconsuming choice ChangeWallet: ContractId Alias 
-      with
-        newWalletBalance: Decimal
-      controller username
-      do
-        archive self
-        create this with walletBalance = newWalletBalance
+
 -- ALIAS_END
