@@ -4,6 +4,7 @@ module User where
 
 import Work
 import Common (Skillset)
+import UserWallet
 
 
 template User with
@@ -38,19 +39,22 @@ template User with
                 rateAmount = rateAmount
                 status = "Awaiting Approval"
     
+    -- Create a UserWallet for the user
+    nonconsuming choice CreateWallet : ContractId UserWallet
+        with
+            initialBalance: Decimal
+        controller username
+        do
+            create UserWallet with
+                username = username
+                walletBalance = initialBalance
+    
     choice ChangeSkillset : ContractId User
         with
             newSkillset: Skillset
         controller username
         do
             create this with skillset = newSkillset
-
-    choice DepositFunds : ContractId User
-        with
-            depositAmount: Decimal
-        controller username
-        do
-            create this with walletBalance = walletBalance + depositAmount
 
 -- ALIAS_BEGIN
 template Alias with

@@ -1,0 +1,31 @@
+module UserWallet where
+
+template UserWallet with
+    username: Party
+    walletBalance: Decimal
+  where
+    signatory username
+
+    key username: Party
+    maintainer key
+
+    choice DepositFunds : ContractId UserWallet
+        with
+            depositAmount: Decimal
+        controller username
+        do
+            create this with walletBalance = walletBalance + depositAmount
+
+    choice DeductFunds : ContractId UserWallet
+        with
+            deductionAmount: Decimal
+        controller username
+        do
+            create this with walletBalance = walletBalance - deductionAmount
+
+    choice AddFunds : ContractId UserWallet
+        with
+            additionAmount: Decimal
+        controller username
+        do
+            create this with walletBalance = walletBalance + additionAmount

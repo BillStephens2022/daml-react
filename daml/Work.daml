@@ -1,8 +1,8 @@
 -- Work.daml
-
 module Work where
-import Common (Skillset)
 
+import Common (Skillset)
+import UserWallet
 
 type WorkProposalId = ContractId WorkProposal
 type WorkContractId = ContractId WorkContract
@@ -91,3 +91,12 @@ template WorkContract
       do
         create this with
           contractStatus = "Work Completed, Awaiting Payment"
+
+    choice MakePayment : ()
+      controller contractClient
+      do
+        exerciseByKey @UserWallet contractClient (DeductFunds contractRateAmount)
+        exerciseByKey @UserWallet contractWorker (AddFunds contractRateAmount)
+
+        archive self
+        pure ()
