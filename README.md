@@ -1,74 +1,49 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/digital-asset/daml/blob/main/LICENSE)
+# Community Helper<br>![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-# daml-react
+  ## Description
+  ***Note:  This is a Work in Process***
+  Community Helper is an application built with React, DAML, & TypeScript. This application matches neighbors with skills with neighbors in need. Utilizes smart contracts for work proposals/contracts.
 
-See [documentation] for details.
+  Deposit Funds to your wallet, Edit your skillset, View Other community Members or submit a work proposal via a form.  Once a work proposal is submitted, the worker can either accept or reject the proposal.  If accepted, the proposal becomes a contract.  If rejected, the proposal can either be edited to more acceptable terms or canceled.
 
-[documentation]: https://docs.daml.com/getting-started/installation.html
+  ### Screenshot of app
+  ![app screenshot](screenshot1.png)
+  
+  ## Table of Contents
+  
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [License](#license)
+  - [Contributing](#contributing)
+  - [Tests](#tests)
+  - [Questions](#questions)
+  
+  ## Installation
+  
+  From the command line, run:
+   ```
+   npm install
+   daml start
+   cd ui
+   npm start
+   ```
+  
+  ## Usage
+  
+  log in as any one of the following: `alice`, `bob`, `charlie`, `debbie`, `ernie`, `fiona`, or `george`.  These are preset members of the community.  No password required.
 
-Please ask for help on [the Daml forum] if you encounter any issue!
+  ## License
+This application is covered under the MIT License.
+<br>For more information: https://opensource.org/licenses/MIT
+  
+  ## Contributing
+  N/A
+  
+  ## Tests
+  N/A
 
-[the Daml forum]: https://discuss.daml.com
-
-## Development Quick Start
-
-You need to have [Node.js] and [Daml] installed.
-
-[Node.js]: https://nodejs.dev
-[Daml]: https://docs.daml.com
-
-First, start the Daml components:
-
-```bash
-daml start
-```
-
-This will:
-
-- Build you Daml code once.
-- Generate JavaScript code (and TypeScript definitions) for your Daml types.
-- Start a Daml sandbox gRPC server (on 6865).
-- Start a Daml HTTP JSON API server (on 7575).
-- Watch for the `r` key press (`r` + Enter on Windows); when pressed, rebuild
-  all of the Daml code, push the new DAR to the ledger, and rerun the JS/TS
-  code generation.
-
-Next, start the JS dev server:
-
-```bash
-cd ui
-npm install
-npm start
-```
-
-This starts a server on `http://localhost:3000` which:
-
-- Builds all of your TypeScript (or JavaScript) code (including type
-  definitions from the codegen).
-- Serves the result on :3000, redirecting `/v1` to the JSON API server (on
-  `127.0.0.1:7575`) so API calls are on the same origin as far as your browser
-  is concerned.
-- Watch for changes in TS/JS code (including codegen), and immediately rebuild.
-
-## Deploying to Daml Hub
-
-To build everything from scratch:
-
-```bash
-daml build
-daml codegen js .daml/dist/daml-react-0.1.0.dar -o ui/daml.js
-cd ui
-npm install
-npm run-script build
-zip -r ../daml-react-ui.zip build
-```
-
-Next you need to create a ledger on [Daml Hub], upload the files
-`.daml/dist/daml-react-0.1.0.dar` (created by the `daml build` command)
-and `daml-react-ui.zip` (created by the `zip` command based on the result
-of `npm run-script build`).
-
-[Daml Hub]: https://hub.daml.com
-
-Once both files are uploaded, you need to tell Daml Hub to deploy them. A few
-seconds later, your website should be up and running.
+  ## Questions
+  Contact Info<br>
+  GitHub user name: BillStephens2022<br>
+  Link to GitHub profile: https://github.com/BillStephens2022<br>
+  Email: stephensbill17@gmail.com
