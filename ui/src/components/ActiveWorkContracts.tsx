@@ -1,13 +1,17 @@
 import React from "react";
 import { Party } from "@daml/types";
-import { Ledger, CreateEvent } from "@daml/ledger";
+import { Ledger, CreateEvent, QueryResult } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
+import { UserWallet } from "@daml.js/daml-react";
 import WorkList from "./WorkList";
+
+
 
 type Props = {
     partyToAlias: Map<Party, string>;
     workProposals: readonly CreateEvent<Work.WorkProposal, undefined, string>[];
     workContracts: readonly CreateEvent<Work.WorkContract, undefined, string>[];
+    wallets: QueryResult<UserWallet.UserWallet, string, string>;
     username: string;
     isWorkerList: boolean;
     isWorkContract: boolean;
@@ -18,6 +22,7 @@ type Props = {
     partyToAlias,
     workProposals,
     workContracts,
+    wallets,
     username,
     isWorkerList,
     isWorkContract,
@@ -29,6 +34,7 @@ type Props = {
               partyToAlias={partyToAlias}
               workProposals={workProposals}
               workContracts={workContracts}
+              wallets={wallets}
               username={username}
               isWorkerList={false}
               isWorkContract={true}

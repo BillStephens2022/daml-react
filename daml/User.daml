@@ -42,11 +42,13 @@ template User with
     nonconsuming choice CreateWallet : ContractId UserWallet
         with
             initialBalance: Decimal
+            walletObservers: [Party]
         controller username
         do
             create UserWallet with
                 username = username
                 walletBalance = initialBalance
+                observers = walletObservers
     
     choice ChangeSkillset : ContractId User
         with

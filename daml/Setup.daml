@@ -91,12 +91,14 @@ createUserContract party skillset = do
   pure cid
 
 -- | Create UserWallet contracts for each party with an initial balance of 0.00.
+
 createUserWallet : Party -> Script (ContractId UserWallet)
 createUserWallet party = do
   cid <- submit party do
     createCmd UserWallet with
       username = party
       walletBalance = 0.00
+      observers = []
   pure cid
 
 -- | Create Alias contracts for each party with their respective skillsets.

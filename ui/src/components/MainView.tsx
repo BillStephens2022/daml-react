@@ -110,7 +110,6 @@ const MainView: React.FC = () => {
         console.log("Worker Alias: ", workerAlias);
         console.log("Worker Lower Case: ", workerLowercase);
         console.log("alias contracts: ", aliases.contracts);
-
         console.error("Worker not found.");
         return false;
       }
@@ -244,6 +243,9 @@ const MainView: React.FC = () => {
   console.log("allUserAliases: ", allUserAliases);
   console.log("allWorkProposals: ", allWorkProposals);
   console.log("formatted users: ", formattedUsers);
+  console.log("User Wallets: ", userWallets);
+  console.log("My Wallet: ", myWallet);
+  console.log("al Work Contracts: ", allWorkContracts);
 
   return (
     <Container className={classes.mainView}>
@@ -414,6 +416,7 @@ const MainView: React.FC = () => {
                   partyToAlias={partyToAlias}
                   workProposals={allWorkProposals}
                   workContracts={allWorkContracts}
+                  wallets={userWallets}
                   username={username}
                   isWorkerList={false}
                   isWorkContract={true}

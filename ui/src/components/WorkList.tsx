@@ -12,8 +12,9 @@ import {
   Button,
 } from "semantic-ui-react";
 import { ContractId, Party } from "@daml/types";
-import { Ledger, CreateEvent } from "@daml/ledger";
+import { Ledger, CreateEvent, QueryResult } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
+import { UserWallet } from "@daml.js/daml-react";
 import RejectForm from "./RejectForm";
 import EditProposalForm from "./EditProposalForm";
 import ContractButton from "./ContractButton";
@@ -22,6 +23,7 @@ type Props = {
   partyToAlias: Map<Party, string>;
   workProposals: readonly CreateEvent<Work.WorkProposal, undefined, string>[];
   workContracts: readonly CreateEvent<Work.WorkContract, undefined, string>[];
+  wallets: QueryResult<UserWallet.UserWallet, string, string>;
   username: string;
   isWorkerList: boolean;
   isWorkContract: boolean;
@@ -32,6 +34,7 @@ const WorkList: React.FC<Props> = ({
   partyToAlias,
   workProposals,
   workContracts,
+  wallets,
   username,
   isWorkerList,
   isWorkContract,
@@ -211,25 +214,152 @@ const WorkList: React.FC<Props> = ({
 
   const handleCompleteJob = async (contractId: ContractId<Work.WorkContract>) => {
     try {
-      const isContractActive = await ledger.fetch(
-        Work.WorkContract,
-        contractId
-      );
+         // Fetch the contract details
+    const contract = await ledger.fetch(Work.WorkContract, contractId);
 
-      if (!isContractActive) {
-        console.error("Contract is not active, cannot complete job.");
-        return;
-      }
+    if (!contract) {
+      console.error("Contract not found:", contractId);
+      return;
+    }
+
+       // Check if the contract is active
+    if (contract.payload.contractStatus !== "Active Contract - Awaiting Work Completion") {
+      console.error("Contract is not active, cannot complete job.");
+      return;
+    }
+     
+
 
       await ledger.exercise(
         Work.WorkContract.CompleteJob,
         contractId,
         {}
       );
+
+      const workerWallet = wallets.contracts.find(
+        (wallet) => wallet.payload.username === contract.payload.contractWorker
+      );
+  
+      if (!workerWallet) {
+        console.error("Worker's wallet not found:", contract.payload.contractWorker);
+        return;
+      }
+    
+
+  // const handlePayment = async (contractId: ContractId<Work.WorkContract>) => {
+  //   try {
+  //     console.log("Fetching contract with ID:", contractId);
+   
+  //     console.log("Wallets Prop: ", wallets.contracts);
+  //     const contract = await ledger.fetch(Work.WorkContract, contractId);
+
+  //     if (!contract) {
+  //       console.error("Contract is not active, cannot make a payment.");
+  //       return;
+  //     }
+
+  //     const paymentAmount = contract.payload.contractRateAmount;
+  //     console.log("Contract to make payment on: ", contract);
+  //     // Log the signatories field of the contract
+  //     console.log("Contract Client: ", contract.payload.contractClient);
+  //     console.log("Contract Worker: ", contract.payload.contractWorker);
+  //     console.log("Exercising choice on contract with ID:", contractId);
+  //      // Find the client's wallet contract
+  //   const clientWallet = wallets.contracts.find(
+  //     (wallet) => wallet.payload.username === contract.payload.contractClient
+  //   );
+
+  //   // Find the worker's wallet contract
+  //   const workerWallet = wallets.contracts.find(
+  //     (wallet) => wallet.payload.username === contract.payload.contractWorker
+  //   );
+
+  //   if (!clientWallet) {
+  //     console.error("Client wallet not found.");
+  //     return;
+  //   }
+
+  //   if (!workerWallet) {
+  //     console.error("Worker wallet not found.");
+  //     return;
+  //   }
+  //   // Access the contract ids from the wallet contracts
+  //   const clientWalletCid = clientWallet.contractId;
+  //   const workerWalletCid = workerWallet.contractId;
+      
+  //     await ledger.exercise(
+  //       Work.WorkContract.MakeContractPayment,
+  //       contractId,
+  //       { 
+  //         clientWalletCid: clientWalletCid,
+  //         workerWalletCid: workerWalletCid,
+  //         amount: paymentAmount 
+  //       }
+  //     );
+    
+
+      console.log("Payment made successfully:", contractId);
     } catch (error) {
-      console.error("Error canceling proposal:", error);
+      console.error("Error making payment:", error);
     }
   };
+
+  const handlePayment = async (contractId: ContractId<Work.WorkContract>) => {
+    try {
+      console.log("Fetching contract with ID:", contractId);
+  
+      const contract = await ledger.fetch(Work.WorkContract, contractId);
+  
+      if (!contract) {
+        console.error("Contract is not active, cannot make a payment.");
+        return;
+      }
+  
+      const paymentAmount = contract.payload.contractRateAmount;
+      console.log("Contract to make payment on: ", contract);
+  
+      // Find the client's wallet contract
+      const clientWallet = wallets.contracts.find(
+        (wallet) => wallet.payload.username === contract.payload.contractClient
+      );
+  
+      // Ensure client's wallet is loaded
+      if (!clientWallet) {
+        console.error("Client wallet not found.");
+        return;
+      }
+  
+      const clientWalletCid = clientWallet.contractId;
+  
+      // Find the worker's wallet contract
+    const workerWallet = wallets.contracts.find(
+      (wallet) => wallet.payload.username === contract.payload.contractWorker
+    );
+
+    // Ensure worker's wallet is loaded
+    if (!workerWallet) {
+      console.error("Worker wallet not found.");
+      return;
+    }
+
+    const workerWalletCid = workerWallet.contractId;
+
+      console.log("Client added as observer to worker's wallet:", contract.payload.contractWorker);
+  
+  
+      // Make the payment
+      await ledger.exercise(Work.WorkContract.MakeContractPayment, contractId, {
+        clientWalletCid,
+        workerWalletCid,
+        amount: paymentAmount,
+      });
+  
+      console.log("Payment made successfully:", contractId);
+    } catch (error) {
+      console.error("Error making payment:", error);
+    }
+  };
+  
 
 
   const buttonToShow = (
@@ -281,7 +411,7 @@ const WorkList: React.FC<Props> = ({
         return (
           <ContractButton
             contractId={contractId as ContractId<Work.WorkContract>}
-            onAction={() => console.log("Making Payment...")}
+            onAction={() => handlePayment(contractId as ContractId<Work.WorkContract>)}
             color="green"
             actionLabel="Make Payment"
           />

@@ -85,18 +85,27 @@ template WorkContract
     contractStatus: Text
   where
     signatory contractClient, contractWorker
-
+    
     choice CompleteJob : ContractId WorkContract
       controller contractWorker
       do
         create this with
           contractStatus = "Work Completed, Awaiting Payment"
 
-    choice MakePayment : ()
+    nonconsuming choice MakeContractPayment : ContractId WorkContract
+      with
+        clientWalletCid: ContractId UserWallet
+        workerWalletCid: ContractId UserWallet
+        amount: Decimal
       controller contractClient
       do
-        exerciseByKey @UserWallet contractClient (DeductFunds contractRateAmount)
-        exerciseByKey @UserWallet contractWorker (AddFunds contractRateAmount)
+        clientWallet <- fetch clientWalletCid
+        assertMsg "Insufficient funds" (clientWallet.walletBalance >= amount)
 
+        _ <- exercise clientWalletCid TransferFunds with
+          toWalletCid = workerWalletCid
+          amount = amount
+
+        -- Update contract status
         archive self
-        pure ()
+        create this with contractStatus = "Paid"

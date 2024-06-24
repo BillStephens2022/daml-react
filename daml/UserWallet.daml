@@ -3,11 +3,20 @@ module UserWallet where
 template UserWallet with
     username: Party
     walletBalance: Decimal
+    observers: [Party]
   where
     signatory username
+    observer observers
 
     key username: Party
     maintainer key
+
+    choice AddObserver : ContractId UserWallet
+      with
+        newObserver: Party
+      controller username
+      do
+        create this with observers = newObserver :: observers
 
     choice DepositFunds : ContractId UserWallet
         with
@@ -29,3 +38,15 @@ template UserWallet with
         controller username
         do
             create this with walletBalance = walletBalance + additionAmount
+            
+    choice TransferFunds : ContractId UserWallet
+        with
+            toWalletCid: ContractId UserWallet
+            amount: Decimal
+        controller username
+        do
+            assertMsg "Insufficient funds" (walletBalance >= amount)
+            toWallet <- fetch toWalletCid
+            exercise toWalletCid AddFunds with additionAmount = amount
+            create this with walletBalance = walletBalance - amount
+    
