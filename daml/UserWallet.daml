@@ -4,6 +4,7 @@ template UserWallet with
     username: Party
     walletBalance: Decimal
     observers: [Party]
+    authorizedParties: [Party]
   where
     signatory username
     observer observers
@@ -17,6 +18,13 @@ template UserWallet with
       controller username
       do
         create this with observers = newObserver :: observers
+    
+    choice AuthorizeParty : ContractId UserWallet
+      with
+        partyToAuthorize: Party
+      controller username
+      do
+        create this with authorizedParties = partyToAuthorize :: authorizedParties
 
     choice DepositFunds : ContractId UserWallet
         with
@@ -43,7 +51,7 @@ template UserWallet with
         with
             toWalletCid: ContractId UserWallet
             amount: Decimal
-        controller username
+        controller username, authorizedParties
         do
             assertMsg "Insufficient funds" (walletBalance >= amount)
             toWallet <- fetch toWalletCid

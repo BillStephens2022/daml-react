@@ -214,6 +214,15 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
+  const authorizeClient = async (workerWalletCid: ContractId<UserWallet.UserWallet>, client: Party) => {
+    try {
+      await ledger.exercise(UserWallet.UserWallet.AuthorizeParty, workerWalletCid, { partyToAuthorize: client });
+      console.log("Client authorized successfully.");
+    } catch (error) {
+      console.error("Error authorizing client:", error);
+    }
+  };
+
   const handleCompleteJob = async (
     contractId: ContractId<Work.WorkContract>
   ) => {
@@ -252,19 +261,22 @@ const WorkList: React.FC<Props> = ({
       console.log("Worker's wallet found! ", workerWallet);
 
       // Add the client as an observer to the worker's wallet, this will allow the client to make the payment to the worker
-      await ledger.exercise(
-        UserWallet.UserWallet.AddObserver,
-        workerWallet.contractId,
-        {
-          newObserver: contract.payload.contractClient,
-        }
-      );
+      // await ledger.exercise(
+      //   UserWallet.UserWallet.AddObserver,
+      //   workerWallet.contractId,
+      //   {
+      //     newObserver: contract.payload.contractClient,
+      //   }
+      // );
+
+      // Authorize the client to make the payment
+      await authorizeClient(workerWallet.contractId, contract.payload.contractClient);
 
       // Refetch the worker's wallet to confirm observer update
-    const updatedWorkerWallet = await ledger.fetch(
-      UserWallet.UserWallet,
-      workerWallet.contractId
-    );
+      const updatedWorkerWallet = await ledger.fetch(
+        UserWallet.UserWallet,
+        workerWallet.contractId
+      );
 
       console.log("Worker's wallet found and updated! ", updatedWorkerWallet);
 
@@ -276,62 +288,6 @@ const WorkList: React.FC<Props> = ({
       console.error("Error completing job:", error);
     }
   };
-
-  // const handlePayment = async (contractId: ContractId<Work.WorkContract>) => {
-  //       try {
-  //         console.log("Fetching contract with ID:", contractId);
-
-  //         console.log("Wallets Prop: ", wallets.contracts);
-  //         const contract = await ledger.fetch(Work.WorkContract, contractId);
-
-  //         if (!contract) {
-  //           console.error("Contract is not active, cannot make a payment.");
-  //           return;
-  //         }
-
-  //         const paymentAmount = contract.payload.contractRateAmount;
-  //         console.log("Contract to make payment on: ", contract);
-  //         // Log the signatories field of the contract
-  //         console.log("Contract Client: ", contract.payload.contractClient);
-  //         console.log("Contract Worker: ", contract.payload.contractWorker);
-  //         console.log("Exercising choice on contract with ID:", contractId);
-  //          // Find the client's wallet contract
-  //       const clientWallet = wallets.contracts.find(
-  //         (wallet) => wallet.payload.username === contract.payload.contractClient
-  //       );
-
-  //       // Find the worker's wallet contract
-  //       const workerWallet = wallets.contracts.find(
-  //         (wallet) => wallet.payload.username === contract.payload.contractWorker
-  //       );
-
-  //       if (!clientWallet) {
-  //         console.error("Client wallet not found.");
-  //         return;
-  //       }
-
-  //       if (!workerWallet) {
-  //         console.error("Worker wallet not found.");
-  //         return;
-  //       }
-  //       // Access the contract ids from the wallet contracts
-  //       const clientWalletCid = clientWallet.contractId;
-  //       const workerWalletCid = workerWallet.contractId;
-
-  //         await ledger.exercise(
-  //           Work.WorkContract.MakeContractPayment,
-  //           contractId,
-  //           {
-  //             clientWalletCid: clientWalletCid,
-  //             workerWalletCid: workerWalletCid,
-  //             amount: paymentAmount
-  //           }
-  //         );
-  //     console.log("Payment made successfully:", contractId);
-  //   } catch (error) {
-  //     console.error("Error making payment:", error);
-  //   }
-  // }
 
   const handlePayment = async (contractId: ContractId<Work.WorkContract>) => {
     try {
@@ -372,6 +328,20 @@ const WorkList: React.FC<Props> = ({
       }
 
       const workerWalletCid = workerWallet.contractId;
+
+      // console.log("username:", username);
+      // console.log(
+      //   "Worker Wallet observers before payment:",
+      //   workerWallet.payload.observers
+      // );
+
+      // console.log(workerWallet.payload.observers.includes(username));
+      // if (!workerWallet.payload.observers.includes(username)) {
+      //   console.error("Client is not an observer on the worker's wallet.");
+      //   return;
+      // }
+
+      console.log("Preparing to make payment...");
 
       // Make the payment
       await ledger.exercise(Work.WorkContract.MakeContractPayment, contractId, {
