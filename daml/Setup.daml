@@ -6,6 +6,7 @@ import DA.Optional (fromSomeNote)
 import qualified DA.Text as T
 import Daml.Script
 import User as UserModule
+import UserWallet
 
 -- | A record containing all the parties that we will use in our script
 data Parties = Parties
@@ -53,14 +54,23 @@ setup = do
   createUserContract fiona Financial
   createUserContract george Handyman
 
+  -- Create UserWallet contracts for each party with initial balance of 0.00
+  createUserWallet alice
+  createUserWallet bob
+  createUserWallet charlie
+  createUserWallet debbie
+  createUserWallet ernie
+  createUserWallet fiona
+  createUserWallet george
+
   -- Create Alias contracts for each party with their respective skillsets
-  createAliasContract alice "Alice" Technology 0.00 public
-  createAliasContract bob "Bob" Handyman 0.00 public
-  createAliasContract charlie "Charlie" Landscaping 0.00 public
-  createAliasContract debbie "Debbie" Babysitting 0.00 public
-  createAliasContract ernie "Ernie" Landscaping 0.00 public
-  createAliasContract fiona "Fiona" Financial 0.00 public
-  createAliasContract george "George" Handyman 0.00 public
+  createAliasContract alice "Alice" Technology public
+  createAliasContract bob "Bob" Handyman public
+  createAliasContract charlie "Charlie" Landscaping public
+  createAliasContract debbie "Debbie" Babysitting public
+  createAliasContract ernie "Ernie" Landscaping public
+  createAliasContract fiona "Fiona" Financial public
+  createAliasContract george "George" Handyman public
 
   pure $ Parties with
     alice
@@ -78,18 +88,28 @@ createUserContract party skillset = do
     createCmd UserModule.User with
       username = party
       skillset = skillset
+  pure cid
+
+-- | Create UserWallet contracts for each party with an initial balance of 0.00.
+
+createUserWallet : Party -> Script (ContractId UserWallet)
+createUserWallet party = do
+  cid <- submit party do
+    createCmd UserWallet with
+      username = party
       walletBalance = 0.00
+      observers = []
+      authorizedParties = []
   pure cid
 
 -- | Create Alias contracts for each party with their respective skillsets.
-createAliasContract : Party -> Text -> Skillset -> Decimal -> Party -> Script ()
-createAliasContract party alias skillset walletBalance public = do
+createAliasContract : Party -> Text -> Skillset -> Party -> Script ()
+createAliasContract party alias skillset public = do
   _ <- submit party do
     createCmd UserModule.Alias with
       username = party
       alias = alias
       skillset = skillset
-      walletBalance = walletBalance
       public = public
   pure ()
 

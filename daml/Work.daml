@@ -1,8 +1,8 @@
 -- Work.daml
-
 module Work where
-import Common (Skillset)
 
+import Common (Skillset)
+import UserWallet
 
 type WorkProposalId = ContractId WorkProposal
 type WorkContractId = ContractId WorkContract
@@ -85,9 +85,33 @@ template WorkContract
     contractStatus: Text
   where
     signatory contractClient, contractWorker
-
+    
     choice CompleteJob : ContractId WorkContract
       controller contractWorker
       do
         create this with
           contractStatus = "Work Completed, Awaiting Payment"
+
+    nonconsuming choice MakeContractPayment : ContractId WorkContract
+      with
+        clientWalletCid: ContractId UserWallet
+        workerWalletCid: ContractId UserWallet
+        amount: Decimal
+      controller contractClient
+      do
+        -- Fetch client and worker wallets
+        clientWallet <- fetch clientWalletCid
+        workerWallet <- fetch workerWalletCid
+        assertMsg "Insufficient funds" (clientWallet.walletBalance >= amount)
+
+        -- Ensure that contractClient is the username for the clientWalletCid
+        assertMsg "Unauthorized payment attempt" (clientWallet.username == contractClient)
+        assertMsg "Worker wallet mismatch" (workerWallet.username == contractWorker)
+
+        _ <- exercise clientWalletCid TransferFunds with
+          toWalletCid = workerWalletCid
+          amount = amount
+
+        -- Update contract status
+        archive self
+        create this with contractStatus = "Paid"

@@ -1,0 +1,60 @@
+module UserWallet where
+
+template UserWallet with
+    username: Party
+    walletBalance: Decimal
+    observers: [Party]
+    authorizedParties: [Party]
+  where
+    signatory username
+    observer observers
+
+    key username: Party
+    maintainer key
+
+    choice AddObserver : ContractId UserWallet
+      with
+        newObserver: Party
+      controller username
+      do
+        create this with observers = newObserver :: observers
+    
+    choice AuthorizeParty : ContractId UserWallet
+      with
+        partyToAuthorize: Party
+      controller username
+      do
+        create this with authorizedParties = partyToAuthorize :: authorizedParties
+
+    choice DepositFunds : ContractId UserWallet
+        with
+            depositAmount: Decimal
+        controller username
+        do
+            create this with walletBalance = walletBalance + depositAmount
+
+    choice DeductFunds : ContractId UserWallet
+        with
+            deductionAmount: Decimal
+        controller username
+        do
+            create this with walletBalance = walletBalance - deductionAmount
+
+    choice AddFunds : ContractId UserWallet
+        with
+            additionAmount: Decimal
+        controller username
+        do
+            create this with walletBalance = walletBalance + additionAmount
+            
+    choice TransferFunds : ContractId UserWallet
+        with
+            toWalletCid: ContractId UserWallet
+            amount: Decimal
+        controller username, authorizedParties
+        do
+            assertMsg "Insufficient funds" (walletBalance >= amount)
+            toWallet <- fetch toWalletCid
+            exercise toWalletCid AddFunds with additionAmount = amount
+            create this with walletBalance = walletBalance - amount
+    

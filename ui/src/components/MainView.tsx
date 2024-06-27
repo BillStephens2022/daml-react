@@ -15,6 +15,7 @@ import {
 import { Party } from "@daml/types";
 import { User } from "@daml.js/daml-react";
 import { Work } from "@daml.js/daml-react";
+import { UserWallet } from "@daml.js/daml-react";
 import { publicContext, userContext } from "./App";
 import WorkRequestForm from "./WorkRequestForm";
 import { WorkRequest } from "../types";
@@ -39,6 +40,7 @@ const MainView: React.FC = () => {
   const aliases = publicContext.useStreamQueries(User.Alias, () => [], []);
   const users = publicContext.useStreamQueries(User.User, () => [], []);
   const allUsers = publicContext.useStreamQueries(User.User, () => [], []);
+  const userWallets = publicContext.useStreamQueries(UserWallet.UserWallet, () => [], []);
   const allWorkProposals = publicContext.useStreamQueries(
     Work.WorkProposal
   ).contracts;
@@ -91,9 +93,9 @@ const MainView: React.FC = () => {
     ? "loading..."
     : users.contracts[0].payload.skillset;
 
-  const myWallet = users.loading
+  const myWallet = userWallets.loading
     ? "loading..."
-    : users.contracts[0].payload.walletBalance;
+    : userWallets.contracts[0]?.payload.walletBalance;
 
   // Function to submit a new work request to the DAML ledger
   const submitWorkRequest = async (workRequest: WorkRequest) => {
@@ -108,7 +110,6 @@ const MainView: React.FC = () => {
         console.log("Worker Alias: ", workerAlias);
         console.log("Worker Lower Case: ", workerLowercase);
         console.log("alias contracts: ", aliases.contracts);
-
         console.error("Worker not found.");
         return false;
       }
@@ -188,21 +189,12 @@ const MainView: React.FC = () => {
   const handleDeposit = async (depositAmount: number) => {
     console.log("depositing to your wallet: ", depositAmount);
     try {
-      const userContractId = users.contracts[0].contractId;
+      const userWalletContractId = userWallets.contracts[0].contractId;
 
-      await ledger.exercise(User.User.DepositFunds, userContractId, {
+      await ledger.exercise(UserWallet.UserWallet.DepositFunds, userWalletContractId, {
         depositAmount: depositAmount.toString(),
       });
-      // Update the corresponding Alias contract with the new skillset
-      const userAlias = aliases.contracts.find(
-        (alias) => alias.payload.username === username
-      );
-      if (userAlias) {
-        const aliasContractId = userAlias.contractId;
-        await ledger.exercise(User.Alias.ChangeWallet, aliasContractId, {
-          newWalletBalance: depositAmount.toString(),
-        });
-      }
+      
       setShowDepositModal(false);
     } catch (error) {
       console.error("Error editing proposal:", error);
@@ -251,6 +243,9 @@ const MainView: React.FC = () => {
   console.log("allUserAliases: ", allUserAliases);
   console.log("allWorkProposals: ", allWorkProposals);
   console.log("formatted users: ", formattedUsers);
+  console.log("User Wallets: ", userWallets);
+  console.log("My Wallet: ", myWallet);
+  console.log("al Work Contracts: ", allWorkContracts);
 
   return (
     <Container className={classes.mainView}>
@@ -421,6 +416,7 @@ const MainView: React.FC = () => {
                   partyToAlias={partyToAlias}
                   workProposals={allWorkProposals}
                   workContracts={allWorkContracts}
+                  wallets={userWallets}
                   username={username}
                   isWorkerList={false}
                   isWorkContract={true}

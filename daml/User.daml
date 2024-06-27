@@ -4,12 +4,12 @@ module User where
 
 import Work
 import Common (Skillset)
+import UserWallet
 
 
 template User with
     username: Party
     skillset: Skillset
-    walletBalance: Decimal
   where
     signatory username
 
@@ -38,6 +38,22 @@ template User with
                 rateAmount = rateAmount
                 status = "Awaiting Approval"
     
+    -- Create a UserWallet for the user
+    nonconsuming choice CreateWallet : ContractId UserWallet
+        with
+            initialBalance: Decimal
+            walletObservers: [Party]
+            authorizedParties: [Party]
+            
+        controller username
+        do
+            create UserWallet with
+                username = username
+                walletBalance = initialBalance
+                observers = walletObservers
+                authorizedParties = authorizedParties
+              
+    
     choice ChangeSkillset : ContractId User
         with
             newSkillset: Skillset
@@ -45,19 +61,11 @@ template User with
         do
             create this with skillset = newSkillset
 
-    choice DepositFunds : ContractId User
-        with
-            depositAmount: Decimal
-        controller username
-        do
-            create this with walletBalance = walletBalance + depositAmount
-
 -- ALIAS_BEGIN
 template Alias with
     username: Party
     alias: Text
     skillset: Skillset
-    walletBalance: Decimal
     public: Party
   where
     signatory username
@@ -75,11 +83,5 @@ template Alias with
         archive self
         create this with alias = newAlias; skillset = newSkillset
     
-    nonconsuming choice ChangeWallet: ContractId Alias 
-      with
-        newWalletBalance: Decimal
-      controller username
-      do
-        archive self
-        create this with walletBalance = newWalletBalance
+
 -- ALIAS_END

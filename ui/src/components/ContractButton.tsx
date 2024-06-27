@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, SemanticCOLORS } from "semantic-ui-react";
 import { ContractId } from "@daml/types";
-import { Work } from "@daml.js/daml-react";
 
 type ButtonProps<T> = {
   contractId: ContractId<T>;
