@@ -214,9 +214,16 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
-  const authorizeClient = async (workerWalletCid: ContractId<UserWallet.UserWallet>, client: Party) => {
+  const authorizeClient = async (
+    workerWalletCid: ContractId<UserWallet.UserWallet>,
+    client: Party
+  ) => {
     try {
-      await ledger.exercise(UserWallet.UserWallet.AuthorizeParty, workerWalletCid, { partyToAuthorize: client });
+      await ledger.exercise(
+        UserWallet.UserWallet.AuthorizeParty,
+        workerWalletCid,
+        { partyToAuthorize: client }
+      );
       console.log("Client authorized successfully.");
     } catch (error) {
       console.error("Error authorizing client:", error);
@@ -261,27 +268,56 @@ const WorkList: React.FC<Props> = ({
       console.log("Worker's wallet found! ", workerWallet);
 
       // Add the client as an observer to the worker's wallet, this will allow the client to make the payment to the worker
-      // await ledger.exercise(
-      //   UserWallet.UserWallet.AddObserver,
-      //   workerWallet.contractId,
-      //   {
-      //     newObserver: contract.payload.contractClient,
-      //   }
-      // );
+      const [newContractId] = await ledger.exercise(
+        UserWallet.UserWallet.AddObserver,
+        workerWallet.contractId,
+        {
+          newObserver: contract.payload.contractClient,
+        }
+      );
+
+      // Refetch the worker's wallet to confirm the observer update
+      let updatedWorkerWallet = await ledger.fetch(
+        UserWallet.UserWallet,
+        newContractId
+      );
+
+      if (!updatedWorkerWallet) {
+        console.error("Failed to refetch updated worker's wallet");
+        return;
+      }
+
+      console.log(
+        "Worker's wallet found and updated with observer! ",
+        updatedWorkerWallet
+      );
 
       // Authorize the client to make the payment
-      await authorizeClient(workerWallet.contractId, contract.payload.contractClient);
-
-      // Refetch the worker's wallet to confirm observer update
-      const updatedWorkerWallet = await ledger.fetch(
+      const [updatedContractId] = await ledger.exercise(
+        UserWallet.UserWallet.AuthorizeParty,
+        updatedWorkerWallet.contractId,
+        {
+          partyToAuthorize: contract.payload.contractClient,
+        }
+      );
+      // Refetch the worker's wallet to confirm the observer update
+      updatedWorkerWallet = await ledger.fetch(
         UserWallet.UserWallet,
         workerWallet.contractId
       );
 
-      console.log("Worker's wallet found and updated! ", updatedWorkerWallet);
+      if (!updatedWorkerWallet) {
+        console.error(
+          "Failed to refetch final worker's wallet after adding authorizer:",
+          workerWallet.contractId
+        );
+        return;
+      }
 
-      console.log("Client added as observer to worker's wallet successfully.");
-      console.log("Job completed:", contractId);
+      console.log(
+        "Client added as authorizer to worker's wallet successfully: ",
+        updatedWorkerWallet
+      );
 
       console.log("Job completed:", contractId);
     } catch (error) {
