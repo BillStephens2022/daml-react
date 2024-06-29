@@ -36,25 +36,37 @@ template UserWallet with
     choice DeductFunds : ContractId UserWallet
         with
             deductionAmount: Decimal
-        controller username
+            authorizedParty: Party
+        controller authorizedParty
         do
+            assertMsg "The party is not authorized" $ authorizedParty `elem` authorizedParties
             create this with walletBalance = walletBalance - deductionAmount
 
     choice AddFunds : ContractId UserWallet
         with
             additionAmount: Decimal
-        controller username
+            authorizedParty: Party
+        controller authorizedParty
         do
+            assertMsg "The party is not authorized" $ authorizedParty `elem` authorizedParties
             create this with walletBalance = walletBalance + additionAmount
             
     choice TransferFunds : ContractId UserWallet
         with
             toWalletCid: ContractId UserWallet
             amount: Decimal
-        controller username, authorizedParties
+            authorizedParty: Party
+        controller authorizedParty
         do
+            assertMsg "The party is not authorized" $ authorizedParty `elem` authorizedParties
             assertMsg "Insufficient funds" (walletBalance >= amount)
-            toWallet <- fetch toWalletCid
-            exercise toWalletCid AddFunds with additionAmount = amount
+
+             -- Deduct from the sender's wallet
             create this with walletBalance = walletBalance - amount
-    
+
+            -- Fetch the recipient's wallet
+            toWallet <- fetch toWalletCid
+            -- Add to the recipient's wallet
+            toWallet' <- exercise toWalletCid AddFunds with additionAmount = amount, authorizedParty = authorizedParty
+        
+            pure toWallet'

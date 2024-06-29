@@ -97,6 +97,7 @@ template WorkContract
         clientWalletCid: ContractId UserWallet
         workerWalletCid: ContractId UserWallet
         amount: Decimal
+        authorizedParty: Party
       controller contractClient
       do
         -- Fetch client and worker wallets
@@ -108,9 +109,14 @@ template WorkContract
         assertMsg "Unauthorized payment attempt" (clientWallet.username == contractClient)
         assertMsg "Worker wallet mismatch" (workerWallet.username == contractWorker)
 
+          -- Ensure the authorized party is in the authorizedParties list
+        assertMsg "The party is not authorized" $ authorizedParty `elem` clientWallet.authorizedParties
+
+        -- Execute the transfer
         _ <- exercise clientWalletCid TransferFunds with
           toWalletCid = workerWalletCid
           amount = amount
+          authorizedParty = authorizedParty
 
         -- Update contract status
         archive self

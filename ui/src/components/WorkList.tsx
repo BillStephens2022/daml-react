@@ -214,21 +214,21 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
-  const authorizeClient = async (
-    workerWalletCid: ContractId<UserWallet.UserWallet>,
-    client: Party
-  ) => {
-    try {
-      await ledger.exercise(
-        UserWallet.UserWallet.AuthorizeParty,
-        workerWalletCid,
-        { partyToAuthorize: client }
-      );
-      console.log("Client authorized successfully.");
-    } catch (error) {
-      console.error("Error authorizing client:", error);
-    }
-  };
+  // const authorizeClient = async (
+  //   workerWalletCid: ContractId<UserWallet.UserWallet>,
+  //   client: Party
+  // ) => {
+  //   try {
+  //     await ledger.exercise(
+  //       UserWallet.UserWallet.AuthorizeParty,
+  //       workerWalletCid,
+  //       { partyToAuthorize: client }
+  //     );
+  //     console.log("Client authorized successfully.");
+  //   } catch (error) {
+  //     console.error("Error authorizing client:", error);
+  //   }
+  // };
 
   const handleCompleteJob = async (
     contractId: ContractId<Work.WorkContract>
@@ -384,6 +384,7 @@ const WorkList: React.FC<Props> = ({
         clientWalletCid,
         workerWalletCid,
         amount: paymentAmount,
+        authorizedParty: contract.payload.contractClient,
       });
 
       console.log("Payment made successfully:", contractId);

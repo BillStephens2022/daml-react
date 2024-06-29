@@ -51,7 +51,7 @@ template User with
                 username = username
                 walletBalance = initialBalance
                 observers = walletObservers
-                authorizedParties = authorizedParties
+                authorizedParties = [username]
               
     
     choice ChangeSkillset : ContractId User
