@@ -425,6 +425,8 @@ const WorkList: React.FC<Props> = ({
         return null;
       case isWorkerList && proposalStatus === "Rejected":
         return null;
+      case contractStatus === "Paid":
+        return <p>Contract completed. Paid in full.</p>;
 
       default:
         return (
