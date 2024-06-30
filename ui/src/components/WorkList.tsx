@@ -1,6 +1,3 @@
-// Copyright (c) 2022 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0
-
 import React, { useState } from "react";
 import {
   Segment,
@@ -214,22 +211,6 @@ const WorkList: React.FC<Props> = ({
     }
   };
 
-  // const authorizeClient = async (
-  //   workerWalletCid: ContractId<UserWallet.UserWallet>,
-  //   client: Party
-  // ) => {
-  //   try {
-  //     await ledger.exercise(
-  //       UserWallet.UserWallet.AuthorizeParty,
-  //       workerWalletCid,
-  //       { partyToAuthorize: client }
-  //     );
-  //     console.log("Client authorized successfully.");
-  //   } catch (error) {
-  //     console.error("Error authorizing client:", error);
-  //   }
-  // };
-
   const handleCompleteJob = async (
     contractId: ContractId<Work.WorkContract>
   ) => {
@@ -300,10 +281,11 @@ const WorkList: React.FC<Props> = ({
           partyToAuthorize: contract.payload.contractClient,
         }
       );
+
       // Refetch the worker's wallet to confirm the observer update
       updatedWorkerWallet = await ledger.fetch(
         UserWallet.UserWallet,
-        workerWallet.contractId
+        updatedContractId
       );
 
       if (!updatedWorkerWallet) {
@@ -364,18 +346,6 @@ const WorkList: React.FC<Props> = ({
       }
 
       const workerWalletCid = workerWallet.contractId;
-
-      // console.log("username:", username);
-      // console.log(
-      //   "Worker Wallet observers before payment:",
-      //   workerWallet.payload.observers
-      // );
-
-      // console.log(workerWallet.payload.observers.includes(username));
-      // if (!workerWallet.payload.observers.includes(username)) {
-      //   console.error("Client is not an observer on the worker's wallet.");
-      //   return;
-      // }
 
       console.log("Preparing to make payment...");
 

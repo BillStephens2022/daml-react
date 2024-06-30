@@ -1,6 +1,3 @@
-// Copyright (c) 2022 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
-// SPDX-License-Identifier: Apache-2.0
-
 import React, { useState, useMemo } from "react";
 import {
   Container,
@@ -32,11 +29,6 @@ import classes from "../styles/MainView.module.css";
 // USERS_BEGIN
 const MainView: React.FC = () => {
   const username = userContext.useParty();
-  // const myUserResult = userContext.useStreamFetchByKeys(
-  //   User.User,
-  //   () => [username],
-  //   [username]
-  // );
   const aliases = publicContext.useStreamQueries(User.Alias, () => [], []);
   const users = publicContext.useStreamQueries(User.User, () => [], []);
   const allUsers = publicContext.useStreamQueries(User.User, () => [], []);
