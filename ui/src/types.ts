@@ -14,6 +14,8 @@ export interface WorkRequest {
   note: string;
   rateType: RateType;
   rateAmount: number;
+  hours: number;
+  totalAmount: number;
   status: string;
 }
 

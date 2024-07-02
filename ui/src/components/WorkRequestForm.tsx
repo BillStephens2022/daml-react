@@ -52,6 +52,8 @@ const WorkRequestForm: React.FC<Props> = ({
     note: "",
     rateType: "Hourly",
     rateAmount: 0,
+    hours: 0,
+    totalAmount: 0,
     status: "Awaiting Review",
   });
 
@@ -86,7 +88,7 @@ const WorkRequestForm: React.FC<Props> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    const newValue = name === "rateAmount" ? parseFloat(value) : value; // Convert value to number for rateAmount
+    const newValue = name === "rateAmount" || name === "hours" ? parseFloat(value) : value; // Convert value to number for rateAmount
     setFormData({ ...formData, [name]: newValue });
   };
 
@@ -107,20 +109,25 @@ const WorkRequestForm: React.FC<Props> = ({
     setFormData({ ...formData, worker: value as string }); // Use value as string
   };
 
-  
+  const handleRateTypeChange = (
+    event: React.SyntheticEvent<HTMLElement, Event>,
+    data: DropdownProps
+  ) => {
+    const { value } = data;
+    setFormData({ ...formData, rateType: value as RateType });
+  };
+
+  useEffect(() => {
+    const calculatedAmount = formData.rateType === "Hourly" 
+      ? formData.rateAmount * formData.hours 
+      : formData.rateAmount;
+    setFormData({ ...formData, totalAmount: calculatedAmount });
+  }, [formData.rateType, formData.rateAmount, formData.hours]);
 
   const handleSubmit = () => {
     console.log("Form Data: ", formData);
     onSubmit(formData);
   };
-
-  // const userOptions = Array.from(allUserAliases.entries()).map(
-  //   ([partyId, alias]) => ({
-  //     key: partyId,
-  //     value: alias,
-  //     text: alias,
-  //   })
-  // );
 
   console.log("user ALIASES: ", userAliases);
   console.log("user options: ", userOptions);
@@ -198,9 +205,7 @@ const WorkRequestForm: React.FC<Props> = ({
         <Dropdown
           name="rateType"
           value={formData.rateType}
-          onChange={(e, data) =>
-            setFormData({ ...formData, rateType: data.value as RateType })
-          }
+          onChange={handleRateTypeChange}
           placeholder="Select Rate Type"
           fluid
           selection
@@ -217,6 +222,29 @@ const WorkRequestForm: React.FC<Props> = ({
           onChange={handleChange}
           placeholder="Rate Amount"
           required
+        />
+      </Form.Field>
+      {formData.rateType === "Hourly" && (
+        <Form.Field>
+          <label>Number of Hours</label>
+          <Input
+            type="number"
+            name="hours"
+            value={formData.hours}
+            onChange={handleChange}
+            placeholder="Number of Hours"
+            required
+          />
+        </Form.Field>
+      )}
+      <Form.Field>
+        <label>Total Amount</label>
+        <Input
+          type="number"
+          name="totalAmount"
+          value={formData.totalAmount}
+          readOnly
+          placeholder="Total Amount"
         />
       </Form.Field>
       <Button type="submit">Submit</Button>

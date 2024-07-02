@@ -23,7 +23,6 @@ template User with
             jobDescription: Text
             note: Text
             rateType: RateType
-            rateAmount: Decimal
             status : Text
         controller username
         do
@@ -35,7 +34,6 @@ template User with
                 jobDescription = jobDescription
                 note = note
                 rateType = rateType
-                rateAmount = rateAmount
                 status = "Awaiting Approval"
     
     -- Create a UserWallet for the user
