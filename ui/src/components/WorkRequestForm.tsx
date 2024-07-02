@@ -214,7 +214,7 @@ const WorkRequestForm: React.FC<Props> = ({
         />
       </Form.Field>
       <Form.Field>
-        <label>Rate Amount</label>
+        <label>{formData.rateType === "Flat" ? "Flat Fee:" : "Hourly Rate"}</label>
         <Input
           type="number"
           name="rateAmount"
@@ -225,6 +225,7 @@ const WorkRequestForm: React.FC<Props> = ({
         />
       </Form.Field>
       {formData.rateType === "Hourly" && (
+        <>
         <Form.Field>
           <label>Number of Hours</label>
           <Input
@@ -236,9 +237,8 @@ const WorkRequestForm: React.FC<Props> = ({
             required
           />
         </Form.Field>
-      )}
       <Form.Field>
-        <label>Total Amount</label>
+        <label>Total Amount Due</label>
         <Input
           type="number"
           name="totalAmount"
@@ -247,6 +247,8 @@ const WorkRequestForm: React.FC<Props> = ({
           placeholder="Total Amount"
         />
       </Form.Field>
+      </>
+      )}
       <Button type="submit">Submit</Button>
       <Button onClick={onCancel} type="button">
         Cancel
