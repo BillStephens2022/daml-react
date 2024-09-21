@@ -23,6 +23,7 @@ template WorkProposal
     jobDescription: Text
     note : Text
     rateType : RateType
+    totalAmount: Decimal
     status : Text
   where
     signatory client
@@ -31,9 +32,6 @@ template WorkProposal
     choice AcceptProposal : ContractId WorkContract
         controller worker
         do
-            let totalAmount = case rateType of
-                                FlatFee { amount } -> amount
-                                HourlyRate { rate, hours } -> rate * hours
             create WorkContract with
                 contractClient = client
                 contractWorker = worker

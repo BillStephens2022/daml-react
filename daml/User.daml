@@ -26,6 +26,9 @@ template User with
             status : Text
         controller username
         do
+            let totalAmount = case rateType of
+                                FlatFee { amount } -> amount
+                                HourlyRate { rate, hours } -> rate * hours
             create WorkProposal with
                 client = username
                 worker = username
@@ -34,6 +37,7 @@ template User with
                 jobDescription = jobDescription
                 note = note
                 rateType = rateType
+                totalAmount = totalAmount
                 status = "Awaiting Approval"
     
     -- Create a UserWallet for the user

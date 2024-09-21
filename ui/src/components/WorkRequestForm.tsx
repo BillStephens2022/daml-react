@@ -6,7 +6,7 @@ import {
   Button,
   DropdownProps,
 } from "semantic-ui-react";
-import { RateType, WorkRequest } from "../types";
+import { RateType, WorkRequest, StructuredRateType, WorkRequestDAML } from "../types";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 
 const RateOptions = [
@@ -29,12 +29,15 @@ console.log("Job Category Options: ", jobCategoryOptions);
 console.log("Skillset enum values: ", Object.values(Skillset));
 
 interface Props {
-  onSubmit: (data: WorkRequest) => void;
+  onSubmit: (data: WorkRequestDAML) => void;
   onCancel: () => void;
   username: string;
   userAliases: string[];
   users: { payload: { username: string; alias: string; skillset: Skillset } }[];
 }
+
+
+
 
 const WorkRequestForm: React.FC<Props> = ({
   onSubmit,
@@ -84,6 +87,16 @@ const WorkRequestForm: React.FC<Props> = ({
     }
   }, [formData.jobCategory, users, jobCategorySelected]);
 
+  useEffect(() => {
+    let structuredRateType: StructuredRateType;
+    if (formData.rateType === "Hourly") {
+      structuredRateType = { HourlyRate: { rate: formData.rateAmount.toFixed(2), hours: formData.hours.toFixed(2) } };
+    } else {
+      structuredRateType = { FlatFee: { amount: formData.rateAmount.toFixed(2) } };
+    }
+    setFormData({ ...formData, rateType: formData.rateType }); // Maintain original rateType for UI
+  }, [formData.rateType, formData.rateAmount, formData.hours]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -126,7 +139,47 @@ const WorkRequestForm: React.FC<Props> = ({
 
   const handleSubmit = () => {
     console.log("Form Data: ", formData);
-    onSubmit(formData);
+    // Validate jobCategory
+  if (!formData.jobCategory) {
+    alert("Job Category is required.");
+    return;
+  }
+    // Construct RateType as per DAML
+  let structuredRateType: StructuredRateType;
+  if (formData.rateType === "Hourly") {
+    structuredRateType = { 
+      HourlyRate: { 
+        rate: formData.rateAmount.toFixed(2), 
+        hours: formData.hours.toFixed(2) 
+      } 
+    };
+  } else {
+    structuredRateType = { 
+      FlatFee: { 
+        amount: formData.rateAmount.toFixed(2) 
+      } 
+    };
+  }
+
+  // Calculate totalAmount as string
+  const totalAmountDAML = formData.rateType === "Hourly" 
+    ? (formData.rateAmount * formData.hours).toFixed(2)
+    : formData.rateAmount.toFixed(2);
+
+  const submissionData: WorkRequestDAML = {
+    client: formData.client,
+    worker: formData.worker,
+    jobCategory: formData.jobCategory, // Ensure non-null
+    jobTitle: formData.jobTitle,
+    jobDescription: formData.jobDescription,
+    note: formData.note,
+    rateType: structuredRateType,
+    totalAmount: totalAmountDAML,
+    status: formData.status,
+  };
+
+    console.log("Submission Data: ", submissionData);
+    onSubmit(submissionData);
   };
 
   console.log("user ALIASES: ", userAliases);

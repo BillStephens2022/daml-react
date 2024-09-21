@@ -1,6 +1,9 @@
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 
 export type RateType = 'Hourly' | 'Flat';
+export type StructuredRateType =
+| { FlatFee: { amount: string } }
+| { HourlyRate: { rate: string; hours: string } };
 
 
 export type NullableSkillset = Skillset | null;
@@ -19,6 +22,17 @@ export interface WorkRequest {
   status: string;
 }
 
+export interface WorkRequestDAML {
+  client: string;
+  worker: string;
+  jobCategory: Skillset;
+  jobTitle: string;
+  jobDescription: string;
+  note: string;
+  rateType: StructuredRateType;
+  totalAmount: string;
+  status: string;
+}
 // export enum Skillset {
 //   Handyman = "Handyman",
 //   Technology = "Technology",
