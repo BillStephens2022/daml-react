@@ -15,7 +15,7 @@ import { Work } from "@daml.js/daml-react";
 import { UserWallet } from "@daml.js/daml-react";
 import { publicContext, userContext } from "./App";
 import WorkRequestForm from "./WorkRequestForm";
-import { WorkRequest } from "../types";
+import { WorkRequestDAML } from "../types";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import EditSkillsetForm from "./EditSkillsetForm";
 import DepositForm from "./DepositForm";
@@ -32,7 +32,11 @@ const MainView: React.FC = () => {
   const aliases = publicContext.useStreamQueries(User.Alias, () => [], []);
   const users = publicContext.useStreamQueries(User.User, () => [], []);
   const allUsers = publicContext.useStreamQueries(User.User, () => [], []);
-  const userWallets = publicContext.useStreamQueries(UserWallet.UserWallet, () => [], []);
+  const userWallets = publicContext.useStreamQueries(
+    UserWallet.UserWallet,
+    () => [],
+    []
+  );
   const allWorkProposals = publicContext.useStreamQueries(
     Work.WorkProposal
   ).contracts;
@@ -90,7 +94,7 @@ const MainView: React.FC = () => {
     : userWallets.contracts[0]?.payload.walletBalance;
 
   // Function to submit a new work request to the DAML ledger
-  const submitWorkRequest = async (workRequest: WorkRequest) => {
+  const submitWorkRequest = async (workRequest: WorkRequestDAML) => {
     try {
       // Convert worker value to lowercase
       const workerLowercase = workRequest.worker.toLowerCase();
@@ -108,6 +112,8 @@ const MainView: React.FC = () => {
       console.log("WorkerAlias!: ", workerAlias);
       const workerParty = workerAlias.payload.username;
       const jobCategory = workRequest.jobCategory || Skillset.None;
+      
+  
       const workProposal = await ledger.create(Work.WorkProposal, {
         client: username,
         worker: workerParty,
@@ -116,7 +122,7 @@ const MainView: React.FC = () => {
         jobDescription: workRequest.jobDescription,
         note: workRequest.note,
         rateType: workRequest.rateType,
-        rateAmount: workRequest.rateAmount.toString(),
+        totalAmount: workRequest.totalAmount,
         status: workRequest.status,
       });
       console.log("Work proposal created:", workProposal);
@@ -128,17 +134,14 @@ const MainView: React.FC = () => {
   };
 
   // Function to handle submission of work request form
-  const handleSubmitWorkRequest = (workRequest: WorkRequest) => {
-    console.log("Work Request Data:", workRequest as WorkRequest);
-    if (typeof workRequest.rateAmount === "number") {
-      submitWorkRequest(workRequest).then((success) => {
-        if (success) {
-          setShowModal(false); // Close the modal after submission
-        }
-      });
-    } else {
-      alert("Invalid rateAmount value");
-    }
+  const handleSubmitWorkRequest = (workRequest: WorkRequestDAML) => {
+    console.log("Work Request Data:", workRequest as WorkRequestDAML);
+
+    submitWorkRequest(workRequest).then((success) => {
+      if (success) {
+        setShowModal(false); // Close the modal after submission
+      }
+    });
   };
 
   const handleCancelWorkRequest = () => {
@@ -183,10 +186,14 @@ const MainView: React.FC = () => {
     try {
       const userWalletContractId = userWallets.contracts[0].contractId;
 
-      await ledger.exercise(UserWallet.UserWallet.DepositFunds, userWalletContractId, {
-        depositAmount: depositAmount.toString(),
-      });
-      
+      await ledger.exercise(
+        UserWallet.UserWallet.DepositFunds,
+        userWalletContractId,
+        {
+          depositAmount: depositAmount.toString(),
+        }
+      );
+
       setShowDepositModal(false);
     } catch (error) {
       console.error("Error editing proposal:", error);

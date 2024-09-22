@@ -6,7 +6,13 @@ import UserWallet
 
 type WorkProposalId = ContractId WorkProposal
 type WorkContractId = ContractId WorkContract
-data RateType = Hourly | Flat deriving (Eq, Show)
+data RateType = 
+    FlatFee with 
+        amount: Decimal 
+    | HourlyRate with 
+        rate: Decimal
+        hours: Decimal
+    deriving (Eq, Show)
 
 template WorkProposal
   with
@@ -17,7 +23,7 @@ template WorkProposal
     jobDescription: Text
     note : Text
     rateType : RateType
-    rateAmount : Decimal
+    totalAmount: Decimal
     status : Text
   where
     signatory client
@@ -33,7 +39,7 @@ template WorkProposal
                 contractJobTitle = jobTitle
                 contractJobDescription = jobDescription
                 contractRateType = rateType
-                contractRateAmount = rateAmount
+                contractTotalAmount = totalAmount
                 contractStatus = "Active Contract - Awaiting Work Completion"
 
     choice RejectProposal : ContractId WorkProposal
@@ -52,7 +58,6 @@ template WorkProposal
             revisedJobDescription : Text
             feedbackText : Text
             adjustedRateType : RateType
-            adjustedRateAmount: Decimal
         controller client
         do
           debug "Revising Proposal!"
@@ -62,7 +67,6 @@ template WorkProposal
               jobDescription = revisedJobDescription
               note = feedbackText
               rateType = adjustedRateType
-              rateAmount = adjustedRateAmount
               status = "Revised - Awaiting Review"
                 
     nonconsuming choice CancelProposal : ()
@@ -81,7 +85,7 @@ template WorkContract
     contractJobTitle: Text
     contractJobDescription : Text
     contractRateType : RateType
-    contractRateAmount : Decimal
+    contractTotalAmount : Decimal
     contractStatus: Text
   where
     signatory contractClient, contractWorker
@@ -115,9 +119,9 @@ template WorkContract
         -- Execute the transfer
         _ <- exercise clientWalletCid TransferFunds with
           toWalletCid = workerWalletCid
-          amount = amount
+          amount = contractTotalAmount
           authorizedParty = authorizedParty
 
         -- Update contract status
-        archive self
+        archive self  
         create this with contractStatus = "Paid"

@@ -151,7 +151,7 @@ const WorkList: React.FC<Props> = ({
         const feedbackText = note ?? selectedProposal.payload.note;
         const adjustedRateType = rateType ?? selectedProposal.payload.rateType;
         const adjustedRateAmount = parseFloat(
-          rateAmount ?? selectedProposal.payload.rateAmount
+          rateAmount ?? selectedProposal.payload.totalAmount
         );
 
         await ledger.exercise(
@@ -163,7 +163,6 @@ const WorkList: React.FC<Props> = ({
             revisedJobDescription,
             feedbackText,
             adjustedRateType,
-            adjustedRateAmount: adjustedRateAmount.toString(), // Convert to string for Decimal
           }
         );
 
@@ -318,7 +317,7 @@ const WorkList: React.FC<Props> = ({
         return;
       }
 
-      const paymentAmount = contract.payload.contractRateAmount;
+      const paymentAmount = contract.payload.contractTotalAmount;
       console.log("Contract to make payment on: ", contract);
 
       // Find the client's wallet contract
@@ -510,14 +509,14 @@ const WorkList: React.FC<Props> = ({
               <p>
                 <strong>Rate Type:</strong>{" "}
                 {isWorkContract
-                  ? (contract.payload as Work.WorkContract).contractRateType
-                  : (contract.payload as Work.WorkProposal).rateType}
+                  ? (contract.payload as Work.WorkContract).contractRateType.tag
+                  : (contract.payload as Work.WorkProposal).rateType.tag}
               </p>
               <p>
                 <strong>Rate Amount:</strong>{" "}
                 {isWorkContract
-                  ? (contract.payload as Work.WorkContract).contractRateAmount
-                  : (contract.payload as Work.WorkProposal).rateAmount}
+                  ? (contract.payload as Work.WorkContract).contractTotalAmount
+                  : (contract.payload as Work.WorkProposal).totalAmount}
               </p>
               <p>
                 <strong>Status</strong>{" "}
@@ -571,10 +570,19 @@ const WorkList: React.FC<Props> = ({
                 jobTitle: selectedProposal.payload?.jobTitle ?? "",
                 jobDescription: selectedProposal.payload?.jobDescription ?? "",
                 note: selectedProposal.payload?.note ?? "",
-                rateType: selectedProposal.payload?.rateType ?? "",
-                // Convert rateAmount to a number
+                rateType: selectedProposal.payload?.rateType.tag ?? "",
                 rateAmount: parseFloat(
-                  selectedProposal.payload?.rateAmount ?? "0"
+                  selectedProposal.payload?.rateType.tag === "HourlyRate"
+                    ? selectedProposal.payload?.rateType.value.rate ?? "0"
+                    : "0"
+                ),
+                hours: parseFloat(
+                  selectedProposal.payload?.rateType.tag === "HourlyRate"
+                    ? selectedProposal.payload?.rateType.value.hours ?? "0"
+                    : "0"
+                ),
+                totalAmount: parseFloat(
+                  selectedProposal.payload?.totalAmount ?? "0"
                 ),
                 status: selectedProposal.payload?.status ?? "",
               }}
