@@ -15,7 +15,7 @@ import { Work } from "@daml.js/daml-react";
 import { UserWallet } from "@daml.js/daml-react";
 import { publicContext, userContext } from "./App";
 import WorkRequestForm from "./WorkRequestForm";
-import { WorkRequestDAML, StructuredRateType } from "../types";
+import { WorkRequestDAML } from "../types";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import EditSkillsetForm from "./EditSkillsetForm";
 import DepositForm from "./DepositForm";
@@ -113,7 +113,6 @@ const MainView: React.FC = () => {
       const workerParty = workerAlias.payload.username;
       const jobCategory = workRequest.jobCategory || Skillset.None;
       
-      const rateType: Work.RateType = workRequest.rateType;
   
       const workProposal = await ledger.create(Work.WorkProposal, {
         client: username,
@@ -122,8 +121,8 @@ const MainView: React.FC = () => {
         jobTitle: workRequest.jobTitle,
         jobDescription: workRequest.jobDescription,
         note: workRequest.note,
-        rateType: rateType,
-        totalAmount: workRequest.totalAmount.toFixed(2),
+        rateType: workRequest.rateType,
+        totalAmount: workRequest.totalAmount,
         status: workRequest.status,
       });
       console.log("Work proposal created:", workProposal);
