@@ -141,7 +141,7 @@ const WorkList: React.FC<Props> = ({
           jobDescription,
           note,
           rateType,
-          rateAmount,
+          // rateAmount,
         } = formData;
         const revisedJobCategory =
           jobCategory ?? selectedProposal.payload.jobCategory;
@@ -150,9 +150,9 @@ const WorkList: React.FC<Props> = ({
           jobDescription ?? selectedProposal.payload.jobDescription;
         const feedbackText = note ?? selectedProposal.payload.note;
         const adjustedRateType = rateType ?? selectedProposal.payload.rateType;
-        const adjustedRateAmount = parseFloat(
-          rateAmount ?? selectedProposal.payload.totalAmount
-        );
+        // const adjustedRateAmount = parseFloat(
+        //   rateAmount ?? selectedProposal.payload.totalAmount
+        // );
 
         await ledger.exercise(
           Work.WorkProposal.ReviseProposal,
@@ -509,11 +509,58 @@ const WorkList: React.FC<Props> = ({
               <p>
                 <strong>Rate Type:</strong>{" "}
                 {isWorkContract
-                  ? (contract.payload as Work.WorkContract).contractRateType.tag
-                  : (contract.payload as Work.WorkProposal).rateType.tag}
+                  ? (contract.payload as Work.WorkContract).contractRateType
+                      .tag === "HourlyRate"
+                    ? "Hourly Rate"
+                    : "Flat Fee"
+                  : (contract.payload as Work.WorkProposal).rateType.tag ===
+                    "HourlyRate"
+                  ? "Hourly Rate"
+                  : "Flat Fee"}
               </p>
+              {isWorkContract ? (
+                (contract.payload as Work.WorkContract).contractRateType.tag ===
+                "HourlyRate" ? (
+                  <p>
+                    <strong>Number of Hours: </strong>
+                    {
+                      (contract.payload as Work.WorkContract).contractRateType
+                        .value.hours
+                    }
+                  </p>
+                ) : null
+              ) : (contract.payload as Work.WorkProposal).rateType.tag ===
+                "HourlyRate" ? (
+                <p>
+                  <strong>Number of Hours: </strong>
+                  {(contract.payload as Work.WorkProposal).rateType.value.hours}
+                </p>
+              ) : null}
+              {isWorkContract ? (
+                (contract.payload as Work.WorkContract).contractRateType.tag ===
+                "HourlyRate" ? (
+                  <p>
+                    <strong>Hourly Rate: </strong>
+                    {
+                      (contract.payload as Work.WorkContract).contractRateType
+                        .value.rate
+                    }{" "}
+                    /hour
+                  </p>
+                ) : null
+              ) : (contract.payload as Work.WorkProposal).rateType.tag ===
+                "HourlyRate" ? (
+                <p>
+                  <strong>Hourly Rate: </strong>
+                  {
+                    (contract.payload as Work.WorkProposal).rateType.value.rate
+                  }{" "}
+                  / hour
+                </p>
+              ) : null}
+
               <p>
-                <strong>Rate Amount:</strong>{" "}
+                <strong>Total Amount:</strong>{" "}
                 {isWorkContract
                   ? (contract.payload as Work.WorkContract).contractTotalAmount
                   : (contract.payload as Work.WorkProposal).totalAmount}

@@ -29,23 +29,23 @@ const EditProposalForm: React.FC<Props> = ({
   );
 
   useEffect(() => {
-    let structuredRateType: Work.RateType;
-    if (formData.rateType === "HourlyRate") {
-      structuredRateType = {
-        tag: "HourlyRate",
-        value: {
-          rate: formData.rateAmount.toFixed(2),
-          hours: formData.hours.toFixed(2),
-        },
-      };
-    } else {
-      structuredRateType = {
-        tag: "FlatFee",
-        value: { amount: formData.rateAmount.toFixed(2) },
-      };
-    }
+    // let structuredRateType: Work.RateType;
+    // if (formData.rateType === "HourlyRate") {
+    //   structuredRateType = {
+    //     tag: "HourlyRate",
+    //     value: {
+    //       rate: formData.rateAmount.toFixed(2),
+    //       hours: formData.hours.toFixed(2),
+    //     },
+    //   };
+    // } else {
+    //   structuredRateType = {
+    //     tag: "FlatFee",
+    //     value: { amount: formData.rateAmount.toFixed(2) },
+    //   };
+    // }
     setFormData({ ...formData, rateType: formData.rateType }); // Maintain original rateType for UI
-  }, [formData.rateType, formData.rateAmount, formData.hours]);
+  }, [formData, formData.rateType, formData.rateAmount, formData.hours]);
 
   useEffect(() => {
     const calculatedAmount =
@@ -53,7 +53,7 @@ const EditProposalForm: React.FC<Props> = ({
         ? formData.rateAmount * formData.hours
         : formData.rateAmount;
     setFormData({ ...formData, totalAmount: calculatedAmount });
-  }, [formData.rateType, formData.rateAmount, formData.hours]);
+  }, [formData, formData.rateType, formData.rateAmount, formData.hours]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
