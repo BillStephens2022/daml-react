@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Form,
   Input,
   Dropdown,
   Button
 } from "semantic-ui-react";
-import { RateType, WorkRequest } from "../types";
+import { RateType, WorkRequest, EditWorkRequest, WorkRequestDAML } from "../types";
+import { Work } from "@daml.js/daml-react";
 
 const RateOptions = [
   { key: "hourly", value: "Hourly", text: "Hourly" },
@@ -13,9 +14,9 @@ const RateOptions = [
 ];
 
 interface Props {
-  onSubmit: (data: WorkRequest) => void;
+  onSubmit: (data: WorkRequestDAML) => void;
   onCancel: () => void;
-  initialValues: WorkRequest;
+  initialValues: EditWorkRequest;
 }
 
 const EditProposalForm: React.FC<Props> = ({
@@ -27,17 +28,88 @@ const EditProposalForm: React.FC<Props> = ({
     initialValues as WorkRequest
   );
 
+  useEffect(() => {
+    let structuredRateType: Work.RateType;
+    if (formData.rateType === "HourlyRate") {
+      structuredRateType = {
+        tag: "HourlyRate",
+        value: {
+          rate: formData.rateAmount.toFixed(2),
+          hours: formData.hours.toFixed(2),
+        },
+      };
+    } else {
+      structuredRateType = {
+        tag: "FlatFee",
+        value: { amount: formData.rateAmount.toFixed(2) },
+      };
+    }
+    setFormData({ ...formData, rateType: formData.rateType }); // Maintain original rateType for UI
+  }, [formData.rateType, formData.rateAmount, formData.hours]);
+
+  useEffect(() => {
+    const calculatedAmount =
+      formData.rateType === "HourlyRate"
+        ? formData.rateAmount * formData.hours
+        : formData.rateAmount;
+    setFormData({ ...formData, totalAmount: calculatedAmount });
+  }, [formData.rateType, formData.rateAmount, formData.hours]);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    const newValue = name === "rateAmount" ? parseFloat(value) : value; // Convert value to number for rateAmount
+    const newValue =
+      name === "rateAmount" || name === "hours" ? parseFloat(value) : value; // Convert value to number for rateAmount
     setFormData({ ...formData, [name]: newValue });
   };
 
   const handleSubmit = () => {
     console.log("Form Data: ", formData);
-    onSubmit(formData);
+    // Validate jobCategory
+    if (!formData.jobCategory) {
+      alert("Job Category is required.");
+      return;
+    }
+    // Construct RateType as per DAML
+    let structuredRateType: Work.RateType;
+    if (formData.rateType === "HourlyRate") {
+      structuredRateType = {
+        tag: "HourlyRate",
+        value: {
+          rate: formData.rateAmount.toFixed(2),
+          hours: formData.hours.toFixed(2),
+        },
+      };
+    } else {
+      structuredRateType = {
+        tag: "FlatFee",
+        value: {
+          amount: formData.rateAmount.toFixed(2),
+        },
+      };
+    }
+
+    // Calculate totalAmount as string
+    const totalAmountDAML =
+      formData.rateType === "HourlyRate"
+        ? (formData.rateAmount * formData.hours).toFixed(2)
+        : formData.rateAmount.toFixed(2);
+
+    const submissionData: WorkRequestDAML = {
+      client: formData.client,
+      worker: formData.worker,
+      jobCategory: formData.jobCategory, // Ensure non-null
+      jobTitle: formData.jobTitle,
+      jobDescription: formData.jobDescription,
+      note: formData.note,
+      rateType: structuredRateType,
+      totalAmount: totalAmountDAML,
+      status: formData.status,
+    };
+
+    console.log("Submission Data: ", submissionData);
+    onSubmit(submissionData);
   };
 
   // Check if initialValues is not null before using it

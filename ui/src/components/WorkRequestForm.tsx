@@ -55,7 +55,7 @@ const WorkRequestForm: React.FC<Props> = ({
     jobTitle: "",
     jobDescription: "",
     note: "",
-    rateType: "Hourly",
+    rateType: "HourlyRate",
     rateAmount: 0,
     hours: 0,
     totalAmount: 0,
@@ -90,7 +90,7 @@ const WorkRequestForm: React.FC<Props> = ({
 
   useEffect(() => {
     let structuredRateType: Work.RateType;
-    if (formData.rateType === "Hourly") {
+    if (formData.rateType === "HourlyRate") {
       structuredRateType = {
         tag: "HourlyRate",
         value: {
@@ -143,7 +143,7 @@ const WorkRequestForm: React.FC<Props> = ({
 
   useEffect(() => {
     const calculatedAmount =
-      formData.rateType === "Hourly"
+      formData.rateType === "HourlyRate"
         ? formData.rateAmount * formData.hours
         : formData.rateAmount;
     setFormData({ ...formData, totalAmount: calculatedAmount });
@@ -158,7 +158,7 @@ const WorkRequestForm: React.FC<Props> = ({
     }
     // Construct RateType as per DAML
     let structuredRateType: Work.RateType;
-    if (formData.rateType === "Hourly") {
+    if (formData.rateType === "HourlyRate") {
       structuredRateType = {
         tag: "HourlyRate",
         value: {
@@ -177,7 +177,7 @@ const WorkRequestForm: React.FC<Props> = ({
 
     // Calculate totalAmount as string
     const totalAmountDAML =
-      formData.rateType === "Hourly"
+      formData.rateType === "HourlyRate"
         ? (formData.rateAmount * formData.hours).toFixed(2)
         : formData.rateAmount.toFixed(2);
 
@@ -283,7 +283,7 @@ const WorkRequestForm: React.FC<Props> = ({
       </Form.Field>
       <Form.Field>
         <label>
-          {formData.rateType === "Flat" ? "Flat Fee:" : "Hourly Rate"}
+          {formData.rateType === "FlatFee" ? "Flat Fee:" : "Hourly Rate"}
         </label>
         <Input
           type="number"
@@ -294,7 +294,7 @@ const WorkRequestForm: React.FC<Props> = ({
           required
         />
       </Form.Field>
-      {formData.rateType === "Hourly" && (
+      {formData.rateType === "HourlyRate" && (
         <>
           <Form.Field>
             <label>Number of Hours</label>
