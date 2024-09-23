@@ -10,7 +10,6 @@ const RejectForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
   const [feedback, setFeedback] = useState<string>("");
 
   const handleSubmit = () => {
-    console.log("Feedback: ", feedback);
     onSubmit(feedback);
   };
 

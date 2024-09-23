@@ -87,15 +87,13 @@ const WorkList: React.FC<Props> = ({
   const acceptProposal = async (contractId: ContractId<Work.WorkProposal>) => {
     try {
       await ledger.exercise(Work.WorkProposal.AcceptProposal, contractId, {});
-      console.log("Proposal accepted:", contractId);
-      // Optionally, you can reload or update the list of proposals after accepting
     } catch (error) {
       console.error("Error accepting proposal:", error);
     }
   };
 
   const openRejectForm = (contractId: ContractId<Work.WorkProposal>) => {
-    setSelectedProposalId(contractId); // Set the selected proposal ID
+    setSelectedProposalId(contractId);
     setShowRejectForm(true);
   };
 
@@ -114,7 +112,6 @@ const WorkList: React.FC<Props> = ({
   };
 
   const handleRejectProposal = async (feedback: string) => {
-    console.log("Before try block in rejectPRoposal handler: ", feedback);
     try {
       if (selectedProposalId) {
         await ledger.exercise(
@@ -122,7 +119,6 @@ const WorkList: React.FC<Props> = ({
           selectedProposalId,
           { feedback }
         );
-        console.log("Proposal rejected:", selectedProposalId);
         setShowRejectForm(false);
         setSelectedProposalId(null);
       }
@@ -188,8 +184,6 @@ const WorkList: React.FC<Props> = ({
         return;
       }
 
-      console.log("Proposal found! ", proposal);
-      // Verify if the contract is active
       const isContractActive = await ledger.fetch(
         Work.WorkProposal,
         contractId
@@ -245,8 +239,6 @@ const WorkList: React.FC<Props> = ({
         return;
       }
 
-      console.log("Worker's wallet found! ", workerWallet);
-
       // Add the client as an observer to the worker's wallet, this will allow the client to make the payment to the worker
       const [newContractId] = await ledger.exercise(
         UserWallet.UserWallet.AddObserver,
@@ -266,11 +258,6 @@ const WorkList: React.FC<Props> = ({
         console.error("Failed to refetch updated worker's wallet");
         return;
       }
-
-      console.log(
-        "Worker's wallet found and updated with observer! ",
-        updatedWorkerWallet
-      );
 
       // Authorize the client to make the payment
       const [updatedContractId] = await ledger.exercise(
@@ -295,12 +282,6 @@ const WorkList: React.FC<Props> = ({
         return;
       }
 
-      console.log(
-        "Client added as authorizer to worker's wallet successfully: ",
-        updatedWorkerWallet
-      );
-
-      console.log("Job completed:", contractId);
     } catch (error) {
       console.error("Error completing job:", error);
     }
@@ -308,8 +289,6 @@ const WorkList: React.FC<Props> = ({
 
   const handlePayment = async (contractId: ContractId<Work.WorkContract>) => {
     try {
-      console.log("Fetching contract with ID:", contractId);
-
       const contract = await ledger.fetch(Work.WorkContract, contractId);
 
       if (!contract) {
@@ -318,7 +297,6 @@ const WorkList: React.FC<Props> = ({
       }
 
       const paymentAmount = contract.payload.contractTotalAmount;
-      console.log("Contract to make payment on: ", contract);
 
       // Find the client's wallet contract
       const clientWallet = wallets.contracts.find(
@@ -346,8 +324,6 @@ const WorkList: React.FC<Props> = ({
 
       const workerWalletCid = workerWallet.contractId;
 
-      console.log("Preparing to make payment...");
-
       // Make the payment
       await ledger.exercise(Work.WorkContract.MakeContractPayment, contractId, {
         clientWalletCid,
@@ -356,7 +332,6 @@ const WorkList: React.FC<Props> = ({
         authorizedParty: contract.payload.contractClient,
       });
 
-      console.log("Payment made successfully:", contractId);
     } catch (error) {
       console.error("Error making payment:", error);
     }

@@ -28,7 +28,6 @@ type Props = {
 const LoginScreen: React.FC<Props> = ({ onLogin }) => {
   const login = useCallback(
     async (credentials: Credentials) => {
-      console.log("Credentials received:", credentials);
       onLogin(credentials);
     },
     [onLogin]

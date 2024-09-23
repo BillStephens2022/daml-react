@@ -103,17 +103,14 @@ const MainView: React.FC = () => {
         (alias) => alias.payload.alias.toLowerCase() === workerLowercase
       );
       if (!workerAlias) {
-        console.log("Worker Alias: ", workerAlias);
-        console.log("Worker Lower Case: ", workerLowercase);
-        console.log("alias contracts: ", aliases.contracts);
         console.error("Worker not found.");
         return false;
       }
-      console.log("WorkerAlias!: ", workerAlias);
+
       const workerParty = workerAlias.payload.username;
       const jobCategory = workRequest.jobCategory || Skillset.None;
       
-  
+
       const workProposal = await ledger.create(Work.WorkProposal, {
         client: username,
         worker: workerParty,
@@ -125,8 +122,9 @@ const MainView: React.FC = () => {
         totalAmount: workRequest.totalAmount,
         status: workRequest.status,
       });
-      console.log("Work proposal created:", workProposal);
+
       return true;
+
     } catch (error) {
       console.error("Error creating work proposal:", error);
       return false;
@@ -135,8 +133,6 @@ const MainView: React.FC = () => {
 
   // Function to handle submission of work request form
   const handleSubmitWorkRequest = (workRequest: WorkRequestDAML) => {
-    console.log("Work Request Data:", workRequest as WorkRequestDAML);
-
     submitWorkRequest(workRequest).then((success) => {
       if (success) {
         setShowModal(false); // Close the modal after submission
@@ -157,10 +153,8 @@ const MainView: React.FC = () => {
   };
 
   const handleEditSkillset = async (selectedSkillset: Skillset) => {
-    console.log("editing skillset!: ", selectedSkillset);
     try {
       const userContractId = users.contracts[0].contractId;
-      console.log("userContractId", userContractId);
       await ledger.exercise(User.User.ChangeSkillset, userContractId, {
         newSkillset: selectedSkillset,
       });
@@ -182,7 +176,6 @@ const MainView: React.FC = () => {
   };
 
   const handleDeposit = async (depositAmount: number) => {
-    console.log("depositing to your wallet: ", depositAmount);
     try {
       const userWalletContractId = userWallets.contracts[0].contractId;
 
@@ -193,7 +186,6 @@ const MainView: React.FC = () => {
           depositAmount: depositAmount.toString(),
         }
       );
-
       setShowDepositModal(false);
     } catch (error) {
       console.error("Error editing proposal:", error);
@@ -235,16 +227,6 @@ const MainView: React.FC = () => {
     setView(view);
     setActiveMenuItem(view);
   };
-
-  console.log("Aliases: ", aliases);
-  console.log("users", users);
-  console.log("allUsers", allUsers);
-  console.log("allUserAliases: ", allUserAliases);
-  console.log("allWorkProposals: ", allWorkProposals);
-  console.log("formatted users: ", formattedUsers);
-  console.log("User Wallets: ", userWallets);
-  console.log("My Wallet: ", myWallet);
-  console.log("al Work Contracts: ", allWorkContracts);
 
   return (
     <Container className={classes.mainView}>

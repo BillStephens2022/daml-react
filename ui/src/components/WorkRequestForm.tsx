@@ -30,9 +30,6 @@ const jobCategoryOptions = validSkillsetValues.map((skillset) => ({
   text: skillset,
 }));
 
-console.log("Job Category Options: ", jobCategoryOptions);
-console.log("Skillset enum values: ", Object.values(Skillset));
-
 interface Props {
   onSubmit: (data: WorkRequestDAML) => void;
   onCancel: () => void;
@@ -69,14 +66,11 @@ const WorkRequestForm: React.FC<Props> = ({
     { key: string; value: string; text: string }[]
   >([]);
 
-  console.log("USERS WORKREQUESTFORM: ", users);
-
   useEffect(() => {
     if (jobCategorySelected) {
       const filteredUsers = users
         .filter((user) => {
           const skillset = user.payload.skillset;
-          console.log(`User: ${user.payload.username}, Skillset: ${skillset}`);
           return skillset === formData.jobCategory;
         })
         .map((user) => ({
@@ -89,21 +83,6 @@ const WorkRequestForm: React.FC<Props> = ({
   }, [formData.jobCategory, users, jobCategorySelected]);
 
   useEffect(() => {
-    // let structuredRateType: Work.RateType;
-    // if (formData.rateType === "HourlyRate") {
-    //   structuredRateType = {
-    //     tag: "HourlyRate",
-    //     value: {
-    //       rate: formData.rateAmount.toFixed(2),
-    //       hours: formData.hours.toFixed(2),
-    //     },
-    //   };
-    // } else {
-    //   structuredRateType = {
-    //     tag: "FlatFee",
-    //     value: { amount: formData.rateAmount.toFixed(2) },
-    //   };
-    // }
     setFormData({ ...formData, rateType: formData.rateType }); // Maintain original rateType for UI
   }, [formData.rateType, formData.rateAmount, formData.hours]);
 
@@ -196,9 +175,6 @@ const WorkRequestForm: React.FC<Props> = ({
     console.log("Submission Data: ", submissionData);
     onSubmit(submissionData);
   };
-
-  console.log("user ALIASES: ", userAliases);
-  console.log("user options: ", userOptions);
 
   return (
     <Form onSubmit={handleSubmit}>
