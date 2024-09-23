@@ -29,21 +29,6 @@ const EditProposalForm: React.FC<Props> = ({
   );
 
   useEffect(() => {
-    // let structuredRateType: Work.RateType;
-    // if (formData.rateType === "HourlyRate") {
-    //   structuredRateType = {
-    //     tag: "HourlyRate",
-    //     value: {
-    //       rate: formData.rateAmount.toFixed(2),
-    //       hours: formData.hours.toFixed(2),
-    //     },
-    //   };
-    // } else {
-    //   structuredRateType = {
-    //     tag: "FlatFee",
-    //     value: { amount: formData.rateAmount.toFixed(2) },
-    //   };
-    // }
     setFormData({ ...formData, rateType: formData.rateType }); // Maintain original rateType for UI
   }, [formData, formData.rateType, formData.rateAmount, formData.hours]);
 
@@ -114,7 +99,7 @@ const EditProposalForm: React.FC<Props> = ({
 
   // Check if initialValues is not null before using it
   if (!initialValues) {
-    return null; // Or return a loading indicator or something else
+    return null;
   }
 
   return (

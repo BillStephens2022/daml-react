@@ -113,7 +113,6 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
         party: primaryParty,
         token: auth.makeToken(username),
         getPublicParty: useGetPublicParty,
-        //skillset: "None",
       });
     };
 
@@ -148,7 +147,6 @@ const LoginScreen: React.FC<Props> = ({ onLogin }) => {
                 usePublicParty: () => usePublicParty(),
                 setup: () => {},
               }),
-              //skillset: "None"
             });
           }
         }}

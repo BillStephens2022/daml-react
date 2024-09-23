@@ -71,7 +71,7 @@ const WorkList: React.FC<Props> = ({
 
   const contractHeaders = ["Accepted Work Contracts", "Active Contracts"];
 
-  // Determine which headers, contracts to use based on isWorkContracct & isWorkerList
+  // Determine which headers, contracts to use based on isWorkContract & isWorkerList
   const headersToUse = isWorkContract
     ? contractHeaders
     : isWorkerList
@@ -137,7 +137,6 @@ const WorkList: React.FC<Props> = ({
           jobDescription,
           note,
           rateType,
-          // rateAmount,
         } = formData;
         const revisedJobCategory =
           jobCategory ?? selectedProposal.payload.jobCategory;
@@ -146,9 +145,6 @@ const WorkList: React.FC<Props> = ({
           jobDescription ?? selectedProposal.payload.jobDescription;
         const feedbackText = note ?? selectedProposal.payload.note;
         const adjustedRateType = rateType ?? selectedProposal.payload.rateType;
-        // const adjustedRateAmount = parseFloat(
-        //   rateAmount ?? selectedProposal.payload.totalAmount
-        // );
 
         await ledger.exercise(
           Work.WorkProposal.ReviseProposal,

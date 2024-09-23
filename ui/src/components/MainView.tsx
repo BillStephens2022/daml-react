@@ -26,7 +26,7 @@ import CommunityList from "./CommunityList";
 import HeaderSubHeader from "semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader";
 import classes from "../styles/MainView.module.css";
 
-// USERS_BEGIN
+
 const MainView: React.FC = () => {
   const username = userContext.useParty();
   const aliases = publicContext.useStreamQueries(User.Alias, () => [], []);
@@ -44,7 +44,6 @@ const MainView: React.FC = () => {
     Work.WorkContract
   ).contracts;
 
-  // USERS_END
   const [showModal, setShowModal] = useState(false);
   const [showSkillsetModal, setShowSkillsetModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
