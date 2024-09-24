@@ -1,18 +1,15 @@
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import { Work } from "@daml.js/daml-react";
 
-export type RateType = 'HourlyRate' | 'FlatFee';
-
-export type NullableSkillset = Skillset | null;
 
 export interface WorkRequest {
   client: string;
   worker: string;
-  jobCategory: NullableSkillset;
+  jobCategory: Skillset | null;
   jobTitle: string;
   jobDescription: string;
   note: string;
-  rateType: RateType;
+  rateType: Work.RateType;
   rateAmount: number;
   hours: number;
   totalAmount: number;
@@ -22,25 +19,13 @@ export interface WorkRequest {
 export interface EditWorkRequest {
   client: string;
   worker: string;
-  jobCategory: NullableSkillset;
-  jobTitle: string;
-  jobDescription: string;
-  note: string;
-  rateType: RateType;
-  rateAmount?: number;
-  hours?: number;
-  totalAmount: number;
-  status: string;
-}
-
-export interface WorkRequestDAML {
-  client: string;
-  worker: string;
-  jobCategory: Skillset;
+  jobCategory: Skillset | null;
   jobTitle: string;
   jobDescription: string;
   note: string;
   rateType: Work.RateType;
-  totalAmount: string;
+  rateAmount?: number;
+  hours?: number;
+  totalAmount: number;
   status: string;
 }
