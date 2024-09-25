@@ -84,6 +84,36 @@ const WorkRequestForm: React.FC<Props> = ({
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleRateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+  
+    setFormData((prevState) => {
+      if (prevState.rateType.tag === "HourlyRate") {
+        return {
+          ...prevState,
+          rateType: {
+            ...prevState.rateType,
+            value: {
+              ...prevState.rateType.value,
+              rate: value, // Update rate in HourlyRate
+            },
+          },
+        };
+      } else if (prevState.rateType.tag === "FlatFee") {
+        return {
+          ...prevState,
+          rateType: {
+            ...prevState.rateType,
+            value: {
+              amount: value, // Update amount in FlatFee
+            },
+          },
+        };
+      }
+      return prevState;
+    });
+  };
+
   const handleJobCategoryChange = (
     event: React.SyntheticEvent<HTMLElement, Event>,
     data: DropdownProps
@@ -126,6 +156,26 @@ const WorkRequestForm: React.FC<Props> = ({
         };
       }
       return prevState;
+    });
+  };
+
+  const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+  
+    setFormData((prevState) => {
+      if (prevState.rateType.tag === "HourlyRate") {
+        return {
+          ...prevState,
+          rateType: {
+            ...prevState.rateType,
+            value: {
+              ...prevState.rateType.value,
+              hours: value, // Update hours in HourlyRate
+            },
+          },
+        };
+      }
+      return prevState; // Return unchanged state if it's not HourlyRate
     });
   };
 
@@ -257,7 +307,7 @@ const WorkRequestForm: React.FC<Props> = ({
               ? formData.rateType.value.rate
               : formData.rateType.value.amount
           }
-          onChange={handleChange}
+          onChange={handleRateAmountChange}
           placeholder="Rate Amount"
           required
         />
@@ -270,7 +320,7 @@ const WorkRequestForm: React.FC<Props> = ({
               type="text"
               name="hours"
               value={String(formData.rateType.value.hours)}
-              onChange={handleChange}
+              onChange={handleHoursChange}
               placeholder="Number of Hours"
               required
             />
