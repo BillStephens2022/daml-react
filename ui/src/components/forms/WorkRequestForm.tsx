@@ -8,11 +8,12 @@ import {
 } from "semantic-ui-react";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import { WorkProposal, RateType } from "@daml.js/daml-react/lib/Work/module";
+import RateTypeSelector from "./formComponents/RateTypeSelector";
 
-const RateOptions = [
-  { key: "hourly", value: "HourlyRate", text: "Hourly" },
-  { key: "flat", value: "FlatFee", text: "Flat" },
-];
+// const RateOptions = [
+//   { key: "hourly", value: "HourlyRate", text: "Hourly" },
+//   { key: "flat", value: "FlatFee", text: "Flat" },
+// ];
 
 const validSkillsetValues = Object.values(Skillset).filter(
   (value) => typeof value === "string"
@@ -90,7 +91,7 @@ const WorkRequestForm: React.FC<Props> = ({
 
   // Handle dynamic rate type changes
   const handleRateTypeChange = (
-    event: React.SyntheticEvent<HTMLElement, Event>,
+    
     data: DropdownProps
   ) => {
     const { value } = data;
@@ -268,51 +269,11 @@ const WorkRequestForm: React.FC<Props> = ({
           placeholder="Note"
         />
       </Form.Field>
-      <Form.Field>
-        <label>Rate Type</label>
-        <Dropdown
-          name="rateType"
-          value={formData.rateType.tag}
-          onChange={handleRateTypeChange}
-          placeholder="Select Rate Type"
-          fluid
-          selection
-          options={RateOptions}
-          required
-        />
-      </Form.Field>
-      <Form.Field>
-        <label>
-          {formData.rateType.tag === "FlatFee" ? "Flat Fee:" : "Hourly Rate"}
-        </label>
-        <Input
-          type="text"
-          name={formData.rateType.tag === "FlatFee" ? "amount" : "rate"}
-          value={
-            formData.rateType.tag === "HourlyRate"
-              ? formData.rateType.value.rate
-              : formData.rateType.value.amount
-          }
-          onChange={handleRateAmountChange}
-          placeholder="Rate Amount"
-          required
-        />
-      </Form.Field>
-      {formData.rateType.tag === "HourlyRate" && (
-        <>
-          <Form.Field>
-            <label>Number of Hours</label>
-            <Input
-              type="text"
-              name="hours"
-              value={formData.rateType.value.hours}
-              onChange={handleRateAmountChange}
-              placeholder="Number of Hours"
-              required
-            />
-          </Form.Field>
-        </>
-      )}
+      <RateTypeSelector
+        rateType={formData.rateType}
+        onRateTypeChange={handleRateTypeChange}
+        onRateAmountChange={handleRateAmountChange}
+      />
       <Form.Field>
         <label>Total Amount</label>
         <Input
