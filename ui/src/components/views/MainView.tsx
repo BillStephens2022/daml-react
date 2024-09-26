@@ -10,21 +10,19 @@ import {
   Modal,
 } from "semantic-ui-react";
 import { Party } from "@daml/types";
-import { User } from "@daml.js/daml-react";
-import { Work } from "@daml.js/daml-react";
-import { UserWallet } from "@daml.js/daml-react";
-import { publicContext, userContext } from "./App";
-import WorkRequestForm from "./WorkRequestForm";
-import { WorkRequestDAML } from "../types";
+import { User, Work, UserWallet } from "@daml.js/daml-react";
+import { publicContext, userContext } from "../App";
+import WorkRequestForm from "../forms/WorkRequestForm";
+import { WorkRequestDAML } from "../../types";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
-import EditSkillsetForm from "./EditSkillsetForm";
-import DepositForm from "./DepositForm";
+import EditSkillsetForm from "../forms/EditSkillsetForm";
+import DepositForm from "../forms/DepositForm";
 import MyRequests from "./MyRequests";
 import MyJobs from "./MyJobs";
 import ActiveWorkContracts from "./ActiveWorkContracts";
 import CommunityList from "./CommunityList";
 import HeaderSubHeader from "semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader";
-import classes from "../styles/MainView.module.css";
+import classes from "../../styles/MainView.module.css";
 
 
 const MainView: React.FC = () => {
@@ -378,6 +376,7 @@ const MainView: React.FC = () => {
                   isWorkerList={false}
                   isWorkContract={true}
                   ledger={ledger}
+                  wallets={userWallets}
                 />
               )}
               {view === "jobView" && (
@@ -389,6 +388,7 @@ const MainView: React.FC = () => {
                   isWorkerList={false}
                   isWorkContract={true}
                   ledger={ledger}
+                  wallets={userWallets}
                 />
               )}
               {view === "contractView" && (

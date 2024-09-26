@@ -2,11 +2,11 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Image, Menu } from 'semantic-ui-react'
 import MainView from './MainView';
 import { User } from '@daml.js/daml-react';
-import { PublicParty } from '../Credentials';
-import { userContext } from './App';
+import { PublicParty } from '../../Credentials';
+import { userContext } from '../App';
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
-import classes from "../styles/MainScreen.module.css"
-import LoaderLarge from './Loader';
+import classes from "../../styles/MainScreen.module.css"
+import LoaderLarge from '../ui/Loader';
 
 
 type Props = {

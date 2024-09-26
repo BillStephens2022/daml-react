@@ -1,7 +1,7 @@
 import React from "react";
 import { Party } from "@daml/types";
-import { Ledger, CreateEvent } from "@daml/ledger";
-import { Work } from "@daml.js/daml-react";
+import { Ledger, CreateEvent, QueryResult } from "@daml/ledger";
+import { Work, UserWallet } from "@daml.js/daml-react";
 import WorkList from "./WorkList";
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
     isWorkerList: boolean;
     isWorkContract: boolean;
     ledger: Ledger;
+    wallets: QueryResult<UserWallet.UserWallet, string, string>;
   };
   
   const MyJobs: React.FC<Props> = ({
@@ -21,7 +22,8 @@ type Props = {
     username,
     isWorkerList,
     isWorkContract,
-    ledger
+    ledger,
+    wallets,
   }) => {
     return (
         <div>
@@ -34,6 +36,7 @@ type Props = {
               isWorkerList={true}
               isWorkContract={false}
               ledger={ledger}
+              wallets={wallets}
             />
         </div>
     )

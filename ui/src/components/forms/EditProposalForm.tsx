@@ -5,7 +5,7 @@ import {
   Dropdown,
   Button
 } from "semantic-ui-react";
-import { RateType, WorkRequest, EditWorkRequest, WorkRequestDAML } from "../types";
+import { RateType, WorkRequest, EditWorkRequest, WorkRequestDAML } from "../../types";
 import { Work } from "@daml.js/daml-react";
 
 const RateOptions = [

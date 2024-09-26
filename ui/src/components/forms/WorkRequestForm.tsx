@@ -10,7 +10,7 @@ import {
   RateType,
   WorkRequest,
   WorkRequestDAML,
-} from "../types";
+} from "../../types";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import { Work } from "@daml.js/daml-react";
 
