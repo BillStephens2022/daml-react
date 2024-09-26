@@ -77,114 +77,89 @@ const WorkRequestForm: React.FC<Props> = ({
     }
   }, [formData.jobCategory, users, jobCategorySelected]);
 
+  // Generalized handleChange function
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleRateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-  
-    setFormData((prevState) => {
-      if (prevState.rateType.tag === "HourlyRate") {
-        return {
-          ...prevState,
-          rateType: {
-            ...prevState.rateType,
-            value: {
-              ...prevState.rateType.value,
-              rate: value, // Update rate in HourlyRate
-            },
-          },
-        };
-      } else if (prevState.rateType.tag === "FlatFee") {
-        return {
-          ...prevState,
-          rateType: {
-            ...prevState.rateType,
-            value: {
-              amount: value, // Update amount in FlatFee
-            },
-          },
-        };
-      }
-      return prevState;
-    });
-  };
-
-  const handleJobCategoryChange = (
-    event: React.SyntheticEvent<HTMLElement, Event>,
-    data: DropdownProps
-  ) => {
-    const { value } = data;
-    setFormData({ ...formData, jobCategory: value as Skillset});
-    setJobCategorySelected(true);
-  };
-
-  const handleWorkerChange = (
-    event: React.SyntheticEvent<HTMLElement, Event>,
-    data: DropdownProps
-  ) => {
-    const { value } = data; // Extract the value from data
-    setFormData({ ...formData, worker: value as string }); // Use value as string
-  };
-
+  // Handle dynamic rate type changes
   const handleRateTypeChange = (
     event: React.SyntheticEvent<HTMLElement, Event>,
     data: DropdownProps
   ) => {
     const { value } = data;
-  
-    setFormData((prevState) => {
-      if (value === "FlatFee") {
-        return {
-          ...prevState,
-          rateType: {
-            tag: "FlatFee",
-            value: { amount: "" }, // Ensure FlatFee has an amount field
-          },
-        };
-      } else if (value === "HourlyRate") {
-        return {
-          ...prevState,
-          rateType: {
-            tag: "HourlyRate",
-            value: { rate: "", hours: "" }, // Ensure HourlyRate has rate and hours fields
-          },
-        };
-      }
-      return prevState;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      rateType:
+        value === "FlatFee"
+          ? ({ tag: "FlatFee", value: { amount: "" } } as RateType)
+          : ({ tag: "HourlyRate", value: { rate: "", hours: "" } } as RateType),
+    }));
   };
 
-  const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-  
-    setFormData((prevState) => {
-      if (prevState.rateType.tag === "HourlyRate") {
+  // Unified handler for rate changes
+  const handleRateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const { rateType } = prev;
+
+      if (rateType.tag === "FlatFee") {
+        // Ensure `FlatFee` has `amount` property
         return {
-          ...prevState,
+          ...prev,
           rateType: {
-            ...prevState.rateType,
+            tag: "FlatFee",
             value: {
-              ...prevState.rateType.value,
-              hours: value, // Update hours in HourlyRate
+              ...rateType.value, // Preserve existing values in case there are other fields
+              amount:
+                name === "amount"
+                  ? value
+                  : (rateType.value as RateType.FlatFee).amount,
             },
           },
         };
+      } else if (rateType.tag === "HourlyRate") {
+        // Ensure `HourlyRate` has `rate` and `hours` properties
+        return {
+          ...prev,
+          rateType: {
+            tag: "HourlyRate",
+            value: {
+              ...rateType.value, // Preserve existing values in case there are other fields
+              rate:
+                name === "rate"
+                  ? value
+                  : (rateType.value as RateType.HourlyRate).rate,
+              hours:
+                name === "hours"
+                  ? value
+                  : (rateType.value as RateType.HourlyRate).hours,
+            },
+          },
+        };
+      } else {
+        // Default case, just return the unchanged form data
+        return prev;
       }
-      return prevState; // Return unchanged state if it's not HourlyRate
     });
   };
 
+  // Calculate total amount
   useEffect(() => {
     let calculatedAmount = "0.00";
     if (formData.rateType.tag === "HourlyRate") {
-      calculatedAmount = (Number(formData.rateType.value.rate || 0) * Number(formData.rateType.value.hours || 0)).toFixed(2);
+      calculatedAmount = (
+        Number(formData.rateType.value.rate || 0) *
+        Number(formData.rateType.value.hours || 0)
+      ).toFixed(2);
     } else if (formData.rateType.tag === "FlatFee") {
-      calculatedAmount = (formData.rateType.value.amount || "0.00");
+      calculatedAmount = formData.rateType.value.amount || "0.00";
     }
     setFormData((prevState) => ({
       ...prevState,
@@ -193,7 +168,6 @@ const WorkRequestForm: React.FC<Props> = ({
   }, [formData.rateType]);
 
   const handleSubmit = () => {
-    console.log("Form Data: ", formData);
     // Validate jobCategory
     if (!formData.jobCategory) {
       alert("Job Category is required.");
@@ -202,15 +176,22 @@ const WorkRequestForm: React.FC<Props> = ({
 
     const submissionData: WorkProposal = {
       ...formData,
-      rateType: formData.rateType.tag === "HourlyRate"
-        ? { tag: "HourlyRate", value: { rate: formData.rateType.value.rate, hours: formData.rateType.value.hours } }
-        : { tag: "FlatFee", value: { amount: formData.rateType.value.amount } },
-      totalAmount: formData.rateType.tag === "HourlyRate"
-        ? (parseFloat(formData.rateType.value.rate) * parseFloat(formData.rateType.value.hours)).toFixed(2)
-        : formData.rateType.value.amount,
+      rateType:
+        formData.rateType.tag === "HourlyRate"
+          ? {
+              tag: "HourlyRate",
+              value: {
+                rate: formData.rateType.value.rate,
+                hours: formData.rateType.value.hours,
+              },
+            }
+          : {
+              tag: "FlatFee",
+              value: { amount: formData.rateType.value.amount },
+            },
+      totalAmount: formData.totalAmount,
     };
 
-    console.log("Submission Data: ", submissionData);
     onSubmit(submissionData);
   };
 
@@ -231,7 +212,10 @@ const WorkRequestForm: React.FC<Props> = ({
         <Dropdown
           name="jobCategory"
           value={formData.jobCategory || ""}
-          onChange={handleJobCategoryChange}
+          onChange={(e, data) => {
+            setJobCategorySelected((prev) => !prev);
+            setFormData({ ...formData, jobCategory: data.value as Skillset });
+          }}
           placeholder="Job Category"
           fluid
           search
@@ -248,7 +232,9 @@ const WorkRequestForm: React.FC<Props> = ({
           fluid
           selection
           options={userOptions}
-          onChange={handleWorkerChange}
+          onChange={(e, data) =>
+            setFormData({ ...formData, worker: data.value as string })
+          }
           disabled={!jobCategorySelected}
           required
         />
@@ -301,7 +287,7 @@ const WorkRequestForm: React.FC<Props> = ({
         </label>
         <Input
           type="text"
-          name="rateAmount"
+          name={formData.rateType.tag === "FlatFee" ? "amount" : "rate"}
           value={
             formData.rateType.tag === "HourlyRate"
               ? formData.rateType.value.rate
@@ -319,27 +305,28 @@ const WorkRequestForm: React.FC<Props> = ({
             <Input
               type="text"
               name="hours"
-              value={String(formData.rateType.value.hours)}
-              onChange={handleHoursChange}
+              value={formData.rateType.value.hours}
+              onChange={handleRateAmountChange}
               placeholder="Number of Hours"
               required
             />
           </Form.Field>
-          <Form.Field>
-            <label>Total Amount Due</label>
-            <Input
-              type="text"
-              name="totalAmount"
-              value={String(formData.totalAmount)}
-              readOnly
-              placeholder="Total Amount"
-            />
-          </Form.Field>
         </>
       )}
-      <Button type="submit">Submit</Button>
-      <Button onClick={onCancel} type="button">
+      <Form.Field>
+        <label>Total Amount</label>
+        <Input
+          name="totalAmount"
+          value={formData.totalAmount}
+          readOnly
+          placeholder="Total Amount"
+        />
+      </Form.Field>
+      <Button type="button" onClick={onCancel}>
         Cancel
+      </Button>
+      <Button type="submit" primary>
+        Submit
       </Button>
     </Form>
   );
