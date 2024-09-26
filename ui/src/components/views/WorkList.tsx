@@ -12,9 +12,9 @@ import { ContractId, Party } from "@daml/types";
 import { Ledger, CreateEvent, QueryResult } from "@daml/ledger";
 import { Work } from "@daml.js/daml-react";
 import { UserWallet } from "@daml.js/daml-react";
-import RejectForm from "./RejectForm";
-import EditProposalForm from "./EditProposalForm";
-import ContractButton from "./ContractButton";
+import RejectForm from "../forms/RejectForm";
+import EditProposalForm from "../forms/EditProposalForm";
+import ContractButton from "../ui/ContractButton";
 
 type Props = {
   partyToAlias: Map<Party, string>;

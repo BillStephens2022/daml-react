@@ -10,28 +10,24 @@ import {
   Modal,
 } from "semantic-ui-react";
 import { Party } from "@daml/types";
-import { User } from "@daml.js/daml-react";
-import { Work } from "@daml.js/daml-react";
-import { UserWallet } from "@daml.js/daml-react";
-import { publicContext, userContext } from "./App";
-import WorkRequestForm from "./WorkRequestForm";
-import { WorkRequestDAML } from "../types";
+import { User, Work, UserWallet } from "@daml.js/daml-react";
+import { publicContext, userContext } from "../App";
+import WorkRequestForm from "../forms/WorkRequestForm";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
-import EditSkillsetForm from "./EditSkillsetForm";
-import DepositForm from "./DepositForm";
+import EditSkillsetForm from "../forms/EditSkillsetForm";
+import DepositForm from "../forms/DepositForm";
 import MyRequests from "./MyRequests";
 import MyJobs from "./MyJobs";
 import ActiveWorkContracts from "./ActiveWorkContracts";
 import CommunityList from "./CommunityList";
 import HeaderSubHeader from "semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader";
-import classes from "../styles/MainView.module.css";
+import classes from "../../styles/MainView.module.css";
 
 
 const MainView: React.FC = () => {
   const username = userContext.useParty();
   const aliases = publicContext.useStreamQueries(User.Alias, () => [], []);
   const users = publicContext.useStreamQueries(User.User, () => [], []);
-  const allUsers = publicContext.useStreamQueries(User.User, () => [], []);
   const userWallets = publicContext.useStreamQueries(
     UserWallet.UserWallet,
     () => [],
@@ -93,7 +89,7 @@ const MainView: React.FC = () => {
     : userWallets.contracts[0]?.payload.walletBalance;
 
   // Function to submit a new work request to the DAML ledger
-  const submitWorkRequest = async (workRequest: WorkRequestDAML) => {
+  const submitWorkRequest = async (workRequest: Work.WorkProposal) => {
     try {
       // Convert worker value to lowercase
       const workerLowercase = workRequest.worker.toLowerCase();
@@ -110,7 +106,7 @@ const MainView: React.FC = () => {
       const jobCategory = workRequest.jobCategory || Skillset.None;
       
 
-      const workProposal = await ledger.create(Work.WorkProposal, {
+      await ledger.create(Work.WorkProposal, {
         client: username,
         worker: workerParty,
         jobCategory: jobCategory,
@@ -131,7 +127,7 @@ const MainView: React.FC = () => {
   };
 
   // Function to handle submission of work request form
-  const handleSubmitWorkRequest = (workRequest: WorkRequestDAML) => {
+  const handleSubmitWorkRequest = (workRequest: Work.WorkProposal) => {
     submitWorkRequest(workRequest).then((success) => {
       if (success) {
         setShowModal(false); // Close the modal after submission

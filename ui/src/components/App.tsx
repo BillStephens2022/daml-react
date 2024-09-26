@@ -1,7 +1,7 @@
 import React from "react";
-import LoginScreen from "./LoginScreen";
-import MainScreen from "./MainScreen";
-import LoaderLarge from "./Loader";
+import LoginScreen from "./views/LoginScreen";
+import MainScreen from "./views/MainScreen";
+import LoaderLarge from "./ui/Loader";
 import { createLedgerContext } from "@daml/react";
 import DamlHub, {
   damlHubLogout,

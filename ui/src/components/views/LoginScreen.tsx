@@ -8,15 +8,15 @@ import {
   Segment,
   Divider,
 } from "semantic-ui-react";
-import Credentials, { PublicParty } from "../Credentials";
+import Credentials, { PublicParty } from "../../Credentials";
 import Ledger from "@daml/ledger";
 import {
   DamlHubLogin as DamlHubLoginBtn,
   usePublicParty,
 } from "@daml/hub-react";
-import { authConfig, Insecure } from "../config";
+import { authConfig, Insecure } from "../../config";
 import HeaderSubHeader from "semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader";
-import classes from "../styles/LoginScreen.module.css";
+import classes from "../../styles/LoginScreen.module.css";
 
 type Props = {
   onLogin: (credentials: Credentials) => void;

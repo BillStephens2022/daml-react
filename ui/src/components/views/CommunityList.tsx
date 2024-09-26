@@ -12,7 +12,7 @@ import {
   TableBody,
 } from "semantic-ui-react";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
-import classes from "../styles/Community.module.css";
+import classes from "../../styles/Community.module.css";
 
 type Props = {
   aliases: { username: string; alias: string; skillset: Skillset }[];
