@@ -9,6 +9,7 @@ import {
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import { WorkProposal, RateType } from "@daml.js/daml-react/lib/Work/module";
 import RateTypeSelector from "./formComponents/RateTypeSelector";
+import { filterWorkersByJobCategory } from "../../utils/helperFunctions";
 
 // const RateOptions = [
 //   { key: "hourly", value: "HourlyRate", text: "Hourly" },
@@ -64,17 +65,7 @@ const WorkRequestForm: React.FC<Props> = ({
 
   useEffect(() => {
     if (jobCategorySelected) {
-      const filteredUsers = users
-        .filter((user) => {
-          const skillset = user.payload.skillset;
-          return skillset === formData.jobCategory;
-        })
-        .map((user) => ({
-          key: user.payload.username,
-          value: user.payload.alias,
-          text: user.payload.alias,
-        }));
-      setUserOptions(filteredUsers);
+      setUserOptions(filterWorkersByJobCategory(users, formData.jobCategory));
     }
   }, [formData.jobCategory, users, jobCategorySelected]);
 
