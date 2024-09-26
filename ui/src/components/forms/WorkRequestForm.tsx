@@ -11,11 +11,6 @@ import { WorkProposal, RateType } from "@daml.js/daml-react/lib/Work/module";
 import RateTypeSelector from "./formComponents/RateTypeSelector";
 import { filterWorkersByJobCategory } from "../../utils/helperFunctions";
 
-// const RateOptions = [
-//   { key: "hourly", value: "HourlyRate", text: "Hourly" },
-//   { key: "flat", value: "FlatFee", text: "Flat" },
-// ];
-
 const validSkillsetValues = Object.values(Skillset).filter(
   (value) => typeof value === "string"
 );
