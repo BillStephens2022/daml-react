@@ -18,7 +18,7 @@ type Props = {
     ledger: Ledger;
   };
   
-  const ActiveWorkContracts: React.FC<Props> = ({
+  const MyContracts: React.FC<Props> = ({
     partyToAlias,
     workProposals,
     workContracts,
@@ -44,4 +44,4 @@ type Props = {
     )
   }
 
-  export default ActiveWorkContracts;
+  export default MyContracts;

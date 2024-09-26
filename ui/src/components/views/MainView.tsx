@@ -16,9 +16,7 @@ import WorkRequestForm from "../forms/WorkRequestForm";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
 import EditSkillsetForm from "../forms/EditSkillsetForm";
 import DepositForm from "../forms/DepositForm";
-import MyRequests from "./MyRequests";
-import MyJobs from "./MyJobs";
-import ActiveWorkContracts from "./ActiveWorkContracts";
+import ContractsView from "./ContractsView";
 import CommunityList from "./CommunityList";
 import HeaderSubHeader from "semantic-ui-react/dist/commonjs/elements/Header/HeaderSubheader";
 import classes from "../../styles/MainView.module.css";
@@ -43,8 +41,6 @@ const MainView: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [showSkillsetModal, setShowSkillsetModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
-  const [view, setView] = useState("jobView");
-  const [activeMenuItem, setActiveMenuItem] = useState("jobView");
 
   const ledger = userContext.useLedger();
 
@@ -218,11 +214,6 @@ const MainView: React.FC = () => {
     }));
   }, [aliases]);
 
-  const handleMenuItemClick = (view: string) => {
-    setView(view);
-    setActiveMenuItem(view);
-  };
-
   return (
     <Container className={classes.mainView}>
       <Grid centered columns={1}>
@@ -332,77 +323,16 @@ const MainView: React.FC = () => {
           </Grid.Column>
         </Grid.Row>
       </Grid>
-      <Segment>
-        <Header>Select a View</Header>
-        <div className="ui grid">
-          <div className="four wide column">
-            <div className="ui vertical fluid tabular menu">
-              <p
-                onClick={() => handleMenuItemClick("jobView")}
-                className={`item ${
-                  activeMenuItem === "jobView" ? "active" : ""
-                }`}
-              >
-                My Jobs
-              </p>
-              <p
-                onClick={() => handleMenuItemClick("requestView")}
-                className={`item ${
-                  activeMenuItem === "requestView" ? "active" : ""
-                }`}
-              >
-                My Requests
-              </p>
-              <p
-                onClick={() => handleMenuItemClick("contractView")}
-                className={`item ${
-                  activeMenuItem === "contractView" ? "active" : ""
-                }`}
-              >
-                Active Contracts
-              </p>
-            </div>
-          </div>
-          <div className="twelve wide stretched column">
-            <div className={`ui segment ${classes.view}`}>
-              {view === "requestView" && (
-                <MyRequests
-                  partyToAlias={partyToAlias}
-                  workProposals={allWorkProposals}
-                  workContracts={allWorkContracts}
-                  username={username}
-                  isWorkerList={false}
-                  isWorkContract={true}
-                  ledger={ledger}
-                />
-              )}
-              {view === "jobView" && (
-                <MyJobs
-                  partyToAlias={partyToAlias}
-                  workProposals={allWorkProposals}
-                  workContracts={allWorkContracts}
-                  username={username}
-                  isWorkerList={false}
-                  isWorkContract={true}
-                  ledger={ledger}
-                />
-              )}
-              {view === "contractView" && (
-                <ActiveWorkContracts
-                  partyToAlias={partyToAlias}
-                  workProposals={allWorkProposals}
-                  workContracts={allWorkContracts}
-                  wallets={userWallets}
-                  username={username}
-                  isWorkerList={false}
-                  isWorkContract={true}
-                  ledger={ledger}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </Segment>
+      <ContractsView 
+        partyToAlias={partyToAlias}
+        workProposals={allWorkProposals}
+        workContracts={allWorkContracts}
+        wallets={userWallets}
+        username={username}
+        isWorkerList={false}
+        isWorkContract={true}
+        ledger={ledger} 
+      />
     </Container>
   );
 };
