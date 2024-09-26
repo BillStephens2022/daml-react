@@ -13,8 +13,6 @@ type Props = {
     workContracts: readonly CreateEvent<Work.WorkContract, undefined, string>[];
     wallets: QueryResult<UserWallet.UserWallet, string, string>;
     username: string;
-    isWorkerList: boolean;
-    isWorkContract: boolean;
     ledger: Ledger;
   };
   
@@ -24,8 +22,6 @@ type Props = {
     workContracts,
     wallets,
     username,
-    isWorkerList,
-    isWorkContract,
     ledger,
   }) => {
     return (

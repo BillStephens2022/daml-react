@@ -26,7 +26,12 @@ const ContractsView: React.FC<Props> = ({ partyToAlias, workContracts, workPropo
   const [view, setView] = useState("jobView");
   const [activeMenuItem, setActiveMenuItem] = useState("jobView");
 
-  const activeContracts = workContracts.filter((contract) => contract.payload.contractStatus === "Active");
+  const activeContracts = workContracts.filter(contract =>
+    ["Active", "Work Completed"].some(status =>
+      contract.payload.contractStatus.startsWith(status)
+    )
+  );
+
   const completedContracts = workContracts.filter((contract) => contract.payload.contractStatus === "Paid");
 
   const handleMenuItemClick = (view: string) => {
@@ -79,9 +84,8 @@ const ContractsView: React.FC<Props> = ({ partyToAlias, workContracts, workPropo
                 partyToAlias={partyToAlias}
                 workProposals={workProposals}
                 workContracts={workContracts}
+                wallets={wallets}
                 username={username}
-                isWorkerList={false}
-                isWorkContract={true}
                 ledger={ledger}
               />
             )}
@@ -90,9 +94,8 @@ const ContractsView: React.FC<Props> = ({ partyToAlias, workContracts, workPropo
                 partyToAlias={partyToAlias}
                 workProposals={workProposals}
                 workContracts={workContracts}
+                wallets={wallets}
                 username={username}
-                isWorkerList={false}
-                isWorkContract={true}
                 ledger={ledger}
               />
             )}
@@ -103,8 +106,6 @@ const ContractsView: React.FC<Props> = ({ partyToAlias, workContracts, workPropo
                 workContracts={activeContracts}
                 wallets={wallets}
                 username={username}
-                isWorkerList={false}
-                isWorkContract={true}
                 ledger={ledger}
               />
             )}
@@ -115,8 +116,6 @@ const ContractsView: React.FC<Props> = ({ partyToAlias, workContracts, workPropo
                 workContracts={completedContracts}
                 wallets={wallets}
                 username={username}
-                isWorkerList={false}
-                isWorkContract={true}
                 ledger={ledger}
               />
             )}
