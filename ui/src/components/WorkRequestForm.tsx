@@ -6,13 +6,8 @@ import {
   Button,
   DropdownProps,
 } from "semantic-ui-react";
-import {
-  RateType,
-  WorkRequest,
-  WorkRequestDAML,
-} from "../types";
 import { Skillset } from "@daml.js/daml-react/lib/Common/module";
-import { Work } from "@daml.js/daml-react";
+import { WorkProposal, RateType } from "@daml.js/daml-react/lib/Work/module";
 
 const RateOptions = [
   { key: "hourly", value: "HourlyRate", text: "Hourly" },
@@ -31,7 +26,7 @@ const jobCategoryOptions = validSkillsetValues.map((skillset) => ({
 }));
 
 interface Props {
-  onSubmit: (data: WorkRequestDAML) => void;
+  onSubmit: (data: WorkProposal) => void;
   onCancel: () => void;
   username: string;
   userAliases: string[];
@@ -42,20 +37,20 @@ const WorkRequestForm: React.FC<Props> = ({
   onSubmit,
   onCancel,
   username,
-  userAliases,
   users,
 }) => {
-  const [formData, setFormData] = useState<WorkRequest>({
+  const [formData, setFormData] = useState<WorkProposal>({
     client: username,
     worker: "",
-    jobCategory: null,
+    jobCategory: "None",
     jobTitle: "",
     jobDescription: "",
     note: "",
-    rateType: "HourlyRate",
-    rateAmount: 0,
-    hours: 0,
-    totalAmount: 0,
+    rateType: {
+      tag: "HourlyRate",
+      value: { rate: "", hours: "" },
+    } as RateType,
+    totalAmount: "",
     status: "Awaiting Review",
   });
 
@@ -82,97 +77,121 @@ const WorkRequestForm: React.FC<Props> = ({
     }
   }, [formData.jobCategory, users, jobCategorySelected]);
 
-  useEffect(() => {
-    setFormData({ ...formData, rateType: formData.rateType }); // Maintain original rateType for UI
-  }, [formData.rateType, formData.rateAmount, formData.hours]);
-
+  // Generalized handleChange function
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    const newValue =
-      name === "rateAmount" || name === "hours" ? parseFloat(value) : value; // Convert value to number for rateAmount
-    setFormData({ ...formData, [name]: newValue });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleJobCategoryChange = (
-    event: React.SyntheticEvent<HTMLElement, Event>,
-    data: DropdownProps
-  ) => {
-    const { value } = data;
-    setFormData({ ...formData, jobCategory: value as Skillset | null }); // Allow setting null
-    setJobCategorySelected(true);
-  };
-
-  const handleWorkerChange = (
-    event: React.SyntheticEvent<HTMLElement, Event>,
-    data: DropdownProps
-  ) => {
-    const { value } = data; // Extract the value from data
-    setFormData({ ...formData, worker: value as string }); // Use value as string
-  };
-
+  // Handle dynamic rate type changes
   const handleRateTypeChange = (
     event: React.SyntheticEvent<HTMLElement, Event>,
     data: DropdownProps
   ) => {
     const { value } = data;
-    setFormData({ ...formData, rateType: value as RateType });
+    setFormData((prev) => ({
+      ...prev,
+      rateType:
+        value === "FlatFee"
+          ? ({ tag: "FlatFee", value: { amount: "" } } as RateType)
+          : ({ tag: "HourlyRate", value: { rate: "", hours: "" } } as RateType),
+    }));
   };
 
+  // Unified handler for rate changes
+  const handleRateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const { rateType } = prev;
+
+      if (rateType.tag === "FlatFee") {
+        // Ensure `FlatFee` has `amount` property
+        return {
+          ...prev,
+          rateType: {
+            tag: "FlatFee",
+            value: {
+              ...rateType.value, // Preserve existing values in case there are other fields
+              amount:
+                name === "amount"
+                  ? value
+                  : (rateType.value as RateType.FlatFee).amount,
+            },
+          },
+        };
+      } else if (rateType.tag === "HourlyRate") {
+        // Ensure `HourlyRate` has `rate` and `hours` properties
+        return {
+          ...prev,
+          rateType: {
+            tag: "HourlyRate",
+            value: {
+              ...rateType.value, // Preserve existing values in case there are other fields
+              rate:
+                name === "rate"
+                  ? value
+                  : (rateType.value as RateType.HourlyRate).rate,
+              hours:
+                name === "hours"
+                  ? value
+                  : (rateType.value as RateType.HourlyRate).hours,
+            },
+          },
+        };
+      } else {
+        // Default case, just return the unchanged form data
+        return prev;
+      }
+    });
+  };
+
+  // Calculate total amount
   useEffect(() => {
-    const calculatedAmount =
-      formData.rateType === "HourlyRate"
-        ? formData.rateAmount * formData.hours
-        : formData.rateAmount;
-    setFormData({ ...formData, totalAmount: calculatedAmount });
-  }, [formData.rateType, formData.rateAmount, formData.hours]);
+    let calculatedAmount = "0.00";
+    if (formData.rateType.tag === "HourlyRate") {
+      calculatedAmount = (
+        Number(formData.rateType.value.rate || 0) *
+        Number(formData.rateType.value.hours || 0)
+      ).toFixed(2);
+    } else if (formData.rateType.tag === "FlatFee") {
+      calculatedAmount = formData.rateType.value.amount || "0.00";
+    }
+    setFormData((prevState) => ({
+      ...prevState,
+      totalAmount: calculatedAmount,
+    }));
+  }, [formData.rateType]);
 
   const handleSubmit = () => {
-    console.log("Form Data: ", formData);
     // Validate jobCategory
     if (!formData.jobCategory) {
       alert("Job Category is required.");
       return;
     }
-    // Construct RateType as per DAML
-    let structuredRateType: Work.RateType;
-    if (formData.rateType === "HourlyRate") {
-      structuredRateType = {
-        tag: "HourlyRate",
-        value: {
-          rate: formData.rateAmount.toFixed(2),
-          hours: formData.hours.toFixed(2),
-        },
-      };
-    } else {
-      structuredRateType = {
-        tag: "FlatFee",
-        value: {
-          amount: formData.rateAmount.toFixed(2),
-        },
-      };
-    }
 
-    // Calculate totalAmount as string
-    const totalAmountDAML =
-      formData.rateType === "HourlyRate"
-        ? (formData.rateAmount * formData.hours).toFixed(2)
-        : formData.rateAmount.toFixed(2);
-
-    const submissionData: WorkRequestDAML = {
-      client: formData.client,
-      worker: formData.worker,
-      jobCategory: formData.jobCategory, // Ensure non-null
-      jobTitle: formData.jobTitle,
-      jobDescription: formData.jobDescription,
-      note: formData.note,
-      rateType: structuredRateType,
-      totalAmount: totalAmountDAML,
-      status: formData.status,
+    const submissionData: WorkProposal = {
+      ...formData,
+      rateType:
+        formData.rateType.tag === "HourlyRate"
+          ? {
+              tag: "HourlyRate",
+              value: {
+                rate: formData.rateType.value.rate,
+                hours: formData.rateType.value.hours,
+              },
+            }
+          : {
+              tag: "FlatFee",
+              value: { amount: formData.rateType.value.amount },
+            },
+      totalAmount: formData.totalAmount,
     };
 
-    console.log("Submission Data: ", submissionData);
     onSubmit(submissionData);
   };
 
@@ -193,7 +212,10 @@ const WorkRequestForm: React.FC<Props> = ({
         <Dropdown
           name="jobCategory"
           value={formData.jobCategory || ""}
-          onChange={handleJobCategoryChange}
+          onChange={(e, data) => {
+            setJobCategorySelected((prev) => !prev);
+            setFormData({ ...formData, jobCategory: data.value as Skillset });
+          }}
           placeholder="Job Category"
           fluid
           search
@@ -210,7 +232,9 @@ const WorkRequestForm: React.FC<Props> = ({
           fluid
           selection
           options={userOptions}
-          onChange={handleWorkerChange}
+          onChange={(e, data) =>
+            setFormData({ ...formData, worker: data.value as string })
+          }
           disabled={!jobCategorySelected}
           required
         />
@@ -248,7 +272,7 @@ const WorkRequestForm: React.FC<Props> = ({
         <label>Rate Type</label>
         <Dropdown
           name="rateType"
-          value={formData.rateType}
+          value={formData.rateType.tag}
           onChange={handleRateTypeChange}
           placeholder="Select Rate Type"
           fluid
@@ -259,45 +283,50 @@ const WorkRequestForm: React.FC<Props> = ({
       </Form.Field>
       <Form.Field>
         <label>
-          {formData.rateType === "FlatFee" ? "Flat Fee:" : "Hourly Rate"}
+          {formData.rateType.tag === "FlatFee" ? "Flat Fee:" : "Hourly Rate"}
         </label>
         <Input
-          type="number"
-          name="rateAmount"
-          value={formData.rateAmount}
-          onChange={handleChange}
+          type="text"
+          name={formData.rateType.tag === "FlatFee" ? "amount" : "rate"}
+          value={
+            formData.rateType.tag === "HourlyRate"
+              ? formData.rateType.value.rate
+              : formData.rateType.value.amount
+          }
+          onChange={handleRateAmountChange}
           placeholder="Rate Amount"
           required
         />
       </Form.Field>
-      {formData.rateType === "HourlyRate" && (
+      {formData.rateType.tag === "HourlyRate" && (
         <>
           <Form.Field>
             <label>Number of Hours</label>
             <Input
-              type="number"
+              type="text"
               name="hours"
-              value={formData.hours}
-              onChange={handleChange}
+              value={formData.rateType.value.hours}
+              onChange={handleRateAmountChange}
               placeholder="Number of Hours"
               required
             />
           </Form.Field>
-          <Form.Field>
-            <label>Total Amount Due</label>
-            <Input
-              type="number"
-              name="totalAmount"
-              value={formData.totalAmount}
-              readOnly
-              placeholder="Total Amount"
-            />
-          </Form.Field>
         </>
       )}
-      <Button type="submit">Submit</Button>
-      <Button onClick={onCancel} type="button">
+      <Form.Field>
+        <label>Total Amount</label>
+        <Input
+          name="totalAmount"
+          value={formData.totalAmount}
+          readOnly
+          placeholder="Total Amount"
+        />
+      </Form.Field>
+      <Button type="button" onClick={onCancel}>
         Cancel
+      </Button>
+      <Button type="submit" primary>
+        Submit
       </Button>
     </Form>
   );
