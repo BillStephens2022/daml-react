@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Form, Input, Button, DropdownProps } from "semantic-ui-react";
-import { WorkRequest, EditWorkRequest } from "../../types";
 import { WorkProposal, RateType } from "@daml.js/daml-react/lib/Work/module";
 import RateTypeSelector from "./formComponents/RateTypeSelector";
 
@@ -8,28 +7,16 @@ import RateTypeSelector from "./formComponents/RateTypeSelector";
 interface Props {
   onSubmit: (data: WorkProposal) => void;
   onCancel: () => void;
-  username: string;
+  initialValues: WorkProposal;
 }
 
 const EditProposalForm: React.FC<Props> = ({
   onSubmit,
   onCancel,
-  username,
+  initialValues
 }) => {
-  const [formData, setFormData] = useState<WorkProposal>({
-    client: username,
-    worker: "",
-    jobCategory: "None",
-    jobTitle: "",
-    jobDescription: "",
-    note: "",
-    rateType: {
-      tag: "HourlyRate",
-      value: { rate: "", hours: "" },
-    } as RateType,
-    totalAmount: "",
-    status: "Awaiting Review",
-  });
+  const [formData, setFormData] = useState<WorkProposal>(initialValues);
+  const [totalAmount, setTotalAmount] = useState<string>("0.00");
 
   // Handle dynamic rate type changes
   const handleRateTypeChange = (
@@ -93,7 +80,6 @@ const EditProposalForm: React.FC<Props> = ({
     });
   };
 
-  // Calculate total amount
   useEffect(() => {
     let calculatedAmount = "0.00";
     if (formData.rateType.tag === "HourlyRate") {
@@ -104,11 +90,15 @@ const EditProposalForm: React.FC<Props> = ({
     } else if (formData.rateType.tag === "FlatFee") {
       calculatedAmount = formData.rateType.value.amount || "0.00";
     }
-    setFormData((prevState) => ({
-      ...prevState,
-      totalAmount: calculatedAmount,
-    }));
-  }, [formData.rateType]);
+    setTotalAmount(calculatedAmount);
+    setFormData({...formData, totalAmount: totalAmount}) // Update totalAmount state
+  }, [
+    formData.rateType,
+    formData.rateType.tag === "HourlyRate" ? formData.rateType.value.rate : undefined,
+    formData.rateType.tag === "HourlyRate" ? formData.rateType.value.hours : undefined,
+    formData.rateType.tag === "FlatFee" ? formData.rateType.value.amount : undefined,
+    totalAmount
+  ]);
 
   // Generalized handleChange function
   const handleChange = (
@@ -143,9 +133,9 @@ const EditProposalForm: React.FC<Props> = ({
               tag: "FlatFee",
               value: { amount: formData.rateType.value.amount },
             },
-      totalAmount: formData.totalAmount,
+            totalAmount: formData.totalAmount,
     };
-
+    console.log("Submitting proposal", submissionData);
     onSubmit(submissionData);
   };
 
@@ -185,6 +175,15 @@ const EditProposalForm: React.FC<Props> = ({
         onRateTypeChange={handleRateTypeChange}
         onRateAmountChange={handleRateAmountChange}
       />
+       <Form.Field>
+        <label>Total Amount Due</label>
+        <Input
+          name="totalAmount"
+          value={totalAmount}
+          readOnly
+          placeholder="Total Amount"
+        />
+      </Form.Field>
       <Button type="submit" primary>
         Submit
       </Button>

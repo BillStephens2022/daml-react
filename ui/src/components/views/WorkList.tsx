@@ -137,6 +137,7 @@ const WorkList: React.FC<Props> = ({
           jobDescription,
           note,
           rateType,
+          totalAmount
         } = formData;
         const revisedJobCategory =
           jobCategory ?? selectedProposal.payload.jobCategory;
@@ -145,6 +146,7 @@ const WorkList: React.FC<Props> = ({
           jobDescription ?? selectedProposal.payload.jobDescription;
         const feedbackText = note ?? selectedProposal.payload.note;
         const adjustedRateType = rateType ?? selectedProposal.payload.rateType;
+        const adjustedTotalAmount = totalAmount ?? selectedProposal.payload.totalAmount;
 
         await ledger.exercise(
           Work.WorkProposal.ReviseProposal,
@@ -155,6 +157,7 @@ const WorkList: React.FC<Props> = ({
             revisedJobDescription,
             feedbackText,
             adjustedRateType,
+            adjustedTotalAmount
           }
         );
 
@@ -519,8 +522,8 @@ const WorkList: React.FC<Props> = ({
                     /hour
                   </p>
                 ) : null
-              ) : (contract.payload as Work.WorkProposal).rateType.tag ===
-                "HourlyRate" ? (
+              ) : (contract.payload as Work.WorkProposal).rateType.tag  ===
+                "HourlyRate"  ? (
                 <p>
                   <strong>Hourly Rate: </strong>
                   {
@@ -588,20 +591,21 @@ const WorkList: React.FC<Props> = ({
                 jobTitle: selectedProposal.payload?.jobTitle ?? "",
                 jobDescription: selectedProposal.payload?.jobDescription ?? "",
                 note: selectedProposal.payload?.note ?? "",
-                rateType: selectedProposal.payload?.rateType.tag ?? "",
-                rateAmount: parseFloat(
-                  selectedProposal.payload?.rateType.tag === "HourlyRate"
-                    ? selectedProposal.payload?.rateType.value.rate ?? "0"
-                    : "0"
-                ),
-                hours: parseFloat(
-                  selectedProposal.payload?.rateType.tag === "HourlyRate"
-                    ? selectedProposal.payload?.rateType.value.hours ?? "0"
-                    : "0"
-                ),
-                totalAmount: parseFloat(
+                // Handle rateType dynamically based on its tag
+                rateType: {
+                  tag: selectedProposal.payload?.rateType.tag,
+                  value: selectedProposal.payload?.rateType.tag === "HourlyRate"
+                    ? {
+                        rate: selectedProposal.payload?.rateType.value.rate ?? 0, 
+                        hours: selectedProposal.payload?.rateType.value.hours ?? 0,
+                      }
+                    : {
+                        amount: selectedProposal.payload?.rateType.value.amount ?? 0,
+                      },
+                } as Work.RateType,
+                totalAmount: String(parseFloat(
                   selectedProposal.payload?.totalAmount ?? "0"
-                ),
+                )),
                 status: selectedProposal.payload?.status ?? "",
               }}
             />

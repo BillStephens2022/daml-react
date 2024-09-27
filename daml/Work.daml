@@ -58,6 +58,7 @@ template WorkProposal
             revisedJobDescription : Text
             feedbackText : Text
             adjustedRateType : RateType
+            adjustedTotalAmount : Decimal
         controller client
         do
           debug "Revising Proposal!"
@@ -67,6 +68,7 @@ template WorkProposal
               jobDescription = revisedJobDescription
               note = feedbackText
               rateType = adjustedRateType
+              totalAmount = adjustedTotalAmount
               status = "Revised - Awaiting Review"
                 
     nonconsuming choice CancelProposal : ()
