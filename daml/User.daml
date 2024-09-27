@@ -52,10 +52,7 @@ template User with
             create UserWallet with
                 username = username
                 walletBalance = initialBalance
-                observers = walletObservers
-                authorizedParties = [username]
               
-    
     choice ChangeSkillset : ContractId User
         with
             newSkillset: Skillset

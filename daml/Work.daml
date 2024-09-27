@@ -2,6 +2,7 @@
 module Work where
 
 import Common (Skillset)
+import Payment
 import UserWallet
 
 type WorkProposalId = ContractId WorkProposal
@@ -100,30 +101,23 @@ template WorkContract
 
     nonconsuming choice MakeContractPayment : ContractId WorkContract
       with
-        clientWalletCid: ContractId UserWallet
-        workerWalletCid: ContractId UserWallet
-        amount: Decimal
-        authorizedParty: Party
+        authorizedParty: Party -- The party authorized to make the payment
+        clientWalletCid: ContractId UserWallet -- The client's wallet contract ID
       controller contractClient
       do
-        -- Fetch client and worker wallets
-        clientWallet <- fetch clientWalletCid
-        workerWallet <- fetch workerWalletCid
-        assertMsg "Insufficient funds" (clientWallet.walletBalance >= amount)
+        -- Ensure the authorized party is in the authorizedParties list
+        assertMsg "The party is not authorized" (authorizedParty == contractClient)
 
-        -- Ensure that contractClient is the username for the clientWalletCid
-        assertMsg "Unauthorized payment attempt" (clientWallet.username == contractClient)
-        assertMsg "Worker wallet mismatch" (workerWallet.username == contractWorker)
+        -- Create a Payment contract
+        paymentCid <- create Payment with
+            client = contractClient
+            worker = contractWorker
+            amount = contractTotalAmount
+            clientWalletCid = clientWalletCid
 
-          -- Ensure the authorized party is in the authorizedParties list
-        assertMsg "The party is not authorized" $ authorizedParty `elem` clientWallet.authorizedParties
+        -- Execute the payment by exercising the MakePayment choice
+        exercise paymentCid MakePayment
 
-        -- Execute the transfer
-        _ <- exercise clientWalletCid TransferFunds with
-          toWalletCid = workerWalletCid
-          amount = contractTotalAmount
-          authorizedParty = authorizedParty
-
-        -- Update contract status
+        -- Update the contract status
         archive self  
         create this with contractStatus = "Paid"

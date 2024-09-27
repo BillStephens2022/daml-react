@@ -10,8 +10,7 @@ import {
 } from "semantic-ui-react";
 import { ContractId, Party } from "@daml/types";
 import { Ledger, CreateEvent, QueryResult } from "@daml/ledger";
-import { Work } from "@daml.js/daml-react";
-import { UserWallet } from "@daml.js/daml-react";
+import { Work, UserWallet, Payment } from "@daml.js/daml-react";
 import RejectForm from "../forms/RejectForm";
 import EditProposalForm from "../forms/EditProposalForm";
 import ContractButton from "../ui/ContractButton";
@@ -137,7 +136,7 @@ const WorkList: React.FC<Props> = ({
           jobDescription,
           note,
           rateType,
-          totalAmount
+          totalAmount,
         } = formData;
         const revisedJobCategory =
           jobCategory ?? selectedProposal.payload.jobCategory;
@@ -146,7 +145,8 @@ const WorkList: React.FC<Props> = ({
           jobDescription ?? selectedProposal.payload.jobDescription;
         const feedbackText = note ?? selectedProposal.payload.note;
         const adjustedRateType = rateType ?? selectedProposal.payload.rateType;
-        const adjustedTotalAmount = totalAmount ?? selectedProposal.payload.totalAmount;
+        const adjustedTotalAmount =
+          totalAmount ?? selectedProposal.payload.totalAmount;
 
         await ledger.exercise(
           Work.WorkProposal.ReviseProposal,
@@ -157,7 +157,7 @@ const WorkList: React.FC<Props> = ({
             revisedJobDescription,
             feedbackText,
             adjustedRateType,
-            adjustedTotalAmount
+            adjustedTotalAmount,
           }
         );
 
@@ -226,61 +226,60 @@ const WorkList: React.FC<Props> = ({
 
       await ledger.exercise(Work.WorkContract.CompleteJob, contractId, {});
 
-      const workerWallet = wallets.contracts.find(
-        (wallet) => wallet.payload.username === contract.payload.contractWorker
-      );
+      // const workerWallet = wallets.contracts.find(
+      //   (wallet) => wallet.payload.username === contract.payload.contractWorker
+      // );
 
-      if (!workerWallet) {
-        console.error(
-          "Worker's wallet not found:",
-          contract.payload.contractWorker
-        );
-        return;
-      }
+      // if (!workerWallet) {
+      //   console.error(
+      //     "Worker's wallet not found:",
+      //     contract.payload.contractWorker
+      //   );
+      //   return;
+      // }
 
-      // Add the client as an observer to the worker's wallet, this will allow the client to make the payment to the worker
-      const [newContractId] = await ledger.exercise(
-        UserWallet.UserWallet.AddObserver,
-        workerWallet.contractId,
-        {
-          newObserver: contract.payload.contractClient,
-        }
-      );
+      // // Add the client as an observer to the worker's wallet, this will allow the client to make the payment to the worker
+      // const [newContractId] = await ledger.exercise(
+      //   UserWallet.UserWallet.AddObserver,
+      //   workerWallet.contractId,
+      //   {
+      //     newObserver: contract.payload.contractClient,
+      //   }
+      // );
 
-      // Refetch the worker's wallet to confirm the observer update
-      let updatedWorkerWallet = await ledger.fetch(
-        UserWallet.UserWallet,
-        newContractId
-      );
+      // // Refetch the worker's wallet to confirm the observer update
+      // let updatedWorkerWallet = await ledger.fetch(
+      //   UserWallet.UserWallet,
+      //   newContractId
+      // );
 
-      if (!updatedWorkerWallet) {
-        console.error("Failed to refetch updated worker's wallet");
-        return;
-      }
+      // if (!updatedWorkerWallet) {
+      //   console.error("Failed to refetch updated worker's wallet");
+      //   return;
+      // }
 
       // Authorize the client to make the payment
-      const [updatedContractId] = await ledger.exercise(
-        UserWallet.UserWallet.AuthorizeParty,
-        updatedWorkerWallet.contractId,
-        {
-          partyToAuthorize: contract.payload.contractClient,
-        }
-      );
+      // const [updatedContractId] = await ledger.exercise(
+      //   UserWallet.UserWallet.AuthorizeParty,
+      //   updatedWorkerWallet.contractId,
+      //   {
+      //     partyToAuthorize: contract.payload.contractClient,
+      //   }
+      // );
 
       // Refetch the worker's wallet to confirm the observer update
-      updatedWorkerWallet = await ledger.fetch(
-        UserWallet.UserWallet,
-        updatedContractId
-      );
+      //   updatedWorkerWallet = await ledger.fetch(
+      //     UserWallet.UserWallet,
+      //     updatedContractId
+      //   );
 
-      if (!updatedWorkerWallet) {
-        console.error(
-          "Failed to refetch final worker's wallet after adding authorizer:",
-          workerWallet.contractId
-        );
-        return;
-      }
-
+      //   if (!updatedWorkerWallet) {
+      //     console.error(
+      //       "Failed to refetch final worker's wallet after adding authorizer:",
+      //       workerWallet.contractId
+      //     );
+      //     return;
+      //   }
     } catch (error) {
       console.error("Error completing job:", error);
     }
@@ -289,48 +288,43 @@ const WorkList: React.FC<Props> = ({
   const handlePayment = async (contractId: ContractId<Work.WorkContract>) => {
     try {
       const contract = await ledger.fetch(Work.WorkContract, contractId);
-
+  
       if (!contract) {
         console.error("Contract is not active, cannot make a payment.");
         return;
       }
-
+  
       const paymentAmount = contract.payload.contractTotalAmount;
-
-      // Find the client's wallet contract
+      const contractClient = contract.payload.contractClient;
+      const contractWorker = contract.payload.contractWorker;
+  
+      // Fetch the client's wallet
       const clientWallet = wallets.contracts.find(
-        (wallet) => wallet.payload.username === contract.payload.contractClient
+        (wallet) => wallet.payload.username === contractClient
       );
-
-      // Ensure client's wallet is loaded
+  
       if (!clientWallet) {
         console.error("Client wallet not found.");
         return;
       }
-
+  
       const clientWalletCid = clientWallet.contractId;
-
-      // Find the worker's wallet contract
-      const workerWallet = wallets.contracts.find(
-        (wallet) => wallet.payload.username === contract.payload.contractWorker
-      );
-
-      // Ensure worker's wallet is loaded
-      if (!workerWallet) {
-        console.error("Worker wallet not found.");
-        return;
-      }
-
-      const workerWalletCid = workerWallet.contractId;
-
-      // Make the payment
-      await ledger.exercise(Work.WorkContract.MakeContractPayment, contractId, {
-        clientWalletCid,
-        workerWalletCid,
+  
+      // Create a Payment contract and initiate payment
+      const paymentCreateEvent = await ledger.create(Payment.Payment, {
+        client: contractClient,
+        worker: contractWorker,
         amount: paymentAmount,
-        authorizedParty: contract.payload.contractClient,
+        clientWalletCid: clientWalletCid,
+        // You don't need to pass the worker wallet, as the ledger will handle it
       });
-
+  
+      const paymentContractId = paymentCreateEvent.contractId;
+  
+      // Exercise MakePayment on the Payment contract
+      await ledger.exercise(Payment.Payment.MakePayment, paymentContractId, {});
+  
+      console.log("Payment successfully made!");
     } catch (error) {
       console.error("Error making payment:", error);
     }
@@ -522,8 +516,8 @@ const WorkList: React.FC<Props> = ({
                     /hour
                   </p>
                 ) : null
-              ) : (contract.payload as Work.WorkProposal).rateType.tag  ===
-                "HourlyRate"  ? (
+              ) : (contract.payload as Work.WorkProposal).rateType.tag ===
+                "HourlyRate" ? (
                 <p>
                   <strong>Hourly Rate: </strong>
                   {
@@ -594,18 +588,23 @@ const WorkList: React.FC<Props> = ({
                 // Handle rateType dynamically based on its tag
                 rateType: {
                   tag: selectedProposal.payload?.rateType.tag,
-                  value: selectedProposal.payload?.rateType.tag === "HourlyRate"
-                    ? {
-                        rate: selectedProposal.payload?.rateType.value.rate ?? 0, 
-                        hours: selectedProposal.payload?.rateType.value.hours ?? 0,
-                      }
-                    : {
-                        amount: selectedProposal.payload?.rateType.value.amount ?? 0,
-                      },
+                  value:
+                    selectedProposal.payload?.rateType.tag === "HourlyRate"
+                      ? {
+                          rate:
+                            selectedProposal.payload?.rateType.value.rate ?? 0,
+                          hours:
+                            selectedProposal.payload?.rateType.value.hours ?? 0,
+                        }
+                      : {
+                          amount:
+                            selectedProposal.payload?.rateType.value.amount ??
+                            0,
+                        },
                 } as Work.RateType,
-                totalAmount: String(parseFloat(
-                  selectedProposal.payload?.totalAmount ?? "0"
-                )),
+                totalAmount: String(
+                  parseFloat(selectedProposal.payload?.totalAmount ?? "0")
+                ),
                 status: selectedProposal.payload?.status ?? "",
               }}
             />

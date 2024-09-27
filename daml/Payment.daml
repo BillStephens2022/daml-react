@@ -1,0 +1,27 @@
+module Payment where
+
+import UserWallet
+
+type PaymentKey = (Party, Party)
+
+template Payment
+  with
+    client : Party
+    worker : Party
+    clientWalletCid: ContractId UserWallet
+    amount : Decimal
+  where
+    signatory [client, worker]
+    key (client, worker) : PaymentKey
+    maintainer key._1, key._2  -- Both client and worker are maintainers
+
+    -- The client makes the payment to the worker
+    choice MakePayment : ContractId UserWallet
+      controller client
+      do
+        -- Deduct funds from the client's wallet
+        clientWallet <- exerciseByKey @UserWallet client DeductFunds with deductionAmount = amount
+        -- Add funds to the worker's wallet
+        exerciseByKey @UserWallet worker AddFunds with additionAmount = amount
+        archive self
+        return clientWallet

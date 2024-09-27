@@ -98,8 +98,6 @@ createUserWallet party = do
     createCmd UserWallet with
       username = party
       walletBalance = 0.00
-      observers = []
-      authorizedParties = [party]
   pure cid
 
 -- | Create Alias contracts for each party with their respective skillsets.
