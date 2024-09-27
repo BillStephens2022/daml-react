@@ -77,7 +77,7 @@ const WorkRequestForm: React.FC<Props> = ({
 
   // Handle dynamic rate type changes
   const handleRateTypeChange = (
-    
+    event: React.SyntheticEvent<HTMLElement>,
     data: DropdownProps
   ) => {
     const { value } = data;

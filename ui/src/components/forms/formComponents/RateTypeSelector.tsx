@@ -5,7 +5,7 @@ import { RateType } from "@daml.js/daml-react/lib/Work/module";
 
 interface RateTypeSelectorProps {
   rateType: RateType;
-  onRateTypeChange: (data: DropdownProps) => void;
+  onRateTypeChange: (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => void;
   onRateAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -34,33 +34,43 @@ const RateTypeSelector: React.FC<RateTypeSelectorProps> = ({
           required
         />
       </Form.Field>
-      <Form.Field>
-        <label>{rateType.tag === "FlatFee" ? "Flat Fee" : "Hourly Rate"}</label>
-        <Input
-          type="text"
-          name={rateType.tag === "FlatFee" ? "amount" : "rate"}
-          value={
-            rateType.tag === "HourlyRate"
-              ? rateType.value.rate
-              : rateType.value.amount
-          }
-          onChange={onRateAmountChange}
-          placeholder="Rate Amount"
-          required
-        />
-      </Form.Field>
-      {rateType.tag === "HourlyRate" && (
+      {rateType.tag === "FlatFee" ? (
         <Form.Field>
-          <label>Number of Hours</label>
+          <label>Flat Fee</label>
           <Input
             type="text"
-            name="hours"
-            value={rateType.value.hours}
+            name="amount"
+            value={rateType.value.amount}
             onChange={onRateAmountChange}
-            placeholder="Number of Hours"
+            placeholder="Flat Fee Amount"
             required
           />
         </Form.Field>
+      ) : (
+        <>
+          <Form.Field>
+            <label>Hourly Rate</label>
+            <Input
+              type="text"
+              name="rate"
+              value={rateType.value.rate}
+              onChange={onRateAmountChange}
+              placeholder="Hourly Rate"
+              required
+            />
+          </Form.Field>
+          <Form.Field>
+            <label>Number of Hours</label>
+            <Input
+              type="text"
+              name="hours"
+              value={rateType.value.hours}
+              onChange={onRateAmountChange}
+              placeholder="Number of Hours"
+              required
+            />
+          </Form.Field>
+        </>
       )}
     </>
   );
