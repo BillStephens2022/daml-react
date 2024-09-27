@@ -1,106 +1,153 @@
 import React, { useState, useEffect } from "react";
-import {
-  Form,
-  Input,
-  Dropdown,
-  Button
-} from "semantic-ui-react";
-import { RateType, WorkRequest, EditWorkRequest, WorkRequestDAML } from "../../types";
-import { Work } from "@daml.js/daml-react";
+import { Form, Input, Button, DropdownProps } from "semantic-ui-react";
+import { WorkRequest, EditWorkRequest } from "../../types";
+import { WorkProposal, RateType } from "@daml.js/daml-react/lib/Work/module";
+import RateTypeSelector from "./formComponents/RateTypeSelector";
 
-const RateOptions = [
-  { key: "hourly", value: "Hourly", text: "Hourly" },
-  { key: "flat", value: "Flat", text: "Flat" },
-];
 
 interface Props {
-  onSubmit: (data: WorkRequestDAML) => void;
+  onSubmit: (data: WorkProposal) => void;
   onCancel: () => void;
-  initialValues: EditWorkRequest;
+  username: string;
 }
 
 const EditProposalForm: React.FC<Props> = ({
   onSubmit,
   onCancel,
-  initialValues,
+  username,
 }) => {
-  const [formData, setFormData] = useState<WorkRequest>(
-    initialValues as WorkRequest
-  );
+  const [formData, setFormData] = useState<WorkProposal>({
+    client: username,
+    worker: "",
+    jobCategory: "None",
+    jobTitle: "",
+    jobDescription: "",
+    note: "",
+    rateType: {
+      tag: "HourlyRate",
+      value: { rate: "", hours: "" },
+    } as RateType,
+    totalAmount: "",
+    status: "Awaiting Review",
+  });
 
+  // Handle dynamic rate type changes
+  const handleRateTypeChange = (
+    event: React.SyntheticEvent<HTMLElement>,
+    data: DropdownProps
+  ) => {
+    const { value } = data;
+    setFormData((prev) => ({
+      ...prev,
+      rateType:
+        value === "FlatFee"
+          ? ({ tag: "FlatFee", value: { amount: "" } } as RateType)
+          : ({ tag: "HourlyRate", value: { rate: "", hours: "" } } as RateType),
+    }));
+  };
+
+  // Unified handler for rate changes
+  const handleRateAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const { rateType } = prev;
+
+      if (rateType.tag === "FlatFee") {
+        // Ensure `FlatFee` has `amount` property
+        return {
+          ...prev,
+          rateType: {
+            tag: "FlatFee",
+            value: {
+              ...rateType.value, // Preserve existing values in case there are other fields
+              amount:
+                name === "amount"
+                  ? value
+                  : (rateType.value as RateType.FlatFee).amount,
+            },
+          },
+        };
+      } else if (rateType.tag === "HourlyRate") {
+        // Ensure `HourlyRate` has `rate` and `hours` properties
+        return {
+          ...prev,
+          rateType: {
+            tag: "HourlyRate",
+            value: {
+              ...rateType.value, // Preserve existing values in case there are other fields
+              rate:
+                name === "rate"
+                  ? value
+                  : (rateType.value as RateType.HourlyRate).rate,
+              hours:
+                name === "hours"
+                  ? value
+                  : (rateType.value as RateType.HourlyRate).hours,
+            },
+          },
+        };
+      } else {
+        // Default case, just return the unchanged form data
+        return prev;
+      }
+    });
+  };
+
+  // Calculate total amount
   useEffect(() => {
-    setFormData({ ...formData, rateType: formData.rateType }); // Maintain original rateType for UI
-  }, [formData, formData.rateType, formData.rateAmount, formData.hours]);
+    let calculatedAmount = "0.00";
+    if (formData.rateType.tag === "HourlyRate") {
+      calculatedAmount = (
+        Number(formData.rateType.value.rate || 0) *
+        Number(formData.rateType.value.hours || 0)
+      ).toFixed(2);
+    } else if (formData.rateType.tag === "FlatFee") {
+      calculatedAmount = formData.rateType.value.amount || "0.00";
+    }
+    setFormData((prevState) => ({
+      ...prevState,
+      totalAmount: calculatedAmount,
+    }));
+  }, [formData.rateType]);
 
-  useEffect(() => {
-    const calculatedAmount =
-      formData.rateType === "HourlyRate"
-        ? formData.rateAmount * formData.hours
-        : formData.rateAmount;
-    setFormData({ ...formData, totalAmount: calculatedAmount });
-  }, [formData, formData.rateType, formData.rateAmount, formData.hours]);
-
+  // Generalized handleChange function
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    const newValue =
-      name === "rateAmount" || name === "hours" ? parseFloat(value) : value; // Convert value to number for rateAmount
-    setFormData({ ...formData, [name]: newValue });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = () => {
-    console.log("Form Data: ", formData);
     // Validate jobCategory
     if (!formData.jobCategory) {
       alert("Job Category is required.");
       return;
     }
-    // Construct RateType as per DAML
-    let structuredRateType: Work.RateType;
-    if (formData.rateType === "HourlyRate") {
-      structuredRateType = {
-        tag: "HourlyRate",
-        value: {
-          rate: formData.rateAmount.toFixed(2),
-          hours: formData.hours.toFixed(2),
-        },
-      };
-    } else {
-      structuredRateType = {
-        tag: "FlatFee",
-        value: {
-          amount: formData.rateAmount.toFixed(2),
-        },
-      };
-    }
 
-    // Calculate totalAmount as string
-    const totalAmountDAML =
-      formData.rateType === "HourlyRate"
-        ? (formData.rateAmount * formData.hours).toFixed(2)
-        : formData.rateAmount.toFixed(2);
-
-    const submissionData: WorkRequestDAML = {
-      client: formData.client,
-      worker: formData.worker,
-      jobCategory: formData.jobCategory, // Ensure non-null
-      jobTitle: formData.jobTitle,
-      jobDescription: formData.jobDescription,
-      note: formData.note,
-      rateType: structuredRateType,
-      totalAmount: totalAmountDAML,
-      status: formData.status,
+    const submissionData: WorkProposal = {
+      ...formData,
+      rateType:
+        formData.rateType.tag === "HourlyRate"
+          ? {
+              tag: "HourlyRate",
+              value: {
+                rate: formData.rateType.value.rate,
+                hours: formData.rateType.value.hours,
+              },
+            }
+          : {
+              tag: "FlatFee",
+              value: { amount: formData.rateType.value.amount },
+            },
+      totalAmount: formData.totalAmount,
     };
 
-    console.log("Submission Data: ", submissionData);
     onSubmit(submissionData);
   };
-
-  // Check if initialValues is not null before using it
-  if (!initialValues) {
-    return null;
-  }
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -133,33 +180,14 @@ const EditProposalForm: React.FC<Props> = ({
           placeholder="Note"
         />
       </Form.Field>
-      <Form.Field>
-        <label>Rate Type</label>
-        <Dropdown
-          name="rateType"
-          value={formData.rateType}
-          onChange={(e, data) =>
-            setFormData({ ...formData, rateType: data.value as RateType })
-          }
-          placeholder="Select Rate Type"
-          fluid
-          selection
-          options={RateOptions}
-          required
-        />
-      </Form.Field>
-      <Form.Field>
-        <label>Rate Amount</label>
-        <Input
-          type="number"
-          name="rateAmount"
-          value={formData.rateAmount.toString()}
-          onChange={handleChange}
-          placeholder="Rate Amount"
-          required
-        />
-      </Form.Field>
-      <Button type="submit" primary>Submit</Button>
+      <RateTypeSelector
+        rateType={formData.rateType}
+        onRateTypeChange={handleRateTypeChange}
+        onRateAmountChange={handleRateAmountChange}
+      />
+      <Button type="submit" primary>
+        Submit
+      </Button>
       <Button onClick={onCancel} type="button">
         Cancel
       </Button>
