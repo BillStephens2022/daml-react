@@ -159,7 +159,7 @@ const EditProposalForm: React.FC<Props> = ({
           required
         />
       </Form.Field>
-      <Button type="submit">Submit</Button>
+      <Button type="submit" primary>Submit</Button>
       <Button onClick={onCancel} type="button">
         Cancel
       </Button>

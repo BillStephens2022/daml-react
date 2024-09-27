@@ -23,7 +23,7 @@ const RejectForm: React.FC<Props> = ({ onSubmit, onCancel }) => {
           onChange={(e) => setFeedback(e.target.value)}
         />
       </Form.Field>
-      <Button type="submit">Submit</Button>
+      <Button type="submit" primary>Submit</Button>
       <Button type="button" onClick={onCancel}>
         Cancel
       </Button>

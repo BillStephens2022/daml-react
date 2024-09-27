@@ -261,7 +261,7 @@ const WorkRequestForm: React.FC<Props> = ({
         onRateAmountChange={handleRateAmountChange}
       />
       <Form.Field>
-        <label>Total Amount</label>
+        <label>Total Amount Due</label>
         <Input
           name="totalAmount"
           value={formData.totalAmount}
