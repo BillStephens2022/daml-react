@@ -42,6 +42,7 @@ template WorkProposal
                 contractRateType = rateType
                 contractTotalAmount = totalAmount
                 contractStatus = "Active Contract - Awaiting Work Completion"
+                workerWalletCid = None
 
     choice RejectProposal : ContractId WorkProposal
         with
@@ -90,14 +91,18 @@ template WorkContract
     contractRateType : RateType
     contractTotalAmount : Decimal
     contractStatus: Text
+    workerWalletCid: Optional (ContractId UserWallet) -- Worker wallet is optional until completion
   where
     signatory contractClient, contractWorker
     
     choice CompleteJob : ContractId WorkContract
       controller contractWorker
       do
+      -- Worker completes the job and authorizes the payment
+        workerWalletCid <- exerciseByKey @UserWallet contractWorker GetWallet -- Worker fetches their own wallet
         create this with
           contractStatus = "Work Completed, Awaiting Payment"
+          workerWalletCid = Some workerWalletCid
 
     nonconsuming choice MakeContractPayment : ContractId WorkContract
       with
@@ -107,6 +112,10 @@ template WorkContract
       do
         -- Ensure the authorized party is in the authorizedParties list
         assertMsg "The party is not authorized" (authorizedParty == contractClient)
+        -- Ensure the worker's wallet is available
+        case workerWalletCid of
+          None -> abort "Worker wallet not authorized"
+          Some _ -> return () -- The wallet is authorized, continue with the payment
 
         -- Create a Payment contract
         paymentCid <- create Payment with

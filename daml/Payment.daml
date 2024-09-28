@@ -11,13 +11,13 @@ template Payment
     clientWalletCid: ContractId UserWallet
     amount : Decimal
   where
-    signatory [client, worker]
+    signatory client, worker
     key (client, worker) : PaymentKey
-    maintainer key._1, key._2  -- Both client and worker are maintainers
+    maintainer key._1 -- The client is the maintainer of the contract
 
     -- The client makes the payment to the worker
     choice MakePayment : ContractId UserWallet
-      controller client
+      controller client, worker
       do
         -- Deduct funds from the client's wallet
         clientWallet <- exerciseByKey @UserWallet client DeductFunds with deductionAmount = amount

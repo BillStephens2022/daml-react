@@ -3,8 +3,11 @@ module UserWallet where
 template UserWallet with
     username: Party
     walletBalance: Decimal
+    observers: [Party]
+    authorizedParties: [Party]
   where
     signatory username
+    observer observers
     key username: Party
     maintainer key
 
@@ -30,4 +33,26 @@ template UserWallet with
         controller username
         do
             create this with walletBalance = walletBalance + additionAmount
+
+    choice AuthorizeParty : ContractId UserWallet
+      with
+        partyToAuthorize: Party
+      controller username
+      do
+        create this with authorizedParties = partyToAuthorize :: authorizedParties
+        
+    -- New choice to add an observer
+    choice AddObserver : ContractId UserWallet
+      with
+        newObserver: Party
+      controller username
+      do
+        assertMsg "Observer already exists" (newObserver `notElem` observers)
+        create this with observers = newObserver :: observers
+
+
+    nonconsuming choice GetWallet : ContractId UserWallet
+        controller username
+        do
+            return self  -- This returns the current wallet contract ID
             
