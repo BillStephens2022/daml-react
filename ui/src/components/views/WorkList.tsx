@@ -24,6 +24,7 @@ type Props = {
   username: string;
   isWorkerList: boolean;
   isWorkContract: boolean;
+  isCompletedContracts?: boolean;
   ledger: Ledger;
 };
 
@@ -35,6 +36,7 @@ const WorkList: React.FC<Props> = ({
   username,
   isWorkerList,
   isWorkContract,
+  isCompletedContracts,
   ledger,
 }) => {
   // state for modal showing the Reject Proposal Form
@@ -62,14 +64,15 @@ const WorkList: React.FC<Props> = ({
 
   const workerHeaders = [
     "Work Proposals to Me",
-    "Please Action- Accept or Reject the Proposal",
+    "Please Action- Accept or Reject the Proposal"
   ];
   const clientHeaders = [
     "My Work Proposals to Others",
     "Pending Worker Approval",
   ];
 
-  const contractHeaders = ["Accepted Work Contracts", "Active Contracts"];
+  const contractHeaders = ["Accepted Work Contracts", "Active Contracts", "Completed Contracts"];
+  const completedContractsSubheader = "Work Completed & Paid in Full";
 
   // Determine which headers, contracts to use based on isWorkContract & isWorkerList
   const headersToUse = isWorkContract
@@ -431,8 +434,8 @@ const WorkList: React.FC<Props> = ({
           <Icon name="wrench" color="blue" />
         )}
         <Header.Content>
-          {headersToUse[0]}
-          <Header.Subheader>{headersToUse[1]}</Header.Subheader>
+          {isCompletedContracts ? contractHeaders[2] : headersToUse[0]}
+          <Header.Subheader>{isCompletedContracts ? completedContractsSubheader : headersToUse[1]}</Header.Subheader>
         </Header.Content>
       </Header>
       <Divider />

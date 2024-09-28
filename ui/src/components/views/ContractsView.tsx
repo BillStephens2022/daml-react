@@ -107,6 +107,7 @@ const ContractsView: React.FC<Props> = ({ partyToAlias, workContracts, workPropo
                 wallets={wallets}
                 username={username}
                 ledger={ledger}
+                isCompletedContracts={false}
               />
             )}
             {view === "completedContractView" && (
@@ -117,6 +118,7 @@ const ContractsView: React.FC<Props> = ({ partyToAlias, workContracts, workPropo
                 wallets={wallets}
                 username={username}
                 ledger={ledger}
+                isCompletedContracts={true}
               />
             )}
           </div>

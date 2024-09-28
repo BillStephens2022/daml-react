@@ -14,6 +14,7 @@ type Props = {
     wallets: QueryResult<UserWallet.UserWallet, string, string>;
     username: string;
     ledger: Ledger;
+    isCompletedContracts: boolean;
   };
   
   const MyContracts: React.FC<Props> = ({
@@ -23,6 +24,7 @@ type Props = {
     wallets,
     username,
     ledger,
+    isCompletedContracts,
   }) => {
     return (
         <div>
@@ -35,6 +37,7 @@ type Props = {
               isWorkerList={false}
               isWorkContract={true}
               ledger={ledger}
+              isCompletedContracts={isCompletedContracts}
             />
         </div>
     )
